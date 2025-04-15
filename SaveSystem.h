@@ -33,8 +33,9 @@ public:
 	/// <param name="isCurrentPatch"></param>
 	/// <param name="SaveFolderPath"></param>
 	/// <returns></returns>
-	static ErrSave SaveProgress(std::list<char*> vehicles, int collectedAmount, bool isCurrentPatch, std::wstring SaveFolderPath);
-	static ErrSave SaveProgressForReplay(std::list<char*> vehicles, int collectedAmount, bool isCurrentPatch, std::wstring SaveFolderPath);
+	static ErrSave SaveProgress(std::list<char*> vehicles, bool isCurrentPatch, std::wstring SaveFolderPath);
+	static ErrSave SaveProgressForReplay(std::list<char*> vehicles, bool isCurrentPatch, std::wstring SaveFolderPath);
+	static ErrSave GetPointerToBeLoadedSaveFile(intptr_t* pointerBuffer);
 
 	/// <summary>
 	/// On first time load the game sets the slot to -1 and stays this way until a save is loaded.
@@ -46,15 +47,22 @@ public:
 	/// <param name="deliveredVehiclesFromSave"> : Returns the list of delivered vehicles from the save file</param>
 	/// <returns></returns>
 	static ErrSave LoadProgressForFirstTime(std::wstring saveFolderPath, std::list<char*>& deliveredVehiclesFromSave);
-
 	/// <summary>
 	/// 
 	/// </summary>
 	static ErrSave LoadProgress(std::wstring saveFolderPath, int saveSlotNumber, std::list<char*>& deliveredVehiclesFromSave);
+	static ErrSave LoadProgressFromReplay(std::wstring saveFolderPath, std::list<char*>& deliveredVehiclesFromSave);
 	/// <summary>
 	/// Quick helper to get the value in the address of global and insert into the pointer for the int.
 	/// </summary>
 	static ErrSave GetLastReadSlotNumber(int* lastSavedSlotBuffer, intptr_t* pointerToLastSavedSlotNumber);
+	/// <summary>
+	/// Quick helper to get the Char 
+	/// </summary>
+	/// <param name="lastSavedSlotBuffer"></param>
+	/// <param name="pointerToLastSavedSlotNumber"></param>
+	/// <returns></returns>
+	static ErrSave GetToBeReadSaveFile(char** ToBeReadSaveFile, intptr_t* pointerToBeReadSaveFile);
 	/// <summary>
 	/// Try get the pointer to the address of the global variable that holds the int value for the last loaded slot.
 	/// </summary>

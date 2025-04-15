@@ -1,6 +1,6 @@
 #pragma once
 #include "Script.h"
-//#include "keyboard.h"
+#include "keyboard.h"
 #include <cstring>
 //taken from Gogsi vehicle spreedsheat.
 // Note: Game works with all the model names in caps only for some reason, be carefull with that.
@@ -377,8 +377,6 @@ enum ScriptStage {
 	DeleteVehicle
 };
 
-
-
 ScriptStage currentStage = ScriptStage::CheckCurrentVehicle;
 bool DidWeAlreadyCheckVehicle = false;
 Blip simeonBlip;
@@ -428,13 +426,23 @@ void TestSaveErr(SaveSystem::ErrSave err) {
 	}
 }
 
+//Pattern Pointers
 intptr_t pSavedSlotNumberPTR;
+intptr_t pToBeLoadedSaveFilePTR;
+// Return of the pointers
 int LastLoadedSaveSlotNumber;
+char* ToBeLoadedSaveFile;
+//Misc
+std::string lastLoadedSaveFile;
 std::wstring pathToSaveFolder;
 //MissionReplay
-bool missionReplayGotCalledThisFrame = false;
-void LoadCurrentSave() {
+bool missionReplayCleanupCalled = false;
+void LoadHookPointers() {
+	//Save Files
 	SaveSystem::GetSaveFilePath(false, &pathToSaveFolder);
+
+	//Pattern Finding
+	// Number of last Loaded Save slot
 	if (SaveSystem::GetPointerToLastLoadedSlotNumber(&pSavedSlotNumberPTR) == SaveSystem::ErrSave::SaveDone)
 	{
 		if (SaveSystem::GetLastReadSlotNumber(&LastLoadedSaveSlotNumber, &pSavedSlotNumberPTR) != SaveSystem::ErrSave::SaveDone)
@@ -450,31 +458,61 @@ void LoadCurrentSave() {
 		CreateHelpText((char*)"something happened and pointers could not be loaded...", true);
 		return;
 	}
+	//char* of to be loaded Save File.
+	if (SaveSystem::GetPointerToBeLoadedSaveFile(&pToBeLoadedSaveFilePTR) == SaveSystem::ErrSave::SaveDone) {
+		if (SaveSystem::GetToBeReadSaveFile(&ToBeLoadedSaveFile,&pToBeLoadedSaveFilePTR) != SaveSystem::ErrSave::SaveDone) {
+			OutputDebugString("something happened address could not be loaded...");
+			CreateHelpText((char*)"something happened address could not be loaded...", true);
+			return;
+		}
+	}
+	else
+	{
+		OutputDebugString("something happened and pointers could not be loaded...");
+		CreateHelpText((char*)"something happened and pointers could not be loaded...", true);
+		return;
+	}
+}
+
+void LoadCurrentSave() {
 
 	// Script got reloaded into prologue, this is probably a new game.
 	// Mission replay does not cause a script reload.
 	if (SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"Prologue1")) > 0)
 	{
-		// Player just loaded a new save file.
+		OutputDebugString("New Mission started, cleaning delivered vehicles");
+		// Player just loaded a new game.
 		// clean everything.
 		deliveredVehicles.clear();
 	}
 	else
 	{
-		if (LastLoadedSaveSlotNumber >= 0 && LastLoadedSaveSlotNumber < 15)
-		{
-			// Player Just loaded a save file.
-			// Load user data from that save.
-			OutputDebugString("Load Save File...");
-			SaveSystem::LoadProgress(pathToSaveFolder, LastLoadedSaveSlotNumber, deliveredVehicles);
+		OutputDebugString("TESTING TO BE LOADED SAVE FILE");
+		OutputDebugString(ToBeLoadedSaveFile);
+		std::string cmp (ToBeLoadedSaveFile);
+		if (missionReplayCleanupCalled && cmp.compare("MISREP0000") == 0) {
+			// Player just got out of a mission replay and is loading everything back.
+			OutputDebugString("Mission replay is over, loading MISREP");
+			SaveSystem::LoadProgressFromReplay(pathToSaveFolder, deliveredVehicles);
+			
 		}
-		else
-		{
-			OutputDebugString("Load Save File for the first time...");
-			SaveSystem::LoadProgressForFirstTime(pathToSaveFolder, deliveredVehicles);
-			// Player Just oppened the game, check the latest saved files.
+		else {
+			if (LastLoadedSaveSlotNumber >= 0 && LastLoadedSaveSlotNumber < 15)
+			{
+				// Player Just loaded a save file.
+				// Load user data from that save.
+				OutputDebugString("Load Save File...");
+				SaveSystem::LoadProgress(pathToSaveFolder, LastLoadedSaveSlotNumber, deliveredVehicles);
+			}
+			else
+			{
+				OutputDebugString("Load Save File for the first time...");
+				SaveSystem::LoadProgressForFirstTime(pathToSaveFolder, deliveredVehicles);
+				// Player Just oppened the game, check the latest saved files.
+			}
 		}
 	}
+	missionReplayCleanupCalled = false;
 }
 
 void QuickAddToDelivered(char* veh)
@@ -524,7 +562,8 @@ void Update() {
 	//Cleanup for mission replay was called, player started mission replay.
 	if (PLAYER::GET_CAUSE_OF_MOST_RECENT_FORCE_CLEANUP() == 64)
 	{
-		missionReplayGotCalledThisFrame = true;
+		missionReplayCleanupCalled = true;
+		SaveSystem::SaveProgressForReplay(deliveredVehicles,false,pathToSaveFolder);
 	}
 
 	// GTA and ScriptHookV don't have a option to directly check if the player just saved the game manually, only auto saves,
@@ -544,7 +583,7 @@ void Update() {
 				for (char* dah : deliveredVehicles) {
 					OutputDebugString(dah);
 				}
-				SaveSystem::ErrSave err = SaveSystem::SaveProgress(deliveredVehicles, deliveredVehicles.size(), false, savepath);
+				SaveSystem::ErrSave err = SaveSystem::SaveProgress(deliveredVehicles, false, savepath);
 				if (err == SaveSystem::ErrSave::FileDoesNotExistOrNotBellowBuffer) {
 					CreateHelpText((char*)"FileDoesNotExistOrNotBellowBuffer", true);
 				}
@@ -591,7 +630,7 @@ void Update() {
 					OutputDebugStringA(a);
 					if (QuickCheckIfDelivered((char*)a)) {
 						alreadyHave = true;
-						CreateHelpText((char*)"Simeon already have this vehicle", false);
+						CreateHelpText((char*)"Simeon already has this vehicle", false);
 						break;
 					}
 					// This vehicle haven't been delivered, tell the player about it and start the script.
@@ -663,19 +702,20 @@ void Update() {
 		break;
 	}
 	case DeleteVehicle:
-		// TODO: instead of only testing the player, test if all passagers got out.
-		// BUG: if player is in hangout with main characters the vehicle will stay.
-		// BUG: if npcs are inside the vehicle, the npc just vanishes.
-		if (!PED::IS_PED_IN_ANY_VEHICLE(PLAYER::PLAYER_PED_ID(), false)) {
-			Vehicle lastDriven = PLAYER::GET_PLAYERS_LAST_VEHICLE();
-			char* vehiclename = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(lastDriven));
-			QuickAddToDelivered(vehiclename);
-			PLAYER::SET_PLAYER_MAY_NOT_ENTER_ANY_VEHICLE(pID);
-			VEHICLE::DELETE_VEHICLE(&lastDriven);
-			CreateHelpText((char*)"Vehicle delivered!", true);
-			currentStage = ScriptStage::CheckCurrentVehicle;
-			//deliveredVehiclesCount++;
-		}
+		//yes.
+		Vehicle lastDriven = PLAYER::GET_PLAYERS_LAST_VEHICLE();
+		if (VEHICLE::IS_VEHICLE_SEAT_FREE(lastDriven, eVehicleSeat::VehicleSeatLeftFront))
+			if (VEHICLE::IS_VEHICLE_SEAT_FREE(lastDriven, eVehicleSeat::VehicleSeatRightFront))
+				if (VEHICLE::IS_VEHICLE_SEAT_FREE(lastDriven, eVehicleSeat::VehicleSeatLeftRear))
+					if (VEHICLE::IS_VEHICLE_SEAT_FREE(lastDriven, eVehicleSeat::VehicleSeatRightRear))
+								if (!PED::IS_PED_IN_ANY_VEHICLE(pPedID, false)) {
+									char* vehiclename = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(lastDriven));
+									QuickAddToDelivered(vehiclename);
+									PLAYER::SET_PLAYER_MAY_NOT_ENTER_ANY_VEHICLE(pID);
+									VEHICLE::DELETE_VEHICLE(&lastDriven);
+									CreateHelpText((char*)"Vehicle delivered!", true);
+									currentStage = ScriptStage::CheckCurrentVehicle;
+								}
 		break;
 	}
 
@@ -697,7 +737,6 @@ void Update() {
 	//STREAMING::IS_MODEL_A_VEHICLE();
 	//ENTITY::GET_ENTITY_MODEL(); // Hash model of a entity. now how to get a entity from a vehicle
 	//draw help text
-	missionReplayGotCalledThisFrame = false;
 }
 
 // Reminder to myself: variables set outside of functions are reserved as globals
@@ -705,7 +744,7 @@ void Update() {
 // the code inside the script is reloaded after transitions and loading screens.
 void ScriptMain() {
 	//Just to make sure everything is correctly loaded.
-	WAIT(500);
+	LoadHookPointers();
 	// Script got reloaded, try read the save files and see if we should do something.
 	LoadCurrentSave();
 	WAIT(1000);
