@@ -379,7 +379,7 @@ enum ScriptStage {
 
 ScriptStage currentStage = ScriptStage::CheckCurrentVehicle;
 bool DidWeAlreadyCheckVehicle = false;
-Blip simeonBlip;
+
 struct TestSave
 {
 	char* test;
@@ -460,7 +460,7 @@ void LoadHookPointers() {
 	}
 	//char* of to be loaded Save File.
 	if (SaveSystem::GetPointerToBeLoadedSaveFile(&pToBeLoadedSaveFilePTR) == SaveSystem::ErrSave::SaveDone) {
-		if (SaveSystem::GetToBeReadSaveFile(&ToBeLoadedSaveFile,&pToBeLoadedSaveFilePTR) != SaveSystem::ErrSave::SaveDone) {
+		if (SaveSystem::GetToBeReadSaveFile(&ToBeLoadedSaveFile, &pToBeLoadedSaveFilePTR) != SaveSystem::ErrSave::SaveDone) {
 			OutputDebugString("something happened address could not be loaded...");
 			CreateHelpText((char*)"something happened address could not be loaded...", true);
 			return;
@@ -489,12 +489,12 @@ void LoadCurrentSave() {
 	{
 		OutputDebugString("TESTING TO BE LOADED SAVE FILE");
 		OutputDebugString(ToBeLoadedSaveFile);
-		std::string cmp (ToBeLoadedSaveFile);
+		std::string cmp(ToBeLoadedSaveFile);
 		if (missionReplayCleanupCalled && cmp.compare("MISREP0000") == 0) {
 			// Player just got out of a mission replay and is loading everything back.
 			OutputDebugString("Mission replay is over, loading MISREP");
 			SaveSystem::LoadProgressFromReplay(pathToSaveFolder, deliveredVehicles);
-			
+
 		}
 		else {
 			if (LastLoadedSaveSlotNumber >= 0 && LastLoadedSaveSlotNumber < 15)
@@ -535,6 +535,29 @@ bool QuickCheckIfDelivered(char* veh)
 	}
 	return false;
 }
+Blip simeonBlip;
+Blip countrysideLightHouseBlip;
+Blip lifeguardBeachBlip;
+
+void EnableAllDeliveryBlips() {
+	//simeonBlip = UI::ADD_BLIP_FOR_COORD(-55, -1112, 26);
+	countrysideLightHouseBlip = UI::ADD_BLIP_FOR_COORD(3426, 5174, 7);
+	lifeguardBeachBlip = UI::ADD_BLIP_FOR_COORD(-1174, -1773, 3);
+	UI::SET_BLIP_FLASHES(countrysideLightHouseBlip, true);
+	UI::SET_BLIP_FLASHES(lifeguardBeachBlip, true);
+	UI::SET_BLIP_FLASH_TIMER(countrysideLightHouseBlip, 7000);
+	UI::SET_BLIP_FLASH_TIMER(lifeguardBeachBlip, 7000);
+
+}
+
+void DisableAllDeliveryBlips() {
+	//if (UI::DOES_BLIP_EXIST(simeonBlip))
+	//	UI::REMOVE_BLIP(&simeonBlip);
+	if (UI::DOES_BLIP_EXIST(countrysideLightHouseBlip))
+		UI::REMOVE_BLIP(&countrysideLightHouseBlip);
+	if (UI::DOES_BLIP_EXIST(lifeguardBeachBlip))
+		UI::REMOVE_BLIP(&lifeguardBeachBlip);
+}
 
 void CreateQuickDebugTextThisFrame(char* text) {
 	//Draw basic text
@@ -553,17 +576,40 @@ void CreateQuickDebugTextThisFrame(char* text) {
 
 bool alreadySaving = false;
 bool wasLoadingScreenActive;
+Vector3 TestPos1;
+Vector3 TestPos2;
 void Update() {
+
 	Ped pPedID = PLAYER::PLAYER_PED_ID();
 	Player pID = PLAYER::PLAYER_ID();
 
+	//if (IsKeyDown(VK_NUMPAD0))
+	//{
+	//	TestPos1 = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+	//	std::string textcomplet = "X: " + std::to_string(TestPos1.x) + " | Y: " + std::to_string(TestPos1.y) + " | Z: " + std::to_string(TestPos1.z);
+	//	CreateHelpText((char*)textcomplet.c_str(), false);
+	//}
+	//if (IsKeyDown(VK_NUMPAD1))
+	//{
+	//	TestPos2 = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+	//	std::string textcomplet = "X: " + std::to_string(TestPos2.x) + " | Y: " + std::to_string(TestPos2.y) + " | Z: " + std::to_string(TestPos2.z);
+	//	CreateHelpText((char*)textcomplet.c_str(), false);
+	//}
+	//if (IsKeyDown(VK_NUMPAD2))
+	//{
+	//	std::string textpos1 = "X: " + std::to_string(TestPos1.x) + " | Y: " + std::to_string(TestPos1.y) + " | Z: " + std::to_string(TestPos1.z);
+	//	std::string textpos2 = "X: " + std::to_string(TestPos2.x) + " | Y: " + std::to_string(TestPos2.y) + " | Z: " + std::to_string(TestPos2.z);
+	//	std::string textcomplet = "pos1:" + textpos1 + "\npos2: " + textpos2;
+	//	GRAPHICS::DRAW_BOX(TestPos1.x, TestPos1.y, TestPos1.z, TestPos2.x, TestPos2.y, TestPos2.z, 2, 176, 135, 125);
+	//	CreateQuickDebugTextThisFrame((char*)textcomplet.c_str());
+	//}
 	//CONST_INT FORCE_CLEANUP_FLAG_REPEAT_PLAY				64
 	//if (PLAYER::HAS_FORCE_CLEANUP_OCCURRED(64) == TRUE) // !!! HAS_FORCE_CLEANUP_OCCURRED don't work for some reason!!!
 	//Cleanup for mission replay was called, player started mission replay.
 	if (PLAYER::GET_CAUSE_OF_MOST_RECENT_FORCE_CLEANUP() == 64)
 	{
 		missionReplayCleanupCalled = true;
-		SaveSystem::SaveProgressForReplay(deliveredVehicles,false,pathToSaveFolder);
+		SaveSystem::SaveProgressForReplay(deliveredVehicles, false, pathToSaveFolder);
 	}
 
 	// GTA and ScriptHookV don't have a option to directly check if the player just saved the game manually, only auto saves,
@@ -607,6 +653,9 @@ void Update() {
 	}
 
 
+	//GRAPHICS::DRAW_BOX(3419, 5152, -1, 3436, 5190, 45, 2, 176, 135, 255);
+	//GRAPHICS::DRAW_BOX(-1173, -1811, 25, -1216, -1768, -1, 2, 176, 135, 125); //lifeguard
+
 	switch (currentStage)
 	{
 	case CheckCurrentVehicle:
@@ -636,7 +685,7 @@ void Update() {
 					// This vehicle haven't been delivered, tell the player about it and start the script.
 					currentStage = ScriptStage::Delivering;
 					CreateHelpText((char*)"This vehicle can be delivered to Simeon", true);
-					simeonBlip = UI::ADD_BLIP_FOR_COORD(-55, -1112, 26);
+					EnableAllDeliveryBlips();
 					break;
 				}
 			}
@@ -650,9 +699,8 @@ void Update() {
 		else
 		{
 			// Player is out of vehicle, stop everything.
-			if (simeonBlip != NULL) {
-				UI::REMOVE_BLIP(&simeonBlip);
-			}
+			DisableAllDeliveryBlips();
+
 		}
 		break;
 
@@ -670,8 +718,13 @@ void Update() {
 		if (PED::IS_PED_IN_ANY_VEHICLE(pPedID, false))
 		{
 			// test if player is in delivery area.
-			if (ENTITY::IS_ENTITY_IN_AREA(pPedID, -59, -1104, 25, -39, -1120, 28, false, false, 0))
+			//if (ENTITY::IS_ENTITY_IN_AREA(pPedID, -59, -1104, 25, -39, -1120, 28, false, false, 0)) // Simeon Dealership
+			// Countryside Lighthouse | Lifeguard tower
+			// Countryside Lighthouse: xyz | Pos 1: 3407, 5193, -1 | Pos 2: 3451, 5150, 45
+			//LifeguardTower: xyz |Pos 1: -1165, -1807, 25 | Pos 2: -1217,-1766 , -1
+			if (ENTITY::IS_ENTITY_IN_AREA(pPedID, 3407, 5193, -1, 3451, 5150, 45, false, false, -1) || ENTITY::IS_ENTITY_IN_AREA(pPedID, -1165, -1807, 25, -1217, -1766, -1, false, false, 0))
 			{
+
 				currentStage = VehicleAtDelivery;
 			}
 		}
@@ -702,26 +755,86 @@ void Update() {
 		break;
 	}
 	case DeleteVehicle:
-		//yes.
+		// BUG: If SET_PLAYER_MAY_NOT_ENTER_ANY_VEHICLE is after GET_PLAYER_LAST_VEHICLE you can't delete the vehicle
+		PLAYER::SET_PLAYER_MAY_NOT_ENTER_ANY_VEHICLE(pID);
 		Vehicle lastDriven = PLAYER::GET_PLAYERS_LAST_VEHICLE();
-		if (VEHICLE::IS_VEHICLE_SEAT_FREE(lastDriven, eVehicleSeat::VehicleSeatLeftFront))
-			if (VEHICLE::IS_VEHICLE_SEAT_FREE(lastDriven, eVehicleSeat::VehicleSeatRightFront))
-				if (VEHICLE::IS_VEHICLE_SEAT_FREE(lastDriven, eVehicleSeat::VehicleSeatLeftRear))
-					if (VEHICLE::IS_VEHICLE_SEAT_FREE(lastDriven, eVehicleSeat::VehicleSeatRightRear))
-								if (!PED::IS_PED_IN_ANY_VEHICLE(pPedID, false)) {
-									char* vehiclename = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(lastDriven));
-									QuickAddToDelivered(vehiclename);
-									PLAYER::SET_PLAYER_MAY_NOT_ENTER_ANY_VEHICLE(pID);
-									VEHICLE::DELETE_VEHICLE(&lastDriven);
-									CreateHelpText((char*)"Vehicle delivered!", true);
-									currentStage = ScriptStage::CheckCurrentVehicle;
-								}
+		//VS_ANY_PASSENGER = -2,				 //Any passenger seat
+		//	VS_DRIVER = -1,						 // Drivers seat
+		//	VS_FRONT_RIGHT = 0,					// Front Right seat
+		//	VS_BACK_LEFT,						//Back left 	
+		//	VS_BACK_RIGHT,						//Back right
+		//	VS_EXTRA_LEFT_1,
+		//	VS_EXTRA_RIGHT_1,
+		//	VS_EXTRA_LEFT_2,
+		//	VS_EXTRA_RIGHT_2,
+		//	VS_EXTRA_LEFT_3,
+		//	VS_EXTRA_RIGHT_3
+		bool someoneStillInCar = false;
+		for (int x = -2; x < 9; x++)
+		{
+			//	if (!VEHICLE::IS_VEHICLE_SEAT_FREE(lastDriven, x)) //this function don't work.
+			Ped pedinSeat = VEHICLE::GET_PED_IN_VEHICLE_SEAT(lastDriven, x); // returns null/0 if seat don't have anyone.
+			if (pedinSeat != NULL) {
+				if (pedinSeat == pPedID)
+				{
+					OutputDebugString("player");
+					someoneStillInCar = true;
+					continue;
+				}
+				if (pedinSeat == 0) {
+					OutputDebugString("NULL");
+				}
+				//flags: WARP PED | DONT CLOSE DOOR | DONT WAIT FOR VEHICLE TO STOP
+				AI::TASK_LEAVE_VEHICLE(pedinSeat, lastDriven, 16 | 256 | 64);
+				OutputDebugString("ASK NPC TO EXIT");
+				someoneStillInCar = true;
+				break;
+			}
+		}
+
+		if (someoneStillInCar) {
+			//Someone still is in the car, test next frame.
+			break;
+		}
+		OutputDebugString("Testing PLayer is in vehicle");
+		WAIT(1000);
+		// Car is probably free to delete;
+		if (!PED::IS_PED_IN_ANY_VEHICLE(pPedID, true)) {
+			Entity attachedVehicle = VEHICLE::GET_ENTITY_ATTACHED_TO_TOW_TRUCK(lastDriven);
+			if (attachedVehicle != -1) {
+				VEHICLE::DETACH_VEHICLE_FROM_TOW_TRUCK(lastDriven, attachedVehicle);
+			}
+			VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(lastDriven);
+			char* vehiclename = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(lastDriven));
+			QuickAddToDelivered(vehiclename);
+			// BUG: if player is in a hangout, for some random reason the script sets the last driven to null but the vehicle never gets deleted.
+			VEHICLE::EXPLODE_VEHICLE(lastDriven, false, false);
+			VEHICLE::DELETE_VEHICLE(&lastDriven);
+			
+
+			CreateHelpText((char*)"Vehicle delivered!", true);
+			currentStage = ScriptStage::CheckCurrentVehicle;
+		}
+
 		break;
 	}
 
 	//Random Ideas - Delete later
+	// 			//ENUM VEHICLE_SEAT
+			//VS_ANY_PASSENGER = -2,				 //Any passenger seat
+			//	VS_DRIVER = -1,						 // Drivers seat
+			//	VS_FRONT_RIGHT = 0,					// Front Right seat
+			//	VS_BACK_LEFT,						//Back left 	
+			//	VS_BACK_RIGHT,						//Back right
+			//	VS_EXTRA_LEFT_1,
+			//	VS_EXTRA_RIGHT_1,
+			//	VS_EXTRA_LEFT_2,
+			//	VS_EXTRA_RIGHT_2,
+			//	VS_EXTRA_LEFT_3,
+			//	VS_EXTRA_RIGHT_3
 	//Vector3 a = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
 	//std::string textcomplet = "X: " + std::to_string(a.x) + " | Y: " + std::to_string(a.y) + " | Z: " + std::to_string(a.z);
+	//CreateQuickDebugTextThisFrame((char*)textcomplet.c_str());
 	//Vehicle lastdrivenvehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
 	////float vehiclehealth = VEHICLE::GET_VEHICLE_BODY_HEALTH(lastdrivenvehicle);
 	////int vehicleClass = VEHICLE::GET_VEHICLE_LAYOUT_HASH(lastdrivenvehicle);
