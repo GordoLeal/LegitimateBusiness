@@ -112,7 +112,6 @@ SaveSystem::ErrSave SaveSystem::SaveProgressForReplay(std::list<char*> vehicles,
 			//Uses a bit more of memory and cpu cycles, but is the easier solution.
 			std::wstring tobetested = folderData.cFileName;
 			//Check only the replay save file and ignore the backup files.
-			//settings and snapmatic are saved in the same folder so we need to ignore them.
 			if (!tobetested.empty())
 				if (tobetested.find(L"MISREP0000") != std::wstring::npos && tobetested.find(L".bak") == std::wstring::npos)
 				{
@@ -291,7 +290,7 @@ SaveSystem::ErrSave FillArrayWithSaveFileData(std::wstring saveFolderPath, std::
 	size_t posOurContent = savefilecontent.find(Identifier);
 	if (posOurContent == std::string::npos) {
 		//Identifier not found, save don't have any data.
-		OutputDebugString("Save File Does have data");
+		OutputDebugString("Save File don't have data");
 		return SaveSystem::ErrSave::SaveFileDontHaveData;
 	}
 	// i don't care for the content that comes before the identifier, also remove the identifier.
@@ -435,7 +434,7 @@ SaveSystem::ErrSave SaveSystem::LoadProgress(std::wstring saveFolderPath, int sa
 		OutputDebugString("File does not exist");
 		return ErrSave::FileDoesNotExist;
 	}
-
+	
 	return FillArrayWithSaveFileData(saveFolderPath, saveFileName, deliveredVehiclesFromSave);
 }
 
