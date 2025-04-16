@@ -585,6 +585,27 @@ void CreateQuickDebugTextThisFrame(char* text) {
 	UI::_DRAW_TEXT(0.5f, 0.5f);
 }
 
+void ShowCollectedAmount() {
+	std::string output;
+	output += std::to_string(deliveredVehicles.size());
+	output += " | ";
+	size_t sizeVL = sizeof(VehiclesList) / sizeof(VehiclesList[0]); // i may change the original vehicle list, so this line automate some of the process.
+	output += std::to_string(sizeVL);
+	//Draw basic text
+	UI::SET_TEXT_FONT(0);
+	UI::SET_TEXT_SCALE(0.1f, 0.1f);
+	UI::SET_TEXT_WRAP(0.0, 1.0);
+	UI::SET_TEXT_CENTRE(1);
+	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
+	UI::SET_TEXT_EDGE(0, 0, 0, 0, 0);
+	UI::SET_TEXT_SCALE(0, 1);
+	UI::SET_TEXT_OUTLINE();
+	UI::_SET_TEXT_ENTRY((char*)"STRING");
+	UI::SET_TEXT_COLOUR(255, 255, 255, 255);
+	UI::_ADD_TEXT_COMPONENT_STRING((char*)output.c_str());
+	UI::_DRAW_TEXT(0.25f, 0.85f);
+}
+
 bool alreadySaving = false;
 bool wasLoadingScreenActive;
 Vector3 TestPos1;
@@ -657,7 +678,8 @@ void Update() {
 	{
 		alreadySaving = false;
 	}
-
+	
+	ShowCollectedAmount();
 
 	switch (currentStage)
 	{
@@ -682,12 +704,12 @@ void Update() {
 					OutputDebugStringA(a);
 					if (QuickCheckIfDelivered((char*)a)) {
 						alreadyHave = true;
-						CreateHelpText((char*)"Simeon already has this vehicle", false);
+						CreateHelpText((char*)"Vehicle already delivered", false);
 						break;
 					}
 					// This vehicle haven't been delivered, tell the player about it and start the script.
 					currentStage = ScriptStage::Delivering;
-					CreateHelpText((char*)"This vehicle can be delivered to Simeon", true);
+					CreateHelpText((char*)"This vehicle can be delivered to the drop point", true);
 					EnableAllDeliveryBlips();
 					break;
 				}
