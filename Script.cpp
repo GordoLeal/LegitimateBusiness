@@ -113,7 +113,7 @@ const char* VehiclesList[] =
 "DUNE",
 "DUNE2",
 //"DUSTER", //FLYING
-//"ELEGY2", //could not find in 1.27. only reference i could find is Rockstar club exclusive?
+"ELEGY2", // Rockstar club exclusive
 "EMPEROR",
 "EMPEROR2",
 //"EMPEROR3", // North Yankton
