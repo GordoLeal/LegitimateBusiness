@@ -206,6 +206,14 @@ SaveSystem::ErrSave SaveSystem::GetPointerToLastLoadedSlotNumber(intptr_t* point
 	if (hModule == NULL) {
 		return ErrSave::ModuleHandleWasNull;
 	}
+
+	uint8_t* BaseAddress = (uint8_t*)hModule;   //Unlock RGSC bonus for Elegy RH8 only on patch 1.27
+
+	if (*(UINT64*)(BaseAddress + 0x1624174) == 0x1416CAE828EC8348)
+	{
+		*(UINT64*)(BaseAddress + 0xF18908) = 0x3390909090C301B0;
+	}
+	
 	MODULEINFO modInfo = { 0 };
 	if (!K32GetModuleInformation(gtaProcess, hModule, &modInfo, sizeof(MODULEINFO)))
 	{
