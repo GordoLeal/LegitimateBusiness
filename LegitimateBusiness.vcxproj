@@ -162,11 +162,13 @@
     <ClCompile Include="keyboard.cpp" />
     <ClCompile Include="SaveSystem.cpp" />
     <ClCompile Include="Script.cpp" />
+    <ClCompile Include="Settings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="keyboard.h" />
     <ClInclude Include="SaveSystem.h" />
     <ClInclude Include="Script.h" />
+    <ClInclude Include="Settings.h" />
     <ClInclude Include="VehicleEnums.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -4,8 +4,8 @@
 #include <filesystem>
 #include <ShlObj.h>
 #include <Shlwapi.h>
-#include <stdexcept>
-#include <exception>
+//#include <stdexcept>
+//#include <exception>
 #include <iostream>
 #include <list>
 
@@ -331,7 +331,7 @@ SaveSystem::ErrSave FillArrayWithSaveFileData(std::wstring saveFolderPath, std::
 		}
 		x++;
 	} while (!hitEnd);
-
+	streamRecentFile.close();
 	return SaveSystem::ErrSave::SaveDone;
 }
 

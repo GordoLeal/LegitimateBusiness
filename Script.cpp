@@ -12,14 +12,14 @@ const char* VehiclesList[] =
 "AKUMA",
 "ALPHA",
 "AMBULANCE",
-"ARMYTANKER",
-"ARMYTRAILER",
-"ARMYTRAILER2",
+//"ARMYTANKER",  //Trailer
+//"ARMYTRAILER", //Trailer
+//"ARMYTRAILER2", //Trailer
 "ASEA",
-"ASEA2",
+//"ASEA2", // North Yankton
 "ASTEROPE",
 "BAGGER",
-"BALETRAILER",
+//"BALETRAILER", //Trailer - Cut from the game
 "BALLER",
 "BALLER2",
 "BANSHEE",
@@ -28,100 +28,100 @@ const char* VehiclesList[] =
 "BATI",
 "BATI2",
 "BENSON",
-"BESRA",
+//"BESRA", // plane
 "BFINJECTION",
 "BIFF",
 "BIFTA",
 "BISON",
-"BISON2",
-"BISON3",
+"BISON2", // Bison with another texture
+"BISON3", // Bison with another color
 "BJXL",
 "BLADE",
 "BLAZER",
 "BLAZER2",
 "BLAZER3",
-"BLIMP",
-"BLIMP2",
+//"BLIMP", // FLYING if returning player bonus is active: you can't spawn it, unless you take it from the air.
+//"BLIMP2", // FLYING returning player bonus
 "BLISTA",
 "BLISTA2",
 "BLISTA3",
 "BMX",
-"BOATTRAILER",
+//"BOATTRAILER", //Trailer
 "BOBCATXL",
 "BODHI2",
 "BOXVILLE",
 "BOXVILLE2",
-"BOXVILLE3",
-"BRAWLER",
+"BOXVILLE3", // One time mission
+//"BRAWLER", //not available in 1.27
 "BTYPE",
 "BUCCANEER",
 "BUFFALO",
 "BUFFALO2",
-"BUFFALO3",
+"BUFFALO3", //returnig player bonus
 "BULLDOZER",
 "BULLET",
 "BURRITO",
 "BURRITO2",
 "BURRITO3",
-"BURRITO4",
-"BURRITO5",
+//"BURRITO4", // Cut from the game in the enhanced version
+//"BURRITO5", // North Yankton
 "BUS",
-"BUZZARD",
-"BUZZARD2",
-"CABLECAR",
+//"BUZZARD", //FLYING
+//"BUZZARD2", //FLYING
+//"CABLECAR", // you can't drive it
 "CADDY",
 "CADDY2",
 "CAMPER",
 "CARBONIZZARE",
 "CARBONRS",
-"CARGOBOB",
-"CARGOBOB2",
-"CARGOBOB3",
-"CARGOPLANE",
+//"CARGOBOB", //FLYING
+//"CARGOBOB2", //FLYING //just a reskin but you can buy
+//"CARGOBOB3", //FLYING // cargobob (TPI) just a reskin
+//"CARGOPLANE", //FLYING
 "CAVALCADE",
 "CAVALCADE2",
 "CHEETAH",
-"CHINO",
+//"CHINO", //Not available in 1.27
 "COACH",
 "COGCABRIO",
 "COMET2",
 "COQUETTE",
 "COQUETTE2",
-"COQUETTE3",
+//"COQUETTE3", //Not available in 1.27
 "CRUISER",
 "CRUSADER",
-"CUBAN800",
-"CUTTER",
+//"CUBAN800", //FLYING
+"CUTTER", //Only available in the big score
 "DAEMON",
 "DILETTANTE",
-"DILETTANTE2",
+"DILETTANTE2", //spawns in Davis Quartz zone at night.
 "DINGHY",
 "DINGHY2",
 "DLOADER",
-"DOCKTRAILER",
+//"DOCKTRAILER",
 "DOCKTUG",
-"DODO",
+//"DODO", //FLYING // Returning Player
 "DOMINATOR",
-"DOMINATOR2",
+"DOMINATOR2", //Returning Player
 "DOUBLE",
 "DUBSTA",
-"DUBSTA2",
+//"DUBSTA2", //just a recolor
 "DUBSTA3",
 "DUKES",
 "DUKES2",
 "DUMP",
 "DUNE",
 "DUNE2",
-"DUSTER",
-"ELEGY2",
+//"DUSTER", //FLYING
+//"ELEGY2", //could not find in 1.27. only reference i could find is Rockstar club exclusive?
 "EMPEROR",
 "EMPEROR2",
-"EMPEROR3",
+//"EMPEROR3", // North Yankton
 "ENTITYXF",
 "EXEMPLAR",
 "F620",
 "FAGGIO2",
-"FBI",
+//"FBI", // Impossible to obtain: https://www.reddit.com/r/GrandTheftAutoV/comments/gj250w/fib_buffalo_unmarked_cruiser_are_no_longer/
 "FBI2",
 "FELON",
 "FELON2",
@@ -132,31 +132,31 @@ const char* VehiclesList[] =
 "FLATBED",
 "FORKLIFT",
 "FQ2",
-"FREIGHT",
-"FREIGHTCAR",
-"FREIGHTCONT1",
-"FREIGHTCONT2",
-"FREIGHTGRAIN",
-"FREIGHTTRAILER",
-"FROGGER",
-"FROGGER2",
+//"FREIGHT", //Train
+//"FREIGHTCAR", //Train
+//"FREIGHTCONT1", //Train
+//"FREIGHTCONT2", //Train
+//"FREIGHTGRAIN", //Train
+//"FREIGHTTRAILER", //TRAILER
+//"FROGGER", //FLYING
+//"FROGGER2", //FLYING
 "FUGITIVE",
 "FUROREGT",
 "FUSILADE",
 "FUTO",
 "GAUNTLET",
-"GAUNTLET2",
+"GAUNTLET2", //Returning Player
 "GBURRITO",
 "GLENDALE",
-"GRAINTRAILER",
+//"GRAINTRAILER", //Trailer
 "GRANGER",
 "GRESLEY",
 "HABANERO",
 "HAKUCHOU",
-"HANDLER",
+//"HANDLER", //Not Possible to reach delivery point
 "HAULER",
 "HEXER",
-"HOTKNIFE",
+"HOTKNIFE", //Returning Player
 "HUNTLEY",
 "INFERNUS",
 "INGOT",
@@ -167,27 +167,27 @@ const char* VehiclesList[] =
 "JB700",
 "JESTER",
 "JESTER2",
-"JET",
-"JETMAX",
+//"JET", //FLYING
+//"JETMAX", //WATER
 "JOURNEY",
 "KALAHARI",
 "LANDSTALKER",
-"LAZER",
+//"LAZER", //FLYING
 "LGUARD",
-"LUXOR",
-"LUXOR2",
-"MAMMATUS",
+//"LUXOR", //FLYING
+//"LUXOR2", //FLYING
+//"MAMMATUS", //FLYING
 "MANANA",
-"MARQUIS",
+//"MARQUIS", //WATER
 "MARSHALL",
 "MASSACRO",
-"MASSACRO2",
-"MAVERICK",
+"MASSACRO2", //Returning Player Bonus
+//"MAVERICK", //FLYING
 "MESA",
-"MESA2",
+//"MESA2", // North Yankton
 "MESA3",
-"METROTRAIN",
-"MILJET",
+//"METROTRAIN", //Train
+//"MILJET", //FLYING
 "MINIVAN",
 "MIXER",
 "MIXER2",
@@ -219,23 +219,23 @@ const char* VehiclesList[] =
 "POLICE3",
 "POLICE4",
 "POLICEB",
-"POLICEOLD1",
-"POLICEOLD2",
+//"POLICEOLD1", //North Yankton
+//"POLICEOLD2", //North Yankton
 "POLICET",
 "POLMAV",
 "PONY",
-"PONY2",
+//"PONY2", //Just a different texture
 "POUNDER",
 "PRAIRIE",
 "PRANGER",
-"PREDATOR",
+//"PREDATOR", //WATER
 "PREMIER",
 "PRIMO",
-"PROPTRAILER",
+//"PROPTRAILER", //Good luck trying to deliver Ortega's trailer.
 "RADI",
-"RAKETRAILER",
+//"RAKETRAILER", //can't drive
 "RANCHERXL",
-"RANCHERXL2",
+//"RANCHERXL2", //North Yankton
 "RAPIDGT",
 "RAPIDGT2",
 "RATLOADER",
@@ -257,7 +257,7 @@ const char* VehiclesList[] =
 "RUMPO2",
 "SABREGT",
 "SADLER",
-"SADLER2",
+//"SADLER2", //North Yankton
 "SANCHEZ",
 "SANCHEZ2",
 "SANDKING",
@@ -266,86 +266,86 @@ const char* VehiclesList[] =
 "SCHWARZER",
 "SCORCHER",
 "SCRAP",
-"SEASHARK",
-"SEASHARK2",
+//"SEASHARK",// WATER
+//"SEASHARK2", //Lifeguard seashark - Just a different texture
 "SEMINOLE",
 "SENTINEL",
 "SENTINEL2",
 "SERRANO",
-"SHAMAL",
+//"SHAMAL", //FLYING
 "SHERIFF",
 "SHERIFF2",
-"SKYLIFT",
+//"SKYLIFT", //FLYING - Can't obtain outside of a setup for big score
 "SLAMVAN",
 "SOVEREIGN",
-"SPEEDER",
+//"SPEEDER", //WATER
 "SPEEDO",
 "SPEEDO2",
-"SQUALO",
+//"SQUALO", //WATER
 "STALION",
 "STALION2",
 "STANIER",
 "STINGER",
 "STOCKADE",
-"STOCKADE3",
+//"STOCKADE3", //Cut from the game
 "STRATUM",
 "STRETCH",
-"STUNT",
-"SUBMERSIBLE",
-"SUBMERSIBLE2",
+//"STUNT", //FLYING
+//"SUBMERSIBLE", //WATER
+//"SUBMERSIBLE2", //WATER
 "SULTAN",
-"SUNTRAP",
+//"SUNTRAP", //WATER
 "SUPERD",
 "SURANO",
 "SURFER",
 "SURFER2",
 "SURGE",
-"SWIFT",
-"SWIFT2",
+//"SWIFT", //FLYING
+//"SWIFT2", //FLYING
 "T20",
 "TACO",
 "TAILGATER",
-"TANKER",
-"TANKERCAR",
+//"TANKER", //Trailer
+//"TANKERCAR", //TRAILER
 "TAXI",
 "THRUST",
 "TIPTRUCK",
 "TIPTRUCK2",
-"TITAN",
+//"TITAN", //FLYING
 "TORNADO",
 "TORNADO2",
 "TORNADO3",
 "TORNADO4",
-"TORO",
+//"TORO", //WATER
 "TOURBUS",
 "TOWTRUCK",
 "TOWTRUCK2",
-"TR2",
-"TR3",
-"TR4",
+//"TR2", //Trailer
+//"TR3", //Trailer
+//"TR4", //Trailer
 "TRACTOR",
 "TRACTOR2",
-"TRACTOR3",
-"TRAILERLOGS",
-"TRAILERS",
-"TRAILERS2",
-"TRAILERS3",
-"TRAILERSMALL",
+//"TRACTOR3", //North Yankton
+//"TRAILERLOGS", //Trailer
+//"TRAILERS", //Trailer
+//"TRAILERS2", //Trailer
+//"TRAILERS3", //Trailer
+//"TRAILERSMALL", //Trailer
 "TRASH",
-"TRFLAT",
+//"TRFLAT", //Trailer
 "TRIBIKE",
-"TRIBIKE2",
-"TRIBIKE3",
-"TROPIC",
+//"TRIBIKE2", //Just another Texture
+//"TRIBIKE3", // Just Another Texture
+//"TROPIC", //WATER
 "TURISMOR",
-"TVTRAILER",
+//"TVTRAILER", //Trailer
 "UTILLITRUCK",
 "UTILLITRUCK2",
 "UTILLITRUCK3",
 "VACCA",
 "VADER",
-"VELUM",
-"VESTRA",
+//"VELUM", //FLYING
+//"VESTRA", //FLYING
 "VIGERO",
 "VINDICATOR",
 "VIRGO",
@@ -360,7 +360,82 @@ const char* VehiclesList[] =
 "ZION2",
 "ZTYPE"
 };
+
+const char* TrailerVehicles[] =
+{
+"ARMYTANKER",  //Trailer
+"ARMYTRAILER", //Trailer
+//"ARMYTRAILER2", //Trailer - Exclusive to mission setup big score
+//"BALETRAILER", // Does not exist
+"BOATTRAILER", //Trailer
+"DOCKTRAILER",
+"GRAINTRAILER", //Trailer
+"TANKER", //Trailer
+//"TANKERCAR", //TRAIN
+"TR2", //Trailer
+"TR3", //Trailer
+"TR4", //Trailer
+"TRAILERLOGS", //Trailer
+"TRAILERS", //Trailer
+"TRAILERS2", //Trailer
+"TRAILERS3", //Trailer
+"TRAILERSMALL", //Trailer
+"TRFLAT", //Trailer
+//"TVTRAILER", //Trailer - Need glitch to leave mission area
+"FREIGHTTRAILER" //TRAILER
+};
+
+const char* FlyingVehicles[] =
+{
+"BESRA",
+"BLIMP", // if returning player bonus is active: you can't spawn it, unless you take it from the air.
+"BLIMP2", //returning player bonus
+"BUZZARD",
+"BUZZARD2",
+"CARGOBOB",
+"CARGOBOB2", //just a reskin but you can buy
+"CARGOBOB3", // cargobob (TPI) just a reskin
+"CARGOPLANE",
+"CUBAN800",
+"DODO", // Returning Player
+"DUSTER", //FLYING
+"FROGGER", //FLYING
+"FROGGER2", //FLYING - Reskin
+"JET", //FLYING
+"LAZER", //FLYING
+"LUXOR", //FLYING
+"LUXOR2", //FLYING
+"MAMMATUS", //FLYING
+"MAVERICK", //FLYING
+"MILJET", //FLYING
+"SHAMAL", //FLYING
+//"SKYLIFT", //FLYING - Can't obtain outside of a setup for big score
+"STUNT", //FLYING
+"SWIFT", //FLYING
+"SWIFT2", //FLYING
+"TITAN", //FLYING
+"VELUM", //FLYING
+"VESTRA" //FLYING
+};
+
+const char* WaterVehicles[] =
+{
+	"JETMAX", //WATER
+	"MARQUIS", //WATER
+	"PREDATOR", //WATER
+"SEASHARK",// WATER
+//"SEASHARK2", //Lifeguard seashark - Just a different texture
+"SPEEDER", //WATER
+"SQUALO", //WATER
+"SUBMERSIBLE", //WATER
+"SUBMERSIBLE2", //WATER
+"SUNTRAP", //WATER
+"TORO", //WATER
+"TROPIC" //WATER
+};
+
 std::list<char*> deliveredVehicles;
+std::list<const char*> fullVehicleList;
 //int deliveredVehiclesCount = 0;
 
 static void CreateHelpText(char* text, bool doSound) {
@@ -379,11 +454,6 @@ enum ScriptStage {
 
 ScriptStage currentStage = ScriptStage::CheckCurrentVehicle;
 bool DidWeAlreadyCheckVehicle = false;
-
-struct TestSave
-{
-	char* test;
-};
 
 void TestSaveErr(SaveSystem::ErrSave err) {
 	switch (err) {
@@ -436,6 +506,7 @@ char* ToBeLoadedSaveFile;
 std::string lastLoadedSaveFile;
 std::wstring pathToSaveFolder;
 std::string lastValueOfToBeLoadedSaveFile;
+Settings gSettings;
 //MissionReplay
 bool missionReplayCalled;
 void LoadHookPointers() {
@@ -475,6 +546,29 @@ void LoadHookPointers() {
 	}
 }
 
+void FillFullVehicleList()
+{
+	fullVehicleList.clear();
+	for (const char* a : VehiclesList) {
+		fullVehicleList.push_back(a);
+	}
+	if (gSettings.EnableFlyingVehicles) {
+		for (const char* b : FlyingVehicles) {
+			fullVehicleList.push_back(b);
+		}
+	}
+	if (gSettings.EnableWaterVehicles) {
+		for (const char* c : WaterVehicles) {
+			fullVehicleList.push_back(c);
+		}
+	}
+	if (gSettings.EnableTrailers) {
+		for (const char* c : WaterVehicles) {
+			fullVehicleList.push_back(c);
+		}
+	}
+}
+
 void LoadCurrentSave() {
 
 	// Script got reloaded into prologue, this is probably a new game.
@@ -494,8 +588,7 @@ void LoadCurrentSave() {
 			std::string cmp(ToBeLoadedSaveFile);
 			OutputDebugString((cmp + "Testando").c_str());
 			if (cmp.find("MISREP000") != std::string::npos) {
-				//absolutamente nada.
-				OutputDebugString("Absolutamente nada");
+				//Nothing is needed
 			}
 			else
 			{
@@ -529,6 +622,8 @@ void LoadCurrentSave() {
 	missionReplayCalled = false;
 }
 
+
+
 void QuickAddToDelivered(char* veh)
 {
 	deliveredVehicles.push_back(veh);
@@ -548,27 +643,53 @@ Blip simeonBlip;
 Blip countrysideLightHouseBlip;
 Blip lifeguardBeachBlip;
 
-void EnableAllDeliveryBlips() {
-	//simeonBlip = UI::ADD_BLIP_FOR_COORD(-55, -1112, 26);
-	countrysideLightHouseBlip = UI::ADD_BLIP_FOR_COORD(3426, 5174, 7);
-	lifeguardBeachBlip = UI::ADD_BLIP_FOR_COORD(-1174, -1773, 3);
-	UI::SET_BLIP_FLASHES(countrysideLightHouseBlip, true);
-	UI::SET_BLIP_FLASHES(lifeguardBeachBlip, true);
-	UI::SET_BLIP_FLASH_TIMER(countrysideLightHouseBlip, 5000);
-	UI::SET_BLIP_FLASH_TIMER(lifeguardBeachBlip, 5000);
-	UI::SET_BLIP_COLOUR(countrysideLightHouseBlip, 53);
-	UI::SET_BLIP_COLOUR(lifeguardBeachBlip, 41);
+void EnableAllDeliveryBlips()
+{
+
+	if (gSettings.BeachAsDelivery) {
+		lifeguardBeachBlip = UI::ADD_BLIP_FOR_COORD(-1174, -1773, 3);
+		UI::SET_BLIP_FLASHES(lifeguardBeachBlip, true);
+		UI::SET_BLIP_FLASH_TIMER(lifeguardBeachBlip, 5000);
+		UI::SET_BLIP_COLOUR(lifeguardBeachBlip, 41);
+	}
+
+	if (gSettings.LightHouseAsDelivery)
+	{
+		countrysideLightHouseBlip = UI::ADD_BLIP_FOR_COORD(3426, 5174, 7);
+		UI::SET_BLIP_FLASHES(countrysideLightHouseBlip, true);
+		UI::SET_BLIP_FLASH_TIMER(countrysideLightHouseBlip, 5000);
+		UI::SET_BLIP_COLOUR(countrysideLightHouseBlip, 53);
+	}
+	if (gSettings.SimeonAsDelivery)
+	{
+		simeonBlip = UI::ADD_BLIP_FOR_COORD(-55, -1112, 26);
+		UI::SET_BLIP_FLASHES(simeonBlip, true);
+		UI::SET_BLIP_FLASH_TIMER(simeonBlip, 5000);
+		UI::SET_BLIP_COLOUR(simeonBlip, BlipColorGreen);
+	}
 
 }
 
 void DisableAllDeliveryBlips() {
-	//if (UI::DOES_BLIP_EXIST(simeonBlip))
-	//	UI::REMOVE_BLIP(&simeonBlip);
+	if (UI::DOES_BLIP_EXIST(simeonBlip))
+		UI::REMOVE_BLIP(&simeonBlip);
 	if (UI::DOES_BLIP_EXIST(countrysideLightHouseBlip))
 		UI::REMOVE_BLIP(&countrysideLightHouseBlip);
 	if (UI::DOES_BLIP_EXIST(lifeguardBeachBlip))
 		UI::REMOVE_BLIP(&lifeguardBeachBlip);
 }
+
+//bool TestIfVehicleIsValid(Hash veh) {
+//	bool valid = false;
+//	if ((VEHICLE::IS_THIS_MODEL_A_HELI(veh) && gSettings.EnableFlyingVehicles) || (VEHICLE::IS_THIS_MODEL_A_PLANE(veh) && gSettings.EnableFlyingVehicles))
+//	{
+//		valid = true;
+//	}
+//	else if (VEHICLE::IS_THIS_MODEL_A_BOAT(veh) && gSettings.EnableWaterVehicles) {
+//		valid = true;
+//	}
+//	return valid;
+//}
 
 void CreateQuickDebugTextThisFrame(char* text) {
 	//Draw basic text
@@ -589,8 +710,7 @@ void ShowCollectedAmount() {
 	std::string output;
 	output += std::to_string(deliveredVehicles.size());
 	output += " | ";
-	size_t sizeVL = sizeof(VehiclesList) / sizeof(VehiclesList[0]); // i may change the original vehicle list, so this line automate some of the process.
-	output += std::to_string(sizeVL);
+	output += std::to_string(fullVehicleList.size());
 	//Draw basic text
 	UI::SET_TEXT_FONT(0);
 	UI::SET_TEXT_SCALE(0.1f, 0.1f);
@@ -608,26 +728,39 @@ void ShowCollectedAmount() {
 
 bool alreadySaving = false;
 bool wasLoadingScreenActive;
-Vector3 TestPos1;
-Vector3 TestPos2;
+//Vector3 TestPos1;
+//Vector3 TestPos2;
 void Update() {
-
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CONSTANTLY USED VARIABLES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	Ped pPedID = PLAYER::PLAYER_PED_ID();
 	Player pID = PLAYER::PLAYER_ID();
 
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	if (IsKeyDown(VK_NUMPAD0))
 	{
-
+		GRAPHICS::DRAW_BOX(3407, 5193, -1, 3451, 5150, 45, 2, 120, 200, 120);
+		GRAPHICS::DRAW_BOX(-1165, -1807, 25, -1217, -1766, -1, 2, 120, 200, 120);
+		GRAPHICS::DRAW_BOX(-38, -1102, -1, -60, -1120, 35, 2, 120, 200, 120);
 	}
-	if (IsKeyDown(VK_NUMPAD1))
+	/*if (IsKeyDown(VK_NUMPAD1))
 	{
-
+		TestPos2 = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
+		std::string textcomplet = "X: " + std::to_string(TestPos2.x) + " | Y: " + std::to_string(TestPos2.y) + " | Z: " + std::to_string(TestPos2.z);
+		CreateHelpText((char*)textcomplet.c_str(), false);
 	}
 	if (IsKeyDown(VK_NUMPAD2))
 	{
-
+		std::string textpos1 = "X: " + std::to_string(TestPos1.x) + " | Y: " + std::to_string(TestPos1.y) + " | Z: " + std::to_string(TestPos1.z);
+		std::string textpos2 = "X: " + std::to_string(TestPos2.x) + " | Y: " + std::to_string(TestPos2.y) + " | Z: " + std::to_string(TestPos2.z);
+		std::string textcomplet = "pos1:" + textpos1 + "\npos2: " + textpos2;
+		GRAPHICS::DRAW_BOX(TestPos1.x, TestPos1.y, TestPos1.z, TestPos2.x, TestPos2.y, TestPos2.z, 2, 176, 135, 125);
+		CreateQuickDebugTextThisFrame((char*)textcomplet.c_str());
+	}*/
+	if (IsKeyDown(VK_NUMPAD3))
+	{
+		VEHICLE::DETACH_VEHICLE_FROM_TRAILER(PLAYER::GET_PLAYERS_LAST_VEHICLE());
 	}
-
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MISSION REPLAY TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// Detect if we started a Mission Replay.
 	if (!missionReplayCalled)
 		if (lastValueOfToBeLoadedSaveFile.find("MISREP") == std::string::npos && std::string(ToBeLoadedSaveFile).find("MISREP") != std::string::npos)
@@ -638,6 +771,8 @@ void Update() {
 		}
 
 	lastValueOfToBeLoadedSaveFile = ToBeLoadedSaveFile;
+
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SAVE LOADING TEST=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 	// GTA and ScriptHookV don't have a option to directly check if the player just saved the game manually, only auto saves,
 	// this require to investigate the globals and too lazy to do this now, so gonna do this check manually.
@@ -678,9 +813,51 @@ void Update() {
 	{
 		alreadySaving = false;
 	}
-	
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- USER INTERFACE =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
 	ShowCollectedAmount();
 
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- TRAILERS TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	//Test if we have trailers inside the zone.
+
+	if (gSettings.EnableTrailers)
+	{
+		const int ARR_SIZE = 255;
+		Vehicle vehInWorld[ARR_SIZE];
+		int vehInWorldCount = worldGetAllVehicles(vehInWorld, ARR_SIZE);
+		for (int b = 0; b < vehInWorldCount; b++)
+		{
+			Vehicle vehTrailerTest = vehInWorld[b];
+			if ((ENTITY::IS_ENTITY_IN_AREA(vehTrailerTest, 3407, 5193, -1, 3451, 5150, 45, false, false, -1) && gSettings.LightHouseAsDelivery)
+				|| (ENTITY::IS_ENTITY_IN_AREA(vehTrailerTest, -1165, -1807, 25, -1217, -1766, -1, false, false, 0) && gSettings.BeachAsDelivery)
+				|| (ENTITY::IS_ENTITY_IN_AREA(vehTrailerTest, -38, -1102, -1, -60, -1120, 35, false, false, 0) && gSettings.SimeonAsDelivery)
+				) 
+			{
+				for (const char* a : TrailerVehicles)
+				{
+					if (VEHICLE::IS_VEHICLE_MODEL(vehTrailerTest, GAMEPLAY::GET_HASH_KEY((char*)a)) == TRUE)
+					{
+						
+						if (!QuickCheckIfDelivered((char*)a))
+						{
+							VEHICLE::DETACH_VEHICLE_FROM_TRAILER(PLAYER::GET_PLAYERS_LAST_VEHICLE());
+							ENTITY::SET_ENTITY_AS_MISSION_ENTITY(vehTrailerTest, TRUE, TRUE);
+							VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(vehTrailerTest);
+							QuickAddToDelivered((char*)a);
+							VEHICLE::DELETE_VEHICLE(&vehTrailerTest);
+							CreateHelpText((char*)"Trailer delivered!", true);
+						}
+						break;
+					}
+				}
+			}
+				
+		}
+	}
+
+
+
+	//  =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SCRIPT STAGES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	switch (currentStage)
 	{
 	case CheckCurrentVehicle:
@@ -695,27 +872,28 @@ void Update() {
 			Vehicle lastDrivenVehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
 			bool foundValidVehicle = false;
 			bool alreadyHave = false;
-			for (const char* a : VehiclesList)
+			for (const char* a : fullVehicleList)
 			{
-				if (VEHICLE::IS_VEHICLE_MODEL(lastDrivenVehicle, GAMEPLAY::GET_HASH_KEY((char*)a)) == TRUE) {
+				if (VEHICLE::IS_VEHICLE_MODEL(lastDrivenVehicle, GAMEPLAY::GET_HASH_KEY((char*)a)) == TRUE) 
+				{
 					foundValidVehicle = true;
 					// The vehicle we have is valid, check the delivered list.
-					OutputDebugStringA("Player is in:");
-					OutputDebugStringA(a);
+					Hash testvehhash = GAMEPLAY::GET_HASH_KEY((char*)a);
 					if (QuickCheckIfDelivered((char*)a)) {
 						alreadyHave = true;
-						CreateHelpText((char*)"Vehicle already delivered", false);
+						CreateHelpText((char*)"Simeon alread has this vehicle!", false);
 						break;
 					}
 					// This vehicle haven't been delivered, tell the player about it and start the script.
 					currentStage = ScriptStage::Delivering;
-					CreateHelpText((char*)"This vehicle can be delivered to the drop point", true);
+					CreateHelpText((char*)"This vehicle can be delivered to Simeon!", true);
 					EnableAllDeliveryBlips();
 					break;
 				}
 			}
 
-			if (alreadyHave || !foundValidVehicle) {
+			if (alreadyHave || !foundValidVehicle)
+			{
 				//Player is in already delivered or vehicle is not in the list, start looking for valid vehicle procedure.
 				currentStage = ScriptStage::LookingForValidVehicle;
 			}
@@ -743,11 +921,15 @@ void Update() {
 		if (PED::IS_PED_IN_ANY_VEHICLE(pPedID, false))
 		{
 			// test if player is in delivery area.
-			//if (ENTITY::IS_ENTITY_IN_AREA(pPedID, -59, -1104, 25, -39, -1120, 28, false, false, 0)) // Simeon Dealership
-			// Countryside Lighthouse | Lifeguard tower
+
+			// Countryside Lighthouse || Lifeguard tower || Simeon
 			// Countryside Lighthouse: xyz | Pos 1: 3407, 5193, -1 | Pos 2: 3451, 5150, 45
-			//LifeguardTower: xyz |Pos 1: -1165, -1807, 25 | Pos 2: -1217,-1766 , -1
-			if (ENTITY::IS_ENTITY_IN_AREA(pPedID, 3407, 5193, -1, 3451, 5150, 45, false, false, -1) || ENTITY::IS_ENTITY_IN_AREA(pPedID, -1165, -1807, 25, -1217, -1766, -1, false, false, 0))
+			// LifeguardTower: xyz |Pos 1: -1165, -1807, 25 | Pos 2: -1217,-1766 , -1
+			// Simeon: xyz | Pos 1: -38,-1102, -1 | Pos 2: -60, -1120, 35
+			if ((ENTITY::IS_ENTITY_IN_AREA(pPedID, 3407, 5193, -1, 3451, 5150, 45, false, false, -1) && gSettings.LightHouseAsDelivery)
+				|| (ENTITY::IS_ENTITY_IN_AREA(pPedID, -1165, -1807, 25, -1217, -1766, -1, false, false, 0) && gSettings.BeachAsDelivery)
+				|| (ENTITY::IS_ENTITY_IN_AREA(pPedID, -38, -1102, -1, -60, -1120, 35, false, false, 0) && gSettings.SimeonAsDelivery)
+				)
 			{
 
 				currentStage = VehicleAtDelivery;
@@ -756,9 +938,7 @@ void Update() {
 		else
 		{
 			// Player got out of vehicle, stop everything.
-			if (simeonBlip != NULL) {
-				UI::REMOVE_BLIP(&simeonBlip);
-			}
+			DisableAllDeliveryBlips();
 			currentStage = ScriptStage::CheckCurrentVehicle;
 		}
 		break;
@@ -782,6 +962,7 @@ void Update() {
 	case DeleteVehicle:
 		// BUG: If SET_PLAYER_MAY_NOT_ENTER_ANY_VEHICLE is after GET_PLAYER_LAST_VEHICLE you can't delete the vehicle
 		PLAYER::SET_PLAYER_MAY_NOT_ENTER_ANY_VEHICLE(pID);
+		VEHICLE::DETACH_VEHICLE_FROM_TRAILER(PLAYER::GET_PLAYERS_LAST_VEHICLE());
 		Vehicle lastDriven = PLAYER::GET_PLAYERS_LAST_VEHICLE();
 		ENTITY::SET_ENTITY_AS_MISSION_ENTITY(lastDriven, true, true);
 		//VS_ANY_PASSENGER = -2,				 //Any passenger seat
@@ -816,15 +997,26 @@ void Update() {
 
 		if (someoneStillInCar) {
 			//Someone still is in the car, test next frame.
+			for (int x = -2; x < 9; x++)
+			{
+				//	if (!VEHICLE::IS_VEHICLE_SEAT_FREE(lastDriven, x)) //this function don't work.
+				Ped pedinSeat = VEHICLE::GET_PED_IN_VEHICLE_SEAT(lastDriven, x); // returns null/0 if seat don't have anyone.
+				if (pedinSeat != NULL) {
+					if (pedinSeat == pPedID)
+					{
+						continue;
+					}
+
+
+					Vector3 pedCoords = ENTITY::GET_ENTITY_COORDS(pedinSeat, false);
+					ENTITY::SET_ENTITY_COORDS(pedinSeat, pedCoords.x, pedCoords.y, pedCoords.z, true, true, true, true);
+					break;
+				}
+			}
 			break;
 		}
-		OutputDebugString("Testing PLayer is in vehicle");
 		// Car is probably free to delete;
 		if (!PED::IS_PED_IN_ANY_VEHICLE(pPedID, true)) {
-			Entity attachedVehicle = VEHICLE::GET_ENTITY_ATTACHED_TO_TOW_TRUCK(lastDriven);
-			if (attachedVehicle != -1) {
-				VEHICLE::DETACH_VEHICLE_FROM_TOW_TRUCK(lastDriven, attachedVehicle);
-			}
 			VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(lastDriven);
 			char* vehiclename = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(lastDriven));
 			QuickAddToDelivered(vehiclename);
@@ -834,15 +1026,6 @@ void Update() {
 			ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&lastDriven);
 			//VEHICLE::DELETE_VEHICLE(&lastDriven);
 			//Just in case the car still somewhere...
-			lastDriven = PLAYER::GET_PLAYERS_LAST_VEHICLE();
-			if (lastDriven != 0)
-			{
-				OutputDebugString("not null");
-			}
-			else
-			{
-				OutputDebugString("is null");
-			}
 			CreateHelpText((char*)"Vehicle delivered!", true);
 
 
@@ -891,6 +1074,9 @@ void Update() {
 void ScriptMain() {
 	//Just to make sure everything is correctly loaded.
 	LoadHookPointers();
+	//Settings
+	gSettings.ReadValuesFromSettingsFile();
+	FillFullVehicleList();
 	// Script got reloaded, try read the save files and see if we should do something.
 	LoadCurrentSave();
 	WAIT(1000);

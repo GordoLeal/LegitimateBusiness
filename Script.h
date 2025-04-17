@@ -10,6 +10,6 @@
 #include "../inc/natives.h"
 #include "../inc/main.h"
 #include "SaveSystem.h"
-
+#include "Settings.h"
 void ScriptMain();
 
