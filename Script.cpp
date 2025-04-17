@@ -752,19 +752,22 @@ const DeliveryArea BeachArea = { -1165, -1807, 25, -1223, -1761, -1 };
 
 StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 
-	if (ENTITY::IS_ENTITY_IN_ANGLED_AREA(entity, LighthouseArea.x1, LighthouseArea.y1, LighthouseArea.z1, LighthouseArea.x2, LighthouseArea.y2, LighthouseArea.z2, 0, true, true, 0)
+	if (ENTITY::IS_ENTITY_IN_AREA(entity, LighthouseArea.x1, LighthouseArea.y1, LighthouseArea.z1, LighthouseArea.x2, LighthouseArea.y2, LighthouseArea.z2, true, true, 0)
 		&& gSettings.LightHouseAsDelivery)
 	{
+		OutputDebugString("Lighthouse tel");
 		return Lighthouse;
 	}
 	if (ENTITY::IS_ENTITY_IN_ANGLED_AREA(entity, BeachArea.x1, BeachArea.y1, BeachArea.z1, BeachArea.x2, BeachArea.y2, BeachArea.z2, 45, false, false, 0)
 		&& gSettings.BeachAsDelivery)
 	{
+		OutputDebugString("beach tel");
 		return Beach;
 	}
 	if (ENTITY::IS_ENTITY_IN_AREA(entity, SimeonArea.x1, SimeonArea.y1, SimeonArea.z1, SimeonArea.x2, SimeonArea.y2, SimeonArea.z2, false, false, 0)
 		&& gSettings.SimeonAsDelivery)
 	{
+		OutputDebugString("Simeon tel");
 		return Simeon;
 	}
 	return none;
@@ -772,9 +775,9 @@ StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 
 //DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-//void DrawBoxArea(DeliveryArea area) {
-//	GRAPHICS::DRAW_BOX(area.x1, area.y1, area.z1, area.x2, area.y2, area.z2, 2, 120, 120, 100);
-//}
+void DrawBoxArea(DeliveryArea area) {
+	GRAPHICS::DRAW_BOX(area.x1, area.y1, area.z1, area.x2, area.y2, area.z2, 2, 120, 120, 100);
+}
 
 
 void Update() {
@@ -783,63 +786,63 @@ void Update() {
 	Player pID = PLAYER::PLAYER_ID();
 
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	//if (IsKeyDown(VK_NUMPAD0))
-	//{
-	//	DrawBoxArea(SimeonArea);
-	//	DrawBoxArea(LighthouseArea);
-	//	DrawBoxArea(BeachArea);
-	//}
-	//if (IsKeyJustUp(VK_NUMPAD1))
-	//{
-	//	//Taken from the nativetrainer
-	//	// get entity to teleport
-	//	Entity e = PLAYER::PLAYER_PED_ID();
-	//	if (PED::IS_PED_IN_ANY_VEHICLE(e, 0))
-	//		e = PED::GET_VEHICLE_PED_IS_USING(e);
+	if (IsKeyDown(VK_NUMPAD0))
+	{
+		DrawBoxArea(SimeonArea);
+		DrawBoxArea(LighthouseArea);
+		DrawBoxArea(BeachArea);
+	}
+	if (IsKeyJustUp(VK_NUMPAD1))
+	{
+		//Taken from the nativetrainer
+		// get entity to teleport
+		Entity e = PLAYER::PLAYER_PED_ID();
+		if (PED::IS_PED_IN_ANY_VEHICLE(e, 0))
+			e = PED::GET_VEHICLE_PED_IS_USING(e);
 
-	//	// get coords
-	//	Vector3 coords;
-	//	bool success = false;
-	//	bool blipFound = false;
-	//	// search for marker blip
-	//	int blipIterator = UI::_GET_BLIP_INFO_ID_ITERATOR();
-	//	for (Blip i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator); UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator))
-	//	{
-	//		if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4)
-	//		{
-	//			coords = UI::GET_BLIP_INFO_ID_COORD(i);
-	//			blipFound = true;
-	//			break;
-	//		}
-	//	}
-	//	if (blipFound)
-	//	{
-	//		// load needed map region and check height levels for ground existence
-	//		bool groundFound = false;
-	//		static float groundCheckHeight[] = {
-	//			100.0, 150.0, 50.0, 0.0, 200.0, 250.0, 300.0, 350.0, 400.0,
-	//			450.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0
-	//		};
-	//		for (int i = 0; i < sizeof(groundCheckHeight) / sizeof(float); i++)
-	//		{
-	//			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, coords.x, coords.y, groundCheckHeight[i], 0, 0, 1);
-	//			WAIT(100);
-	//			if (GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, groundCheckHeight[i], &coords.z, FALSE))
-	//			{
-	//				groundFound = true;
-	//				coords.z += 3.0;
-	//				break;
-	//			}
-	//		}
-	//		// if ground not found then set Z in air and give player a parachute
-	//		if (!groundFound)
-	//		{
-	//			coords.z = 100.0;
-	//			WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), GAMEPLAY::GET_HASH_KEY((char*)"GADGET_PARACHUTE"), 1, 0);
-	//		}
-	//		success = true;
-	//	}
-	//}
+		// get coords
+		Vector3 coords;
+		bool success = false;
+		bool blipFound = false;
+		// search for marker blip
+		int blipIterator = UI::_GET_BLIP_INFO_ID_ITERATOR();
+		for (Blip i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator); UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator))
+		{
+			if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4)
+			{
+				coords = UI::GET_BLIP_INFO_ID_COORD(i);
+				blipFound = true;
+				break;
+			}
+		}
+		if (blipFound)
+		{
+			// load needed map region and check height levels for ground existence
+			bool groundFound = false;
+			static float groundCheckHeight[] = {
+				100.0, 150.0, 50.0, 0.0, 200.0, 250.0, 300.0, 350.0, 400.0,
+				450.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0
+			};
+			for (int i = 0; i < sizeof(groundCheckHeight) / sizeof(float); i++)
+			{
+				ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, coords.x, coords.y, groundCheckHeight[i], 0, 0, 1);
+				WAIT(100);
+				if (GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, groundCheckHeight[i], &coords.z, FALSE))
+				{
+					groundFound = true;
+					coords.z += 3.0;
+					break;
+				}
+			}
+			// if ground not found then set Z in air and give player a parachute
+			if (!groundFound)
+			{
+				coords.z = 100.0;
+				WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), GAMEPLAY::GET_HASH_KEY((char*)"GADGET_PARACHUTE"), 1, 0);
+			}
+			success = true;
+		}
+	}
 
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MISSION REPLAY TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// Detect if we started a Mission Replay.
@@ -1054,7 +1057,7 @@ void Update() {
 		Vehicle lastDriven = PLAYER::GET_PLAYERS_LAST_VEHICLE();
 		//vehicle id / stopping distance / time to stop the vehicle for / bool: no idea what it does
 		//VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 5, 5, true); // Stop vehicle
-		switch (IsEntityInDeliveryArea(lastDriven))
+		switch (IsEntityInDeliveryArea(pPedID))
 		{
 		case none:
 			//wut?
@@ -1064,7 +1067,7 @@ void Update() {
 			break;
 		case Lighthouse:
 			WAIT(1000);
-			ENTITY::SET_ENTITY_COORDS(pPedID, 3351, 5152, 20, false, false, false, false);
+			ENTITY::SET_ENTITY_COORDS(pPedID, 3351, 5152, 20, false, false, false, false); // warp to safe zone.
 			break;
 		case Beach:
 			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 1, 5, true); // Stop vehicle
