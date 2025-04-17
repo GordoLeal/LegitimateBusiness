@@ -6,8 +6,8 @@
 // Note: Game works with all the model names in caps only for some reason, be carefull with that.
 const char* VehiclesList[] =
 {
+"ADDER",
 "AIRBUS",
-"ADDER"
 "AIRTUG",
 "AKUMA",
 "ALPHA",
@@ -63,7 +63,7 @@ const char* VehiclesList[] =
 "BURRITO",
 "BURRITO2",
 "BURRITO3",
-//"BURRITO4", // Cut from the game in the enhanced version
+//"BURRITO4", // Cut from the game in the enhanced version, only used in online
 //"BURRITO5", // North Yankton
 "BUS",
 //"BUZZARD", //FLYING
@@ -630,12 +630,16 @@ void QuickAddToDelivered(char* veh)
 }
 bool QuickCheckIfDelivered(char* veh)
 {
+	std::string a(veh);
 	for (char* v : deliveredVehicles)
 	{
-		if (_stricmp(v, veh) == 0)
-		{
+		if (a.compare(v) ==0) {
 			return true;
 		}
+		/*if (_stricmp(v, veh) == 0)
+		{
+			return true;
+		}*/
 	}
 	return false;
 }
@@ -728,8 +732,29 @@ void ShowCollectedAmount() {
 
 bool alreadySaving = false;
 bool wasLoadingScreenActive;
-//Vector3 TestPos1;
-//Vector3 TestPos2;
+std::string lastValidVehicle = std::string("");
+typedef struct {
+	float x1;
+	float y1;
+	float z1;
+	float x2;
+	float y2;
+	float z2;
+}DeliveryArea;
+
+const DeliveryArea SimeonArea = { -38, -1102, -1, -60, -1120, 35 };
+const DeliveryArea LighthouseArea = { 3407, 5193, -1, 3451, 5150, 45 };
+const DeliveryArea BeachArea = { -1165, -1807, 25, -1217, -1766, -1 };
+
+
+//DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+bool ShowDebug = false; //FOR TESINTG REMOVE LATER
+
+void DrawBoxArea(DeliveryArea area) {
+	GRAPHICS::DRAW_BOX(area.x1, area.y1, area.z1, area.x2, area.y2, area.z2, 2, 120, 120, 100);
+}
+
+
 void Update() {
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CONSTANTLY USED VARIABLES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	Ped pPedID = PLAYER::PLAYER_PED_ID();
@@ -738,27 +763,74 @@ void Update() {
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	if (IsKeyDown(VK_NUMPAD0))
 	{
-		GRAPHICS::DRAW_BOX(3407, 5193, -1, 3451, 5150, 45, 2, 120, 200, 120);
-		GRAPHICS::DRAW_BOX(-1165, -1807, 25, -1217, -1766, -1, 2, 120, 200, 120);
-		GRAPHICS::DRAW_BOX(-38, -1102, -1, -60, -1120, 35, 2, 120, 200, 120);
+		DrawBoxArea(SimeonArea);
+		DrawBoxArea(LighthouseArea);
+		DrawBoxArea(BeachArea);
 	}
-	/*if (IsKeyDown(VK_NUMPAD1))
+	if (IsKeyJustUp(VK_NUMPAD1))
 	{
-		TestPos2 = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
-		std::string textcomplet = "X: " + std::to_string(TestPos2.x) + " | Y: " + std::to_string(TestPos2.y) + " | Z: " + std::to_string(TestPos2.z);
-		CreateHelpText((char*)textcomplet.c_str(), false);
+		//Taken from the nativetrainer
+		// get entity to teleport
+		Entity e = PLAYER::PLAYER_PED_ID();
+		if (PED::IS_PED_IN_ANY_VEHICLE(e, 0))
+			e = PED::GET_VEHICLE_PED_IS_USING(e);
+
+		// get coords
+		Vector3 coords;
+		bool success = false;
+		bool blipFound = false;
+		// search for marker blip
+		int blipIterator = UI::_GET_BLIP_INFO_ID_ITERATOR();
+		for (Blip i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator); UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator))
+		{
+			if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4)
+			{
+				coords = UI::GET_BLIP_INFO_ID_COORD(i);
+				blipFound = true;
+				break;
+			}
+		}
+		if (blipFound)
+		{
+			// load needed map region and check height levels for ground existence
+			bool groundFound = false;
+			static float groundCheckHeight[] = {
+				100.0, 150.0, 50.0, 0.0, 200.0, 250.0, 300.0, 350.0, 400.0,
+				450.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0
+			};
+			for (int i = 0; i < sizeof(groundCheckHeight) / sizeof(float); i++)
+			{
+				ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, coords.x, coords.y, groundCheckHeight[i], 0, 0, 1);
+				WAIT(100);
+				if (GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, groundCheckHeight[i], &coords.z, FALSE))
+				{
+					groundFound = true;
+					coords.z += 3.0;
+					break;
+				}
+			}
+			// if ground not found then set Z in air and give player a parachute
+			if (!groundFound)
+			{
+				coords.z = 100.0;
+				WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), GAMEPLAY::GET_HASH_KEY((char*)"GADGET_PARACHUTE"), 1, 0);
+			}
+			success = true;
+		}
 	}
-	if (IsKeyDown(VK_NUMPAD2))
+	if (IsKeyJustUp(VK_NUMPAD2))
 	{
-		std::string textpos1 = "X: " + std::to_string(TestPos1.x) + " | Y: " + std::to_string(TestPos1.y) + " | Z: " + std::to_string(TestPos1.z);
-		std::string textpos2 = "X: " + std::to_string(TestPos2.x) + " | Y: " + std::to_string(TestPos2.y) + " | Z: " + std::to_string(TestPos2.z);
-		std::string textcomplet = "pos1:" + textpos1 + "\npos2: " + textpos2;
-		GRAPHICS::DRAW_BOX(TestPos1.x, TestPos1.y, TestPos1.z, TestPos2.x, TestPos2.y, TestPos2.z, 2, 176, 135, 125);
-		CreateQuickDebugTextThisFrame((char*)textcomplet.c_str());
-	}*/
-	if (IsKeyDown(VK_NUMPAD3))
+		ShowDebug = !ShowDebug;
+		
+	}
+	if (IsKeyJustUp(VK_NUMPAD3))
 	{
-		VEHICLE::DETACH_VEHICLE_FROM_TRAILER(PLAYER::GET_PLAYERS_LAST_VEHICLE());
+		DWORD model = GAMEPLAY::GET_HASH_KEY((char*)"BURRITO");
+		STREAMING::REQUEST_MODEL(model);
+		while (!STREAMING::HAS_MODEL_LOADED(model)) WAIT(0);
+		Vector3 coords = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER::PLAYER_PED_ID(), 0.0, 5.0, 0.0);
+		Vehicle veh = VEHICLE::CREATE_VEHICLE(model, coords.x, coords.y, coords.z, 0.0, 1, 1);
+		VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(veh);
 	}
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MISSION REPLAY TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// Detect if we started a Mission Replay.
@@ -831,13 +903,13 @@ void Update() {
 			if ((ENTITY::IS_ENTITY_IN_AREA(vehTrailerTest, 3407, 5193, -1, 3451, 5150, 45, false, false, -1) && gSettings.LightHouseAsDelivery)
 				|| (ENTITY::IS_ENTITY_IN_AREA(vehTrailerTest, -1165, -1807, 25, -1217, -1766, -1, false, false, 0) && gSettings.BeachAsDelivery)
 				|| (ENTITY::IS_ENTITY_IN_AREA(vehTrailerTest, -38, -1102, -1, -60, -1120, 35, false, false, 0) && gSettings.SimeonAsDelivery)
-				) 
+				)
 			{
 				for (const char* a : TrailerVehicles)
 				{
 					if (VEHICLE::IS_VEHICLE_MODEL(vehTrailerTest, GAMEPLAY::GET_HASH_KEY((char*)a)) == TRUE)
 					{
-						
+
 						if (!QuickCheckIfDelivered((char*)a))
 						{
 							VEHICLE::DETACH_VEHICLE_FROM_TRAILER(PLAYER::GET_PLAYERS_LAST_VEHICLE());
@@ -851,7 +923,7 @@ void Update() {
 					}
 				}
 			}
-				
+
 		}
 	}
 
@@ -872,22 +944,30 @@ void Update() {
 			Vehicle lastDrivenVehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
 			bool foundValidVehicle = false;
 			bool alreadyHave = false;
+
+			Hash lastDriveModelHash = ENTITY::GET_ENTITY_MODEL(lastDrivenVehicle);
+			VEHICLE::GET_VEHICLE_CLASS_FROM_NAME(lastDriveModelHash);
+			OutputDebugString("player last drive model hash:");
+			OutputDebugString(std::to_string(lastDriveModelHash).c_str());
+
 			for (const char* a : fullVehicleList)
 			{
-				if (VEHICLE::IS_VEHICLE_MODEL(lastDrivenVehicle, GAMEPLAY::GET_HASH_KEY((char*)a)) == TRUE) 
+
+				if (VEHICLE::IS_VEHICLE_MODEL(lastDrivenVehicle, GAMEPLAY::GET_HASH_KEY((char*)a)) == TRUE)
 				{
 					foundValidVehicle = true;
 					// The vehicle we have is valid, check the delivered list.
-					Hash testvehhash = GAMEPLAY::GET_HASH_KEY((char*)a);
 					if (QuickCheckIfDelivered((char*)a)) {
 						alreadyHave = true;
 						CreateHelpText((char*)"Simeon alread has this vehicle!", false);
 						break;
 					}
+					
 					// This vehicle haven't been delivered, tell the player about it and start the script.
 					currentStage = ScriptStage::Delivering;
 					CreateHelpText((char*)"This vehicle can be delivered to Simeon!", true);
 					EnableAllDeliveryBlips();
+					lastValidVehicle = a;
 					break;
 				}
 			}
@@ -1018,17 +1098,13 @@ void Update() {
 		// Car is probably free to delete;
 		if (!PED::IS_PED_IN_ANY_VEHICLE(pPedID, true)) {
 			VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(lastDriven);
-			char* vehiclename = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(lastDriven));
-			QuickAddToDelivered(vehiclename);
+			QuickAddToDelivered((char*)lastValidVehicle.c_str());
 			// BUG: if player is in a hangout, for some random reason the script sets the last driven to null but the vehicle never gets deleted.
-			//VEHICLE::EXPLODE_VEHICLE(lastDriven, false, true);
 			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(lastDriven, 0, 0, 0, true, true, true);
+			VEHICLE::EXPLODE_VEHICLE(lastDriven, false, true);
 			ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&lastDriven);
 			//VEHICLE::DELETE_VEHICLE(&lastDriven);
-			//Just in case the car still somewhere...
 			CreateHelpText((char*)"Vehicle delivered!", true);
-
-
 			currentStage = ScriptStage::CheckCurrentVehicle;
 		}
 
