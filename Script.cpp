@@ -1,7 +1,7 @@
 #pragma once
 #include "Script.h"
 #include "keyboard.h"
-#include <cstring>
+//#include <cstring>
 //taken from Gogsi vehicle spreedsheat.
 // Note: Game works with all the model names in caps only for some reason, be carefull with that.
 const char* VehiclesList[] =
@@ -195,7 +195,7 @@ const char* VehiclesList[] =
 "MONSTER",
 "MOWER",
 "MULE",
-"MULE2",
+//"MULE2", // ONLINE ONLY
 "NEMESIS",
 "NINEF",
 "NINEF2",
@@ -334,8 +334,8 @@ const char* VehiclesList[] =
 "TRASH",
 //"TRFLAT", //Trailer
 "TRIBIKE",
-//"TRIBIKE2", //Just another Texture
-//"TRIBIKE3", // Just Another Texture
+"TRIBIKE2", //Just another Texture
+"TRIBIKE3", // Just Another Texture
 //"TROPIC", //WATER
 "TURISMOR",
 //"TVTRAILER", //Trailer
@@ -437,13 +437,6 @@ const char* WaterVehicles[] =
 std::list<char*> deliveredVehicles;
 std::list<const char*> fullVehicleList;
 //int deliveredVehiclesCount = 0;
-
-static void CreateHelpText(char* text, bool doSound) {
-	UI::_SET_TEXT_COMPONENT_FORMAT((char*)"STRING");
-	UI::_ADD_TEXT_COMPONENT_STRING(text);
-	UI::_DISPLAY_HELP_TEXT_FROM_STRING_LABEL(0, 0, doSound, -1);
-}
-
 enum ScriptStage {
 	CheckCurrentVehicle,
 	LookingForValidVehicle,
@@ -453,48 +446,53 @@ enum ScriptStage {
 };
 
 ScriptStage currentStage = ScriptStage::CheckCurrentVehicle;
-bool DidWeAlreadyCheckVehicle = false;
+//bool DidWeAlreadyCheckVehicle = false;
 
-void TestSaveErr(SaveSystem::ErrSave err) {
-	switch (err) {
-	case SaveSystem::SaveDone:
-		CreateHelpText((char*)"it worked", true);
-		break;
-	case SaveSystem::FileDoesNotExist:
-		CreateHelpText((char*)"file does not exist", true);
-		break;
-	case SaveSystem::FolderNotFound:
-		CreateHelpText((char*)"folder not found", true);
-		break;
-	case SaveSystem::DocumentsFolderNotFound:
-		CreateHelpText((char*)"DocumentsFolderNotFound", true);
-		break;
-	case SaveSystem::EnhancedFolderEmpty:
-		CreateHelpText((char*)"EnhancedFolderEmpty", true);
-		break;
-	case SaveSystem::EnhancedFolderNotFound:
-		CreateHelpText((char*)"EnhancedFolderEmpty", true);
-		break;
-	case SaveSystem::OldPatchFolderEmpty:
-		CreateHelpText((char*)"oldpatch empty", true);
-		break;
-	case SaveSystem::OldPatchFolderNotFound:
-		CreateHelpText((char*)"oldpatchnotfoundd", true);
-		break;
-	case SaveSystem::AddressToPaternNotFound:
-		CreateHelpText((char*)"AddressToPaternNotFound", true);
-		break;
-	case SaveSystem::CouldNotGetGTAVModule:
-		CreateHelpText((char*)"CouldNotGetGTAVModule", true);
-		break;
-	case SaveSystem::ModuleHandleWasNull:
-		CreateHelpText((char*)"ModuleHandleWasNull", true);
-		break;
-	case SaveSystem::UNK:
-		CreateHelpText((char*)"UNK", true);
-		break;
-	}
+static void CreateHelpText(char* text, bool doSound) {
+	UI::_SET_TEXT_COMPONENT_FORMAT((char*)"STRING");
+	UI::_ADD_TEXT_COMPONENT_STRING(text);
+	UI::_DISPLAY_HELP_TEXT_FROM_STRING_LABEL(0, 0, doSound, -1);
 }
+//void TestSaveErr(SaveSystem::ErrSave err) {
+//	switch (err) {
+//	case SaveSystem::SaveDone:
+//		CreateHelpText((char*)"it worked", true);
+//		break;
+//	case SaveSystem::FileDoesNotExist:
+//		CreateHelpText((char*)"file does not exist", true);
+//		break;
+//	case SaveSystem::FolderNotFound:
+//		CreateHelpText((char*)"folder not found", true);
+//		break;
+//	case SaveSystem::DocumentsFolderNotFound:
+//		CreateHelpText((char*)"DocumentsFolderNotFound", true);
+//		break;
+//	case SaveSystem::EnhancedFolderEmpty:
+//		CreateHelpText((char*)"EnhancedFolderEmpty", true);
+//		break;
+//	case SaveSystem::EnhancedFolderNotFound:
+//		CreateHelpText((char*)"EnhancedFolderEmpty", true);
+//		break;
+//	case SaveSystem::OldPatchFolderEmpty:
+//		CreateHelpText((char*)"oldpatch empty", true);
+//		break;
+//	case SaveSystem::OldPatchFolderNotFound:
+//		CreateHelpText((char*)"oldpatchnotfoundd", true);
+//		break;
+//	case SaveSystem::AddressToPaternNotFound:
+//		CreateHelpText((char*)"AddressToPaternNotFound", true);
+//		break;
+//	case SaveSystem::CouldNotGetGTAVModule:
+//		CreateHelpText((char*)"CouldNotGetGTAVModule", true);
+//		break;
+//	case SaveSystem::ModuleHandleWasNull:
+//		CreateHelpText((char*)"ModuleHandleWasNull", true);
+//		break;
+//	case SaveSystem::UNK:
+//		CreateHelpText((char*)"UNK", true);
+//		break;
+//	}
+//}
 
 //Pattern Pointers
 intptr_t pSavedSlotNumberPTR;
@@ -633,16 +631,13 @@ bool QuickCheckIfDelivered(char* veh)
 	std::string a(veh);
 	for (char* v : deliveredVehicles)
 	{
-		if (a.compare(v) ==0) {
+		if (a.compare(v) == 0) {
 			return true;
 		}
-		/*if (_stricmp(v, veh) == 0)
-		{
-			return true;
-		}*/
 	}
 	return false;
 }
+
 Blip simeonBlip;
 Blip countrysideLightHouseBlip;
 Blip lifeguardBeachBlip;
@@ -695,20 +690,20 @@ void DisableAllDeliveryBlips() {
 //	return valid;
 //}
 
-void CreateQuickDebugTextThisFrame(char* text) {
-	//Draw basic text
-	UI::SET_TEXT_FONT(0);
-	UI::SET_TEXT_SCALE(0.5f, 0.5f);
-	UI::SET_TEXT_WRAP(0.0, 1.0);
-	UI::SET_TEXT_CENTRE(1);
-	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
-	UI::SET_TEXT_EDGE(0, 0, 0, 0, 0);
-	UI::SET_TEXT_SCALE(0, 1);
-	UI::_SET_TEXT_ENTRY((char*)"STRING");
-	UI::SET_TEXT_COLOUR(255, 255, 255, 255);
-	UI::_ADD_TEXT_COMPONENT_STRING(text);
-	UI::_DRAW_TEXT(0.5f, 0.5f);
-}
+//void CreateQuickDebugTextThisFrame(char* text) {
+//	//Draw basic text
+//	UI::SET_TEXT_FONT(0);
+//	UI::SET_TEXT_SCALE(0.5f, 0.5f);
+//	UI::SET_TEXT_WRAP(0.0, 1.0);
+//	UI::SET_TEXT_CENTRE(1);
+//	UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
+//	UI::SET_TEXT_EDGE(0, 0, 0, 0, 0);
+//	UI::SET_TEXT_SCALE(0, 1);
+//	UI::_SET_TEXT_ENTRY((char*)"STRING");
+//	UI::SET_TEXT_COLOUR(255, 255, 255, 255);
+//	UI::_ADD_TEXT_COMPONENT_STRING(text);
+//	UI::_DRAW_TEXT(0.5f, 0.5f);
+//}
 
 void ShowCollectedAmount() {
 	std::string output;
@@ -733,6 +728,8 @@ void ShowCollectedAmount() {
 bool alreadySaving = false;
 bool wasLoadingScreenActive;
 std::string lastValidVehicle = std::string("");
+
+// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-  Testing player in Area =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 typedef struct {
 	float x1;
 	float y1;
@@ -742,17 +739,42 @@ typedef struct {
 	float z2;
 }DeliveryArea;
 
-const DeliveryArea SimeonArea = { -38, -1102, -1, -60, -1120, 35 };
-const DeliveryArea LighthouseArea = { 3407, 5193, -1, 3451, 5150, 45 };
-const DeliveryArea BeachArea = { -1165, -1807, 25, -1217, -1766, -1 };
+enum StatusEntityInArea {
+	none,
+	Simeon,
+	Beach,
+	Lighthouse
+};
 
+const DeliveryArea SimeonArea = { -38, -1102, -1, -60, -1120, 35 };
+const DeliveryArea LighthouseArea = { 3459, 5148, 45, 3369, 5197, -1 };
+const DeliveryArea BeachArea = { -1165, -1807, 25, -1223, -1761, -1 };
+
+StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
+
+	if (ENTITY::IS_ENTITY_IN_ANGLED_AREA(entity, LighthouseArea.x1, LighthouseArea.y1, LighthouseArea.z1, LighthouseArea.x2, LighthouseArea.y2, LighthouseArea.z2, 0, true, true, 0)
+		&& gSettings.LightHouseAsDelivery)
+	{
+		return Lighthouse;
+	}
+	if (ENTITY::IS_ENTITY_IN_ANGLED_AREA(entity, BeachArea.x1, BeachArea.y1, BeachArea.z1, BeachArea.x2, BeachArea.y2, BeachArea.z2, 45, false, false, 0)
+		&& gSettings.BeachAsDelivery)
+	{
+		return Beach;
+	}
+	if (ENTITY::IS_ENTITY_IN_AREA(entity, SimeonArea.x1, SimeonArea.y1, SimeonArea.z1, SimeonArea.x2, SimeonArea.y2, SimeonArea.z2, false, false, 0)
+		&& gSettings.SimeonAsDelivery)
+	{
+		return Simeon;
+	}
+	return none;
+}
 
 //DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-bool ShowDebug = false; //FOR TESINTG REMOVE LATER
 
-void DrawBoxArea(DeliveryArea area) {
-	GRAPHICS::DRAW_BOX(area.x1, area.y1, area.z1, area.x2, area.y2, area.z2, 2, 120, 120, 100);
-}
+//void DrawBoxArea(DeliveryArea area) {
+//	GRAPHICS::DRAW_BOX(area.x1, area.y1, area.z1, area.x2, area.y2, area.z2, 2, 120, 120, 100);
+//}
 
 
 void Update() {
@@ -761,77 +783,64 @@ void Update() {
 	Player pID = PLAYER::PLAYER_ID();
 
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	if (IsKeyDown(VK_NUMPAD0))
-	{
-		DrawBoxArea(SimeonArea);
-		DrawBoxArea(LighthouseArea);
-		DrawBoxArea(BeachArea);
-	}
-	if (IsKeyJustUp(VK_NUMPAD1))
-	{
-		//Taken from the nativetrainer
-		// get entity to teleport
-		Entity e = PLAYER::PLAYER_PED_ID();
-		if (PED::IS_PED_IN_ANY_VEHICLE(e, 0))
-			e = PED::GET_VEHICLE_PED_IS_USING(e);
+	//if (IsKeyDown(VK_NUMPAD0))
+	//{
+	//	DrawBoxArea(SimeonArea);
+	//	DrawBoxArea(LighthouseArea);
+	//	DrawBoxArea(BeachArea);
+	//}
+	//if (IsKeyJustUp(VK_NUMPAD1))
+	//{
+	//	//Taken from the nativetrainer
+	//	// get entity to teleport
+	//	Entity e = PLAYER::PLAYER_PED_ID();
+	//	if (PED::IS_PED_IN_ANY_VEHICLE(e, 0))
+	//		e = PED::GET_VEHICLE_PED_IS_USING(e);
 
-		// get coords
-		Vector3 coords;
-		bool success = false;
-		bool blipFound = false;
-		// search for marker blip
-		int blipIterator = UI::_GET_BLIP_INFO_ID_ITERATOR();
-		for (Blip i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator); UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator))
-		{
-			if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4)
-			{
-				coords = UI::GET_BLIP_INFO_ID_COORD(i);
-				blipFound = true;
-				break;
-			}
-		}
-		if (blipFound)
-		{
-			// load needed map region and check height levels for ground existence
-			bool groundFound = false;
-			static float groundCheckHeight[] = {
-				100.0, 150.0, 50.0, 0.0, 200.0, 250.0, 300.0, 350.0, 400.0,
-				450.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0
-			};
-			for (int i = 0; i < sizeof(groundCheckHeight) / sizeof(float); i++)
-			{
-				ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, coords.x, coords.y, groundCheckHeight[i], 0, 0, 1);
-				WAIT(100);
-				if (GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, groundCheckHeight[i], &coords.z, FALSE))
-				{
-					groundFound = true;
-					coords.z += 3.0;
-					break;
-				}
-			}
-			// if ground not found then set Z in air and give player a parachute
-			if (!groundFound)
-			{
-				coords.z = 100.0;
-				WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), GAMEPLAY::GET_HASH_KEY((char*)"GADGET_PARACHUTE"), 1, 0);
-			}
-			success = true;
-		}
-	}
-	if (IsKeyJustUp(VK_NUMPAD2))
-	{
-		ShowDebug = !ShowDebug;
-		
-	}
-	if (IsKeyJustUp(VK_NUMPAD3))
-	{
-		DWORD model = GAMEPLAY::GET_HASH_KEY((char*)"BURRITO");
-		STREAMING::REQUEST_MODEL(model);
-		while (!STREAMING::HAS_MODEL_LOADED(model)) WAIT(0);
-		Vector3 coords = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER::PLAYER_PED_ID(), 0.0, 5.0, 0.0);
-		Vehicle veh = VEHICLE::CREATE_VEHICLE(model, coords.x, coords.y, coords.z, 0.0, 1, 1);
-		VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(veh);
-	}
+	//	// get coords
+	//	Vector3 coords;
+	//	bool success = false;
+	//	bool blipFound = false;
+	//	// search for marker blip
+	//	int blipIterator = UI::_GET_BLIP_INFO_ID_ITERATOR();
+	//	for (Blip i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator); UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator))
+	//	{
+	//		if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4)
+	//		{
+	//			coords = UI::GET_BLIP_INFO_ID_COORD(i);
+	//			blipFound = true;
+	//			break;
+	//		}
+	//	}
+	//	if (blipFound)
+	//	{
+	//		// load needed map region and check height levels for ground existence
+	//		bool groundFound = false;
+	//		static float groundCheckHeight[] = {
+	//			100.0, 150.0, 50.0, 0.0, 200.0, 250.0, 300.0, 350.0, 400.0,
+	//			450.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0
+	//		};
+	//		for (int i = 0; i < sizeof(groundCheckHeight) / sizeof(float); i++)
+	//		{
+	//			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, coords.x, coords.y, groundCheckHeight[i], 0, 0, 1);
+	//			WAIT(100);
+	//			if (GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, groundCheckHeight[i], &coords.z, FALSE))
+	//			{
+	//				groundFound = true;
+	//				coords.z += 3.0;
+	//				break;
+	//			}
+	//		}
+	//		// if ground not found then set Z in air and give player a parachute
+	//		if (!groundFound)
+	//		{
+	//			coords.z = 100.0;
+	//			WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), GAMEPLAY::GET_HASH_KEY((char*)"GADGET_PARACHUTE"), 1, 0);
+	//		}
+	//		success = true;
+	//	}
+	//}
+
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MISSION REPLAY TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// Detect if we started a Mission Replay.
 	if (!missionReplayCalled)
@@ -900,10 +909,14 @@ void Update() {
 		for (int b = 0; b < vehInWorldCount; b++)
 		{
 			Vehicle vehTrailerTest = vehInWorld[b];
-			if ((ENTITY::IS_ENTITY_IN_AREA(vehTrailerTest, 3407, 5193, -1, 3451, 5150, 45, false, false, -1) && gSettings.LightHouseAsDelivery)
-				|| (ENTITY::IS_ENTITY_IN_AREA(vehTrailerTest, -1165, -1807, 25, -1217, -1766, -1, false, false, 0) && gSettings.BeachAsDelivery)
-				|| (ENTITY::IS_ENTITY_IN_AREA(vehTrailerTest, -38, -1102, -1, -60, -1120, 35, false, false, 0) && gSettings.SimeonAsDelivery)
-				)
+			/*if ((ENTITY::IS_ENTITY_IN_ANGLED_AREA(vehTrailerTest, LighthouseArea.x1, LighthouseArea.y1, LighthouseArea.z1, LighthouseArea.x2, LighthouseArea.y2, LighthouseArea.z2,0, true, true, 0)
+				&& gSettings.LightHouseAsDelivery)
+				|| (ENTITY::IS_ENTITY_IN_ANGLED_AREA(vehTrailerTest, BeachArea.x1, BeachArea.y1, BeachArea.z1, BeachArea.x2, BeachArea.y2, BeachArea.z2,45, false, false, 0)
+					&& gSettings.BeachAsDelivery)
+				|| (ENTITY::IS_ENTITY_IN_AREA(vehTrailerTest, SimeonArea.x1, SimeonArea.y1, SimeonArea.z1, SimeonArea.x2, SimeonArea.y2, SimeonArea.z2, false, false, 0)
+					&& gSettings.SimeonAsDelivery)
+				)*/
+			if (IsEntityInDeliveryArea(vehTrailerTest) != none)
 			{
 				for (const char* a : TrailerVehicles)
 				{
@@ -912,12 +925,18 @@ void Update() {
 
 						if (!QuickCheckIfDelivered((char*)a))
 						{
+							VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(GAMEPLAY::GET_HASH_KEY((char*)a));
 							VEHICLE::DETACH_VEHICLE_FROM_TRAILER(PLAYER::GET_PLAYERS_LAST_VEHICLE());
 							ENTITY::SET_ENTITY_AS_MISSION_ENTITY(vehTrailerTest, TRUE, TRUE);
 							VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(vehTrailerTest);
 							QuickAddToDelivered((char*)a);
 							VEHICLE::DELETE_VEHICLE(&vehTrailerTest);
-							CreateHelpText((char*)"Trailer delivered!", true);
+							std::string trHelper;
+							trHelper += "Trailer Delivered to Simeon!";
+							trHelper += "(";
+							trHelper += a;
+							trHelper += ")";
+							CreateHelpText((char*)trHelper.c_str(), true);
 						}
 						break;
 					}
@@ -959,10 +978,10 @@ void Update() {
 					// The vehicle we have is valid, check the delivered list.
 					if (QuickCheckIfDelivered((char*)a)) {
 						alreadyHave = true;
-						CreateHelpText((char*)"Simeon alread has this vehicle!", false);
+						CreateHelpText((char*)"Simeon already has this vehicle!", false);
 						break;
 					}
-					
+
 					// This vehicle haven't been delivered, tell the player about it and start the script.
 					currentStage = ScriptStage::Delivering;
 					CreateHelpText((char*)"This vehicle can be delivered to Simeon!", true);
@@ -1001,18 +1020,25 @@ void Update() {
 		if (PED::IS_PED_IN_ANY_VEHICLE(pPedID, false))
 		{
 			// test if player is in delivery area.
-
-			// Countryside Lighthouse || Lifeguard tower || Simeon
-			// Countryside Lighthouse: xyz | Pos 1: 3407, 5193, -1 | Pos 2: 3451, 5150, 45
-			// LifeguardTower: xyz |Pos 1: -1165, -1807, 25 | Pos 2: -1217,-1766 , -1
-			// Simeon: xyz | Pos 1: -38,-1102, -1 | Pos 2: -60, -1120, 35
-			if ((ENTITY::IS_ENTITY_IN_AREA(pPedID, 3407, 5193, -1, 3451, 5150, 45, false, false, -1) && gSettings.LightHouseAsDelivery)
-				|| (ENTITY::IS_ENTITY_IN_AREA(pPedID, -1165, -1807, 25, -1217, -1766, -1, false, false, 0) && gSettings.BeachAsDelivery)
-				|| (ENTITY::IS_ENTITY_IN_AREA(pPedID, -38, -1102, -1, -60, -1120, 35, false, false, 0) && gSettings.SimeonAsDelivery)
+			/*if (
+				(ENTITY::IS_ENTITY_IN_AREA(pPedID, LighthouseArea.x1, LighthouseArea.y1, LighthouseArea.z1, LighthouseArea.x2, LighthouseArea.y2, LighthouseArea.z2, false, true, 0)
+					&& gSettings.LightHouseAsDelivery)
+				|| (ENTITY::IS_ENTITY_IN_ANGLED_AREA(pPedID, BeachArea.x1, BeachArea.y1, BeachArea.z1, BeachArea.x2, BeachArea.y2, BeachArea.z2,45, false, true, 0)
+					&& gSettings.BeachAsDelivery)
+				|| (ENTITY::IS_ENTITY_IN_AREA(pPedID, SimeonArea.x1, SimeonArea.y1, SimeonArea.z1, SimeonArea.x2, SimeonArea.y2, SimeonArea.z2, false, true, 0)
+					&& gSettings.SimeonAsDelivery)
 				)
 			{
-
 				currentStage = VehicleAtDelivery;
+			}*/
+			switch (IsEntityInDeliveryArea(pPedID))
+			{
+			case none:
+				break;
+			default:
+				currentStage = VehicleAtDelivery;
+				break;
+
 			}
 		}
 		else
@@ -1026,17 +1052,31 @@ void Update() {
 	case VehicleAtDelivery:
 	{ // C2360
 		Vehicle lastDriven = PLAYER::GET_PLAYERS_LAST_VEHICLE();
-		//VEHICLE::GET_PED_IN_VEHICLE_SEAT(eVehicleSeat::VehicleSeatAny);
+		//vehicle id / stopping distance / time to stop the vehicle for / bool: no idea what it does
+		//VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 5, 5, true); // Stop vehicle
+		switch (IsEntityInDeliveryArea(lastDriven))
+		{
+		case none:
+			//wut?
+			break;
+		case Simeon:
+			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 1, 5, true); // Stop vehicle
+			break;
+		case Lighthouse:
+			WAIT(1000);
+			ENTITY::SET_ENTITY_COORDS(pPedID, 3351, 5152, 20, false, false, false, false);
+			break;
+		case Beach:
+			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 1, 5, true); // Stop vehicle
+			break;
+		}
+
 		AI::TASK_EVERYONE_LEAVE_VEHICLE(lastDriven);
-		//char* vehiclename = VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(lastDriven));
 		ENTITY::SET_ENTITY_AS_MISSION_ENTITY(lastDriven, true, true); // set current vehicle as a mission entity, so we can delete after.
 		// GTA missions scripts = const float DEFAULT_VEH_STOPPING_DISTANCE = 10.5
-		//vehicle id / stopping distance / time to stop the vehicle for / bool: no idea what it does
-		VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 1, 10, true); // Stop vehicle
-		//PED::KNOCK_PED_OFF_VEHICLE(PLAYER::PLAYER_PED_ID()); // kick player from vehicle
-		//AI::TASK_LEAVE_VEHICLE(PLAYER::PLAYER_PED_ID(), lastDriven, 0);
 
 		currentStage = ScriptStage::DeleteVehicle;
+		WAIT(500);
 		break;
 	}
 	case DeleteVehicle:
@@ -1097,6 +1137,11 @@ void Update() {
 		}
 		// Car is probably free to delete;
 		if (!PED::IS_PED_IN_ANY_VEHICLE(pPedID, true)) {
+			std::string deliMsg;
+			deliMsg += "Vehicle Delivered to Simeon!";
+			deliMsg += "\n(";
+			deliMsg += VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(lastDriven));
+			deliMsg += ")";
 			VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(lastDriven);
 			QuickAddToDelivered((char*)lastValidVehicle.c_str());
 			// BUG: if player is in a hangout, for some random reason the script sets the last driven to null but the vehicle never gets deleted.
@@ -1104,7 +1149,7 @@ void Update() {
 			VEHICLE::EXPLODE_VEHICLE(lastDriven, false, true);
 			ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&lastDriven);
 			//VEHICLE::DELETE_VEHICLE(&lastDriven);
-			CreateHelpText((char*)"Vehicle delivered!", true);
+			CreateHelpText((char*)deliMsg.c_str(), true);
 			currentStage = ScriptStage::CheckCurrentVehicle;
 		}
 
