@@ -367,16 +367,16 @@ const char* TrailerVehicles[] =
 //"GRAINTRAILER", //Trailer - Online only
 "TANKER", //Trailer
 "TR2", //Trailer
-"TR3", //Trailer
+//"TR3", //Trailer - Father&Son Trailer impossible to obtain
 "TR4", //Trailer
 "TRAILERLOGS", //Trailer
 "TRAILERS", //Trailer
 "TRAILERS2", //Trailer
 "TRAILERS3", //Trailer
 "TRAILERSMALL", //Trailer
-"TRFLAT", //Trailer
 //"TVTRAILER", //Trailer - Need glitch to leave mission area
-"FREIGHTTRAILER" //TRAILER
+//"FREIGHTTRAILER", //TRAILER - Big Score Setup Sidetracked - Impossible to obtain
+"TRFLAT" //Trailer
 };
 
 const char* FlyingVehicles[] =
