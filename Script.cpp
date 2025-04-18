@@ -29,7 +29,6 @@ Settings gSettings;
 ScriptStage currentStage = ScriptStage::CheckCurrentVehicle;
 // MissionReplay
 bool missionReplayCalled;
-// Settings Warning
 
 static void CreateHelpText(char* text, bool doSound) {
 	UI::_SET_TEXT_COMPONENT_FORMAT((char*)"STRING");
@@ -397,8 +396,7 @@ void Update() {
 	// check if any file has been modified, and if it did trigger the save.
 	// note for myself: i could also check if the hud element for the save icon is visible.
 	if (SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"save_anywhere")) > 0 
-		|| GAMEPLAY::IS_AUTO_SAVE_IN_PROGRESS() 
-		|| SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"savegame_bed")) > 0)
+		|| GAMEPLAY::IS_AUTO_SAVE_IN_PROGRESS())
 	{
 		// if save was been called or the save menu has been open, test if we can save and try to save into it.
 		if (!alreadySaving) {
