@@ -297,7 +297,7 @@ const char* VehiclesList[] =
 "SURGE",
 //"SWIFT", //FLYING
 //"SWIFT2", //FLYING
-"T20",
+//"T20",  // not available in 1.27
 "TACO",
 "TAILGATER",
 //"TANKER", //Trailer
@@ -342,7 +342,7 @@ const char* VehiclesList[] =
 //"VELUM", //FLYING
 //"VESTRA", //FLYING
 "VIGERO",
-"VINDICATOR",
+//"VINDICATOR", // no available in 1.27
 "VIRGO",
 "VOLTIC",
 "VOODOO2",
@@ -364,7 +364,7 @@ const char* TrailerVehicles[] =
 //"BALETRAILER", // Does not exist
 "BOATTRAILER", //Trailer
 "DOCKTRAILER",
-//"GRAINTRAILER", //Trailer
+//"GRAINTRAILER", //Trailer - Online only
 "TANKER", //Trailer
 "TR2", //Trailer
 "TR3", //Trailer
@@ -424,6 +424,6 @@ const char* WaterVehicles[] =
 "SUBMERSIBLE", //WATER
 "SUBMERSIBLE2", //WATER
 "SUNTRAP", //WATER
-"TORO", //WATER
+//"TORO", //WATER - Not Available in 1.27
 "TROPIC" //WATER
 };
