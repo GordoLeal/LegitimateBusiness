@@ -366,7 +366,6 @@ const char* TrailerVehicles[] =
 "DOCKTRAILER",
 "GRAINTRAILER", //Trailer
 "TANKER", //Trailer
-//"TANKERCAR", //TRAIN
 "TR2", //Trailer
 "TR3", //Trailer
 "TR4", //Trailer

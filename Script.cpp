@@ -14,7 +14,6 @@ enum ScriptStage {
 	DeleteVehicle
 };
 
-
 // Pattern Pointers
 intptr_t pSavedSlotNumberPTR;
 intptr_t pToBeLoadedSaveFilePTR;
@@ -25,8 +24,12 @@ char* ToBeLoadedSaveFile;
 std::string lastLoadedSaveFile;
 std::wstring pathToSaveFolder;
 std::string lastValueOfToBeLoadedSaveFile;
+bool alreadySaving = false;
+bool wasLoadingScreenActive;
+char* lastValidVehicle;
 Settings gSettings;
 ScriptStage currentStage = ScriptStage::CheckCurrentVehicle;
+bool OrtegaTrailerDelivered;
 // MissionReplay
 bool missionReplayCalled;
 
@@ -165,6 +168,7 @@ bool QuickCheckIfDelivered(char* veh)
 	return false;
 }
 
+// BLIPS
 Blip simeonBlip;
 Blip countrysideLightHouseBlip;
 Blip lifeguardBeachBlip;
@@ -234,10 +238,10 @@ void CreateQuickTextThisFrame(char* text) {
 
 void ShowCollectedAmount() {
 	std::string output;
-	output += std::to_string(deliveredVehicles.size());
+	output += std::to_string(deliveredVehicles.size() + OrtegaTrailerDelivered);
 	if (gSettings.DisplayMaxAmount) {
 		output += " | ";
-		output += std::to_string(fullVehicleList.size());
+		output += std::to_string(fullVehicleList.size() + OrtegaTrailerDelivered);
 	}
 	//Draw basic text
 	UI::SET_TEXT_FONT(0);
@@ -253,9 +257,6 @@ void ShowCollectedAmount() {
 	UI::_DRAW_TEXT(0.25f, 0.85f);
 }
 
-bool alreadySaving = false;
-bool wasLoadingScreenActive;
-char* lastValidVehicle;
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-  Testing player in Area =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 typedef struct {
@@ -307,6 +308,22 @@ void DrawBoxArea(DeliveryArea area) {
 	GRAPHICS::DRAW_BOX(area.x1, area.y1, area.z1, area.x2, area.y2, area.z2, 2, 120, 120, 100);
 
 }
+
+// =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= ORTEGA TRAILER =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
+
+void SetOrtegaTrailerWasDelivered() {
+	const std::string modelName = "PROPTRAILER";
+	for (char* a : deliveredVehicles) {
+		//"PROPTRAILER"
+		if (modelName == a)
+		{
+			OrtegaTrailerDelivered = true;
+			return;
+		}
+	}
+	OrtegaTrailerDelivered = false;
+}
+
 
 void Update() {
 
@@ -395,7 +412,7 @@ void Update() {
 	// Did the player open the save menu or auto-save happened?
 	// check if any file has been modified, and if it did trigger the save.
 	// note for myself: i could also check if the hud element for the save icon is visible.
-	if (SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"save_anywhere")) > 0 
+	if (SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"save_anywhere")) > 0
 		|| GAMEPLAY::IS_AUTO_SAVE_IN_PROGRESS())
 	{
 		// if save was been called or the save menu has been open, test if we can save and try to save into it.
@@ -435,18 +452,17 @@ void Update() {
 	ShowCollectedAmount();
 
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- TRAILERS TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	
-	//Test if we have trailers inside the zone.
-	if (gSettings.EnableTrailers)
+	// We want to only call this only once per frame, so have it so can be reused for other parts of the script.
+	const int ARR_SIZE = 255;
+	Vehicle vehInWorld[ARR_SIZE];
+	int vehInWorldCount = worldGetAllVehicles(vehInWorld, ARR_SIZE);
+	for (int b = 0; b < vehInWorldCount; b++)
 	{
-		const int ARR_SIZE = 255;
-		Vehicle vehInWorld[ARR_SIZE];
-		int vehInWorldCount = worldGetAllVehicles(vehInWorld, ARR_SIZE);
-		for (int b = 0; b < vehInWorldCount; b++)
+		Vehicle vehTrailerTest = vehInWorld[b];
+		if (IsEntityInDeliveryArea(vehTrailerTest) != none)
 		{
-			Vehicle vehTrailerTest = vehInWorld[b];
-			if (IsEntityInDeliveryArea(vehTrailerTest) != none)
-			{
+			if (gSettings.EnableTrailers) {
+
 				for (const char* a : TrailerVehicles)
 				{
 					if (VEHICLE::IS_VEHICLE_MODEL(vehTrailerTest, GAMEPLAY::GET_HASH_KEY((char*)a)) == TRUE)
@@ -466,16 +482,43 @@ void Update() {
 							trHelper += a;
 							trHelper += ")";
 							CreateHelpText((char*)trHelper.c_str(), true);
+							OrtegaTrailerDelivered = true;
 						}
 						break;
 					}
 				}
 			}
 
+			// Using the trailer loop just so we don't have a second loop, is a small optmization.
+			if (!OrtegaTrailerDelivered) {
+				if (VEHICLE::IS_VEHICLE_MODEL(vehTrailerTest, GAMEPLAY::GET_HASH_KEY((char*)"PROPTRAILER")) == TRUE)
+				{
+					if (!QuickCheckIfDelivered((char*)"PROPTRAILER"))
+					{
+						VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(GAMEPLAY::GET_HASH_KEY((char*)"PROPTRAILER"));
+						VEHICLE::DETACH_VEHICLE_FROM_TRAILER(PLAYER::GET_PLAYERS_LAST_VEHICLE());
+						ENTITY::SET_ENTITY_AS_MISSION_ENTITY(vehTrailerTest, TRUE, TRUE);
+						VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(vehTrailerTest);
+						QuickAddToDelivered((char*)"PROPTRAILER");
+						VEHICLE::DELETE_VEHICLE(&vehTrailerTest);
+						std::string trHelper;
+						trHelper += "Ortega Delivered to Simeon???";
+						trHelper += "(";
+						trHelper += "PROPTRAILER";
+						trHelper += ")";
+						CreateHelpText((char*)trHelper.c_str(), true);
+						UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
+						UI::_ADD_TEXT_COMPONENT_STRING((char*)"WHY DID YOU BRING A ENTIRE HOME TRAILER? AND WHO IS THIS GUY INSIDE IT?");
+						UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"SIMEON", (char*)"What is this?");
+						UI::_DRAW_NOTIFICATION(0, 1);
+					}
+					break;
+				}
+
+			}
 		}
+
 	}
-
-
 
 	//  =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SCRIPT STAGES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	switch (currentStage)
@@ -720,7 +763,6 @@ void ScriptMain() {
 	// Script got reloaded, try read the save files and see if we should do something.
 	LoadCurrentSave();
 	WAIT(1000);
-
 	if (!gSettings.DoesSettingsFileExists())
 	{
 		UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
@@ -728,7 +770,8 @@ void ScriptMain() {
 		UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"WARNING!", (char*)"");
 		UI::_DRAW_NOTIFICATION(0, 1);
 	}
-	
+	//Check if ortega trailer was delivered
+	SetOrtegaTrailerWasDelivered();
 	currentStage = ScriptStage::CheckCurrentVehicle;
 	while (true) {
 		Update();
