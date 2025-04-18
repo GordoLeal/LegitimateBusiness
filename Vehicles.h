@@ -100,7 +100,7 @@ const char* VehiclesList[] =
 "DOMINATOR2", //Returning Player
 "DOUBLE",
 "DUBSTA",
-//"DUBSTA2", //just a recolor
+"DUBSTA2",
 "DUBSTA3",
 "DUKES",
 "DUKES2",
@@ -148,10 +148,10 @@ const char* VehiclesList[] =
 "GRESLEY",
 "HABANERO",
 "HAKUCHOU",
-//"HANDLER", //Not Possible to reach delivery point
+"HANDLER",
 "HAULER",
 "HEXER",
-"HOTKNIFE", //Returning Player
+"HOTKNIFE", //Collector's edition
 "HUNTLEY",
 "INFERNUS",
 "INGOT",
@@ -219,7 +219,7 @@ const char* VehiclesList[] =
 "POLICET",
 "POLMAV",
 "PONY",
-//"PONY2", //Just a different texture
+"PONY2",
 "POUNDER",
 "PRAIRIE",
 "PRANGER",
@@ -228,7 +228,7 @@ const char* VehiclesList[] =
 "PRIMO",
 //"PROPTRAILER", //Good luck trying to deliver Ortega's trailer.
 "RADI",
-//"RAKETRAILER", //can't drive
+"RAKETRAILER", //can't drive
 "RANCHERXL",
 //"RANCHERXL2", //North Yankton
 "RAPIDGT",
@@ -360,7 +360,7 @@ const char* TrailerVehicles[] =
 {
 "ARMYTANKER",  //Trailer
 "ARMYTRAILER", //Trailer
-//"ARMYTRAILER2", //Trailer - Exclusive to mission setup big score
+"ARMYTRAILER2", //Trailer - Exclusive to mission setup big score
 //"BALETRAILER", // Does not exist
 "BOATTRAILER", //Trailer
 "DOCKTRAILER",
@@ -403,7 +403,7 @@ const char* FlyingVehicles[] =
 "MAVERICK", //FLYING
 "MILJET", //FLYING
 "SHAMAL", //FLYING
-//"SKYLIFT", //FLYING - Can't obtain outside of a setup for big score
+"SKYLIFT", //FLYING - Can't obtain outside of a setup for big score
 "STUNT", //FLYING
 "SWIFT", //FLYING
 "SWIFT2", //FLYING
@@ -414,11 +414,11 @@ const char* FlyingVehicles[] =
 
 const char* WaterVehicles[] =
 {
-	"JETMAX", //WATER
-	"MARQUIS", //WATER
-	"PREDATOR", //WATER
+"JETMAX", //WATER
+"MARQUIS", //WATER
+"PREDATOR", //WATER
 "SEASHARK",// WATER
-//"SEASHARK2", //Lifeguard seashark - Just a different texture
+"SEASHARK2", //Lifeguard seashark - Just a different texture
 "SPEEDER", //WATER
 "SQUALO", //WATER
 "SUBMERSIBLE", //WATER
