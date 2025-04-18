@@ -755,6 +755,7 @@ void Update() {
 					WAIT(1000);
 					VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
 					CreateHelpText((char*)"Parking lot abuse detected!", true);
+					break;
 					}
 
 					else 
