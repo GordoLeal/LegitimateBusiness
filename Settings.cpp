@@ -30,8 +30,10 @@ void Settings::CreateSettingsFile()
 		fileout += "# 0 = false/disabled | 1 = true/enabled\n\n";
 		fileout += "# Enable lighthouse as a delivery point\n";
 		fileout += "LightHouseAsDelivery=1\n\n";
-		fileout += "# Enable the lifeguard tower as a delivery point\n";
-		fileout += "BeachAsDelivery=1\n\n";
+		fileout += "# Enable the Del Perro Pier as a delivery point\n";
+		fileout += "PierAsDelivery=1\n\n";
+		fileout += "# Enable the lifeguard tower (Vespucci Beach) as a delivery point\n";
+		fileout += "BeachAsDelivery=0\n\n";
 		fileout += "# Enable Simeon as a delivery point\n";
 		fileout += "SimeonAsDelivery=1\n\n";
 		fileout += "# Enable Trailers as vehicles that can be delivered\n";
@@ -82,9 +84,10 @@ void Settings::ReadValuesFromSettingsFile()
 	if (!DoesSettingsFileExists()) {
 		
 		CreateSettingsFile();
-		LightHouseAsDelivery = true;
+		LightHouseAsDelivery = false;
 		BeachAsDelivery = true;
 		SimeonAsDelivery = true;
+		PierAsDelivery = true;
 		EnableTrailers = true;
 		EnableFlyingVehicles = true;
 		EnableWaterVehicles = true;
@@ -92,6 +95,7 @@ void Settings::ReadValuesFromSettingsFile()
 		ShowHelpText = true;
 		return;
 	}
+
 	std::fstream settFileStream;
 	settFileStream.open(SettingsFileName, std::ios::out | std::ios::in);
 	std::string line;
@@ -153,6 +157,11 @@ void Settings::ReadValuesFromSettingsFile()
 			if (!found && command.find("SimeonAsDelivery") == 0)
 			{
 				SimeonAsDelivery= stringToBool(value);
+				found = true;
+			}
+			if (!found && command.find("PierAsDelivery") == 0)
+			{
+				PierAsDelivery = stringToBool(value);
 				found = true;
 			}
 			if (!found && command.find("EnableTrailers") == 0)

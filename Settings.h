@@ -5,6 +5,7 @@ public:
 	bool LightHouseAsDelivery;
 	bool BeachAsDelivery;
 	bool SimeonAsDelivery;
+	bool PierAsDelivery;
 	bool EnableTrailers;
 	bool EnableFlyingVehicles;
 	bool EnableWaterVehicles;

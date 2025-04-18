@@ -295,12 +295,14 @@ enum StatusEntityInArea {
 	none,
 	Simeon,
 	Beach,
-	Lighthouse
+	Lighthouse,
+	Pier
 };
 
 const DeliveryArea SimeonArea = { -38, -1102, -1, -60, -1120, 35 };
 const DeliveryArea LighthouseArea = { 3459, 5148, 45, 3369, 5197, -1 };
 const DeliveryArea BeachArea = { -1165, -1807, 25, -1223, -1761, -1 };
+const DeliveryArea PierArea = { -1787, -1180, 50, -1859, -1260, -1 };
 
 StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 
@@ -321,6 +323,12 @@ StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 	{
 		//	OutputDebugString("Simeon tel");
 		return Simeon;
+	}
+	if (ENTITY::IS_ENTITY_IN_ANGLED_AREA(entity, PierArea.x1, PierArea.y1, PierArea.z1, PierArea.x2, PierArea.y2, PierArea.z2,45, false, false, 0)
+		&& gSettings.SimeonAsDelivery)
+	{
+		//	OutputDebugString("Simeon tel");
+		return Pier;
 	}
 	return none;
 }
@@ -832,6 +840,9 @@ void Update() {
 			ENTITY::SET_ENTITY_COORDS(pPedID, 3351, 5152, 20, false, false, false, false); // warp to safe zone.
 			break;
 		case Beach:
+			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 1, 5, true); // Stop vehicle
+			break;
+		case Pier:
 			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 1, 5, true); // Stop vehicle
 			break;
 		}
