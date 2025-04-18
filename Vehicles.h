@@ -409,8 +409,8 @@ const char* FlyingVehicles[] =
 "SWIFT2", //FLYING
 "TITAN", //FLYING
 "VELUM", //FLYING
-"VESTRA" //FLYING
-"POLMAV", //FLYING
+"VESTRA", //FLYING
+"POLMAV" //FLYING
 };
 
 const char* WaterVehicles[] =
