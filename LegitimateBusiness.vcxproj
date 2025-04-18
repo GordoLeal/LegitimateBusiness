@@ -170,6 +170,7 @@
     <ClInclude Include="Script.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="VehicleEnums.h" />
+    <ClInclude Include="Vehicles.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

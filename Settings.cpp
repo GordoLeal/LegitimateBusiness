@@ -40,8 +40,10 @@ void Settings::CreateSettingsFile()
 		fileout += "EnableFlyingVehicles=1\n\n";
 		fileout += "# Enable boats to be delivered\n";
 		fileout += "EnableWaterVehicles=1\n\n";
-		fileout += "\n\n# Mod Made by GordoLeal";
-		fileout += "\n# Twitch.tv/GordoLeal";
+		fileout += "# Display Max Amount of vehicles to be collected\n";
+		fileout += "DisplayMaxAmount=1\n\n";
+		fileout += "# Mod Made by GordoLeal\n";
+		fileout += "# Twitch.tv/GordoLeal";
 		settingsStream << fileout;
 	}
 
@@ -84,6 +86,7 @@ void Settings::ReadValuesFromSettingsFile()
 		EnableTrailers = true;
 		EnableFlyingVehicles = true;
 		EnableWaterVehicles = true;
+		DisplayMaxAmount = true;
 		return;
 	}
 	std::fstream settFileStream;
@@ -162,6 +165,11 @@ void Settings::ReadValuesFromSettingsFile()
 			if (!found && command.find("EnableWaterVehicles") == 0)
 			{
 				EnableWaterVehicles= stringToBool(value);
+				found = true;
+			}
+			if (!found && command.find("DisplayMaxAmount") == 0)
+			{
+				DisplayMaxAmount = stringToBool(value);
 				found = true;
 			}
 		}

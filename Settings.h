@@ -8,6 +8,7 @@ public:
 	bool EnableTrailers;
 	bool EnableFlyingVehicles;
 	bool EnableWaterVehicles;
+	bool DisplayMaxAmount;
 
 	bool GetBoolFromSetting(char* setting);
 	bool DoesSettingsFileExists();
