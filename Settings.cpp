@@ -34,6 +34,8 @@ void Settings::CreateSettingsFile()
 		fileout += "PierAsDelivery=1\n\n";
 		fileout += "# Enable the lifeguard tower (Vespucci Beach) as a delivery point\n";
 		fileout += "BeachAsDelivery=0\n\n";
+		fileout += "# Protection for the player to not abuse the parking lot next to lifeguard tower(anti cheat)\n";
+		fileout += "AntiParkingLotBeach=1\n\n";
 		fileout += "# Enable Simeon as a delivery point\n";
 		fileout += "SimeonAsDelivery=1\n\n";
 		fileout += "# Enable Trailers as vehicles that can be delivered\n";
@@ -82,7 +84,7 @@ bool stringToBool(std::string inS) {
 void Settings::ReadValuesFromSettingsFile()
 {
 	if (!DoesSettingsFileExists()) {
-		
+
 		CreateSettingsFile();
 		LightHouseAsDelivery = false;
 		BeachAsDelivery = true;
@@ -93,6 +95,7 @@ void Settings::ReadValuesFromSettingsFile()
 		EnableWaterVehicles = true;
 		DisplayMaxAmount = true;
 		ShowHelpText = true;
+		AntiParkingLotBeach = true;
 		return;
 	}
 
@@ -141,22 +144,22 @@ void Settings::ReadValuesFromSettingsFile()
 				break;
 		}
 
-		if (foundCmd) 
+		if (foundCmd)
 		{
 			bool found = false;
-			if(!found && command.find("LightHouseAsDelivery") == 0)
+			if (!found && command.find("LightHouseAsDelivery") == 0)
 			{
 				LightHouseAsDelivery = stringToBool(value);
 				found = true;
 			}
 			if (!found && command.find("BeachAsDelivery") == 0)
 			{
-				BeachAsDelivery= stringToBool(value);
+				BeachAsDelivery = stringToBool(value);
 				found = true;
 			}
 			if (!found && command.find("SimeonAsDelivery") == 0)
 			{
-				SimeonAsDelivery= stringToBool(value);
+				SimeonAsDelivery = stringToBool(value);
 				found = true;
 			}
 			if (!found && command.find("PierAsDelivery") == 0)
@@ -166,17 +169,17 @@ void Settings::ReadValuesFromSettingsFile()
 			}
 			if (!found && command.find("EnableTrailers") == 0)
 			{
-				EnableTrailers= stringToBool(value);
+				EnableTrailers = stringToBool(value);
 				found = true;
 			}
 			if (!found && command.find("EnableFlyingVehicles") == 0)
 			{
-				EnableFlyingVehicles= stringToBool(value);
+				EnableFlyingVehicles = stringToBool(value);
 				found = true;
 			}
 			if (!found && command.find("EnableWaterVehicles") == 0)
 			{
-				EnableWaterVehicles= stringToBool(value);
+				EnableWaterVehicles = stringToBool(value);
 				found = true;
 			}
 			if (!found && command.find("DisplayMaxAmount") == 0)
@@ -187,6 +190,11 @@ void Settings::ReadValuesFromSettingsFile()
 			if (!found && command.find("ShowHelpText") == 0)
 			{
 				ShowHelpText = stringToBool(value);
+				found = true;
+			}
+			if (!found && command.find("AntiParkingLotBeach") == 0)
+			{
+				AntiParkingLotBeach = stringToBool(value);
 				found = true;
 			}
 		}

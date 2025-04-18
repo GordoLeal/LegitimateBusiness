@@ -324,7 +324,7 @@ StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 		//	OutputDebugString("Simeon tel");
 		return Simeon;
 	}
-	if (ENTITY::IS_ENTITY_IN_ANGLED_AREA(entity, PierArea.x1, PierArea.y1, PierArea.z1, PierArea.x2, PierArea.y2, PierArea.z2,45, false, false, 0)
+	if (ENTITY::IS_ENTITY_IN_ANGLED_AREA(entity, PierArea.x1, PierArea.y1, PierArea.z1, PierArea.x2, PierArea.y2, PierArea.z2, 45, false, false, 0)
 		&& gSettings.SimeonAsDelivery)
 	{
 		//	OutputDebugString("Simeon tel");
@@ -621,7 +621,7 @@ void Update() {
 				}
 				else
 				{
-					
+
 					UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
 					UI::_ADD_TEXT_COMPONENT_STRING((char*)"SSA_MissingVehicles.txt couldn't be created.\nPlease start GTAV as ADMINISTRATOR.");
 					UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"WARNING!", (char*)"");
@@ -727,31 +727,34 @@ void Update() {
 			Vehicle lastDrivenVehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
 			bool foundValidVehicle = false;
 			bool alreadyHave = false;
-
-		if (LastStolenVehicle != lastDrivenVehicle)
-		{
-			LastStolenVehicle = lastDrivenVehicle;
-
-			if (VEHICLE::GET_VEHICLE_NUMBER_OF_PASSENGERS(lastDrivenVehicle) == 0)
+			if (gSettings.AntiParkingLotBeach && gSettings.BeachAsDelivery) 
 			{
-				if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(lastDrivenVehicle))
+				if (LastStolenVehicle != lastDrivenVehicle)
 				{
-				Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
+					LastStolenVehicle = lastDrivenVehicle;
 
-				float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, -1195, -1788, 0);
-
-					if (CheatDistance < 1000.0f)
+					if (VEHICLE::GET_VEHICLE_NUMBER_OF_PASSENGERS(lastDrivenVehicle) == 0)
 					{
-					LastStolenVehicle = 0;
-					ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z+1, 0x0, 0x0, 0x0, 0x0);
-					WAIT(1000);
-					VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
-					CreateHelpText((char*)"Parking lot abuse detected!", true);
-					}
+						if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(lastDrivenVehicle))
+						{
+							Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
 
+							float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, -1195, -1788, 0);
+
+							if (CheatDistance < 500.0f)
+							{
+								LastStolenVehicle = 0;
+								ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z + 1, 0x0, 0x0, 0x0, 0x0);
+								WAIT(1000);
+								VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
+								CreateHelpText((char*)"Parking lot abuse detected!", true);
+							}
+
+						}
+					}
 				}
 			}
-		}
+				
 			Hash lastDriveModelHash = ENTITY::GET_ENTITY_MODEL(lastDrivenVehicle);
 
 			for (const char* a : fullVehicleList)

@@ -11,6 +11,7 @@ public:
 	bool EnableWaterVehicles;
 	bool DisplayMaxAmount;
 	bool ShowHelpText;
+	bool AntiParkingLotBeach;
 
 	bool GetBoolFromSetting(char* setting);
 	bool DoesSettingsFileExists();
