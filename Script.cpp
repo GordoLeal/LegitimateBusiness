@@ -739,33 +739,38 @@ void Update() {
 			bool alreadyHave = false;
 			
 			// ANTI PARKING LOT ABUSE
-			if (gSettings.AntiParkingLotBeach && gSettings.BeachAsDelivery) 
+		if (gSettings.AntiParkingLotBeach && gSettings.BeachAsDelivery) 
+		{
+			if (LastStolenVehicle != lastDrivenVehicle)
 			{
-				if (LastStolenVehicle != lastDrivenVehicle)
+				if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(lastDrivenVehicle))
 				{
-					LastStolenVehicle = lastDrivenVehicle;
+				Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
 
-					if (VEHICLE::GET_VEHICLE_NUMBER_OF_PASSENGERS(lastDrivenVehicle) == 0)
+				float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, -1195, -1788, 0);
+
+					if (CheatDistance < 600.0f)
 					{
-						if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(lastDrivenVehicle))
-						{
-							Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
-
-							float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, -1195, -1788, 0);
-
-							if (CheatDistance < 200.0f)
-							{
-								LastStolenVehicle = 0;
-								ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z + 1, 0x0, 0x0, 0x0, 0x0);
-								WAIT(1000);
-								VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
-								CreateHelpText((char*)"Parking lot abuse detected!", true);
-							}
-
-						}
+					ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z + 1, 0x0, 0x0, 0x0, 0x0);
+					WAIT(1000);
+					VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
+					CreateHelpText((char*)"Parking lot abuse detected!", true);
+					break;
 					}
+
+					else 
+					{
+					LastStolenVehicle = lastDrivenVehicle;
+					}
+
+				}
+
+				else 
+				{
+				LastStolenVehicle = lastDrivenVehicle;
 				}
 			}
+		}
 				
 			Hash lastDriveModelHash = ENTITY::GET_ENTITY_MODEL(lastDrivenVehicle);
 
