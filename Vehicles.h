@@ -228,7 +228,7 @@ const char* VehiclesList[] =
 "PRIMO",
 //"PROPTRAILER", //Good luck trying to deliver Ortega's trailer.
 "RADI",
-"RAKETRAILER", //can't drive
+//"RAKETRAILER", //can't drive
 "RANCHERXL",
 //"RANCHERXL2", //North Yankton
 "RAPIDGT",
@@ -377,6 +377,7 @@ const char* TrailerVehicles[] =
 //"TVTRAILER", //Trailer - Need glitch to leave mission area
 //"FREIGHTTRAILER", //TRAILER - Big Score Setup Sidetracked - Impossible to obtain
 "TRFLAT" //Trailer
+"RAKETRAILER", //Trailer
 };
 
 const char* FlyingVehicles[] =
