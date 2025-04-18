@@ -727,30 +727,28 @@ void Update() {
 			bool foundValidVehicle = false;
 			bool alreadyHave = false;
 
-			if (LastStolenVehicle != lastDrivenVehicle)
+		if (LastStolenVehicle != lastDrivenVehicle)
+		{
+			LastStolenVehicle = lastDrivenVehicle;
+
+			if (VEHICLE::GET_VEHICLE_NUMBER_OF_PASSENGERS(lastDrivenVehicle) == 0)
 			{
-				if (VEHICLE::GET_VEHICLE_NUMBER_OF_PASSENGERS(lastDrivenVehicle) == 0)
+				if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(lastDrivenVehicle))
 				{
-					if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(lastDrivenVehicle))
+				Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
+
+				float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, LighthouseArea.x1, LighthouseArea.y1, LighthouseArea.z1);
+
+					if (CheatDistance < 50.0f)
 					{
-						Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
-
-						float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, LighthouseArea.x1, LighthouseArea.y1, LighthouseArea.z1);
-
-						if (CheatDistance > 50.0f)
-						{
-							LastStolenVehicle = lastDrivenVehicle;
-						}
-						else
-						{
-							VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
-							CreateHelpText((char*)"Parking lot abuse detected!", true);
-						}
-
+					LastStolenVehicle = 0;
+					VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
+					CreateHelpText((char*)"Parking lot abuse detected!", true);
 					}
+
 				}
 			}
-
+		}
 			Hash lastDriveModelHash = ENTITY::GET_ENTITY_MODEL(lastDrivenVehicle);
 
 			for (const char* a : fullVehicleList)
