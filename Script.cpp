@@ -508,7 +508,7 @@ void Update() {
 						trHelper += ")";
 						CreateHelpText((char*)trHelper.c_str(), true);
 						UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
-						UI::_ADD_TEXT_COMPONENT_STRING((char*)"WHY DID YOU BRING A ENTIRE HOME TRAILER? AND WHO IS THIS GUY INSIDE IT?");
+						UI::_ADD_TEXT_COMPONENT_STRING((char*)"WHY DID YOU BRING A ENTIRE TRAILER? AND WHY THERE'S A GUY INSIDE IT?");
 						UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"SIMEON", (char*)"What is this?");
 						UI::_DRAW_NOTIFICATION(0, 1);
 					}
@@ -763,6 +763,8 @@ void ScriptMain() {
 	// Script got reloaded, try read the save files and see if we should do something.
 	LoadCurrentSave();
 	WAIT(1000);
+
+	UI::_DRAW_NOTIFICATION(0, 1);
 	if (!gSettings.DoesSettingsFileExists())
 	{
 		UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");

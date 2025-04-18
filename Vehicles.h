@@ -364,7 +364,7 @@ const char* TrailerVehicles[] =
 //"BALETRAILER", // Does not exist
 "BOATTRAILER", //Trailer
 "DOCKTRAILER",
-"GRAINTRAILER", //Trailer
+//"GRAINTRAILER", //Trailer
 "TANKER", //Trailer
 "TR2", //Trailer
 "TR3", //Trailer
