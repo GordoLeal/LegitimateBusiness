@@ -34,7 +34,7 @@ void Settings::CreateSettingsFile()
 		fileout += "PierAsDelivery=1\n\n";
 		fileout += "# Enable the lifeguard tower (Vespucci Beach) as a delivery point\n";
 		fileout += "BeachAsDelivery=0\n\n";
-		fileout += "# Protection for the player to not abuse the parking lot next to lifeguard tower(anti cheat)\n";
+		fileout += "# Protection for the player to not abuse the parking lot next to lifeguard tower (anti cheat)\n";
 		fileout += "AntiParkingLotBeach=1\n\n";
 		fileout += "# Enable Simeon as a delivery point\n";
 		fileout += "SimeonAsDelivery=1\n\n";
@@ -86,8 +86,8 @@ void Settings::ReadValuesFromSettingsFile()
 	if (!DoesSettingsFileExists()) {
 
 		CreateSettingsFile();
-		LightHouseAsDelivery = false;
-		BeachAsDelivery = true;
+		LightHouseAsDelivery = true;
+		BeachAsDelivery = false;
 		SimeonAsDelivery = true;
 		PierAsDelivery = true;
 		EnableTrailers = true;

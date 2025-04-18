@@ -190,6 +190,7 @@ bool QuickCheckIfDelivered(char* veh)
 Blip simeonBlip;
 Blip countrysideLightHouseBlip;
 Blip lifeguardBeachBlip;
+Blip PierBlip;
 
 void EnableAllDeliveryBlips()
 {
@@ -198,7 +199,7 @@ void EnableAllDeliveryBlips()
 		lifeguardBeachBlip = UI::ADD_BLIP_FOR_COORD(-1174, -1773, 3);
 		UI::SET_BLIP_FLASHES(lifeguardBeachBlip, true);
 		UI::SET_BLIP_FLASH_TIMER(lifeguardBeachBlip, 5000);
-		UI::SET_BLIP_COLOUR(lifeguardBeachBlip, 53);
+		UI::SET_BLIP_COLOUR(lifeguardBeachBlip, BlipColorWhite);
 	}
 
 	if (gSettings.LightHouseAsDelivery)
@@ -215,6 +216,12 @@ void EnableAllDeliveryBlips()
 		UI::SET_BLIP_FLASH_TIMER(simeonBlip, 5000);
 		UI::SET_BLIP_COLOUR(simeonBlip, BlipColorGreen);
 	}
+	if (gSettings.PierAsDelivery) {
+		PierBlip = UI::ADD_BLIP_FOR_COORD(-1813, -1200, 13);
+		UI::SET_BLIP_FLASHES(PierBlip, true);
+		UI::SET_BLIP_FLASH_TIMER(PierBlip, 5000);
+		UI::SET_BLIP_COLOUR(PierBlip, 53);
+	}
 
 }
 
@@ -225,8 +232,11 @@ void DisableAllDeliveryBlips() {
 		UI::REMOVE_BLIP(&countrysideLightHouseBlip);
 	if (UI::DOES_BLIP_EXIST(lifeguardBeachBlip))
 		UI::REMOVE_BLIP(&lifeguardBeachBlip);
+	if (UI::DOES_BLIP_EXIST(PierBlip))
+		UI::REMOVE_BLIP(&PierBlip);
 }
 
+// =-=-=-=-=-=-=-=-=-=-=-=-=- UI =-=-=-=-=-=-=-=-=-=-
 void CreateQuickTextThisFrame(char* text) {
 	//Draw basic text
 	UI::SET_TEXT_FONT(0);
@@ -325,7 +335,7 @@ StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 		return Simeon;
 	}
 	if (ENTITY::IS_ENTITY_IN_ANGLED_AREA(entity, PierArea.x1, PierArea.y1, PierArea.z1, PierArea.x2, PierArea.y2, PierArea.z2, 45, false, false, 0)
-		&& gSettings.SimeonAsDelivery)
+		&& gSettings.PierAsDelivery)
 	{
 		//	OutputDebugString("Simeon tel");
 		return Pier;
@@ -727,6 +737,8 @@ void Update() {
 			Vehicle lastDrivenVehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
 			bool foundValidVehicle = false;
 			bool alreadyHave = false;
+			
+			// ANTI PARKING LOT ABUSE
 			if (gSettings.AntiParkingLotBeach && gSettings.BeachAsDelivery) 
 			{
 				if (LastStolenVehicle != lastDrivenVehicle)
@@ -741,7 +753,7 @@ void Update() {
 
 							float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, -1195, -1788, 0);
 
-							if (CheatDistance < 500.0f)
+							if (CheatDistance < 200.0f)
 							{
 								LastStolenVehicle = 0;
 								ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z + 1, 0x0, 0x0, 0x0, 0x0);
