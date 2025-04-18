@@ -942,8 +942,7 @@ void ScriptMain() {
 	// Script got reloaded, try read the save files and see if we should do something.
 	LoadCurrentSave();
 	WAIT(1000);
-
-	UI::_DRAW_NOTIFICATION(0, 1);
+	//Check if it was possible to create the file.
 	if (!gSettings.DoesSettingsFileExists())
 	{
 		UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
