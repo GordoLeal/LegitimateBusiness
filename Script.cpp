@@ -751,11 +751,14 @@ void Update() {
 
 					if (CheatDistance < 600.0f)
 					{
-					ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z + 1, 0x0, 0x0, 0x0, 0x0);
-					WAIT(1000);
-					VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
-					CreateHelpText((char*)"Parking lot abuse detected!", true);
-					break;
+						if (PLAYER::CAN_PLAYER_START_MISSION(pPedID))
+						{
+						ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z + 1, 0x0, 0x0, 0x0, 0x0);
+						WAIT(1000);
+						VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
+						CreateHelpText((char*)"Parking lot abuse detected!", true);
+						break;
+						}	
 					}
 
 					else 
