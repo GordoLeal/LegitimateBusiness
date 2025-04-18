@@ -621,6 +621,7 @@ void Update() {
 				}
 				else
 				{
+					
 					UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
 					UI::_ADD_TEXT_COMPONENT_STRING((char*)"SSA_MissingVehicles.txt couldn't be created.\nPlease start GTAV as ADMINISTRATOR.");
 					UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"WARNING!", (char*)"");
@@ -737,11 +738,13 @@ void Update() {
 				{
 				Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
 
-				float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, LighthouseArea.x1, LighthouseArea.y1, LighthouseArea.z1);
+				float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, -1195, -1788, 0);
 
-					if (CheatDistance < 50.0f)
+					if (CheatDistance < 1000.0f)
 					{
 					LastStolenVehicle = 0;
+					ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z+1, 0x0, 0x0, 0x0, 0x0);
+					WAIT(1000);
 					VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
 					CreateHelpText((char*)"Parking lot abuse detected!", true);
 					}
