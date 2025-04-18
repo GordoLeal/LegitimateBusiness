@@ -471,7 +471,7 @@ void Update() {
 		show = !show;
 		if (show)
 		{
-			CreateHelpText((char*)"yes",true);
+			CreateHelpText((char*)"yes", true);
 
 		}
 		else
@@ -479,7 +479,7 @@ void Update() {
 			CreateHelpText((char*)"no", true);
 		}
 	}
-	if (show) 
+	if (show)
 	{
 		DeliveryArea area;
 		area.x1 = pos1.x;
@@ -491,7 +491,7 @@ void Update() {
 		DrawBoxArea(area);
 		GRAPHICS::DRAW_BOX(pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z, 2, 120, 120, 200);
 		Vector3 pos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
-		GRAPHICS::DRAW_DEBUG_SPHERE(pos.x, pos.y, pos.z,3,10,150,10,200);
+		GRAPHICS::DRAW_DEBUG_SPHERE(pos.x, pos.y, pos.z, 3, 10, 150, 10, 200);
 	}
 
 
@@ -719,30 +719,29 @@ void Update() {
 			bool foundValidVehicle = false;
 			bool alreadyHave = false;
 
-	if (LastStolenVehicle != lastDrivenVehicle)
-        {
-		if (VEHICLE::GET_VEHICLE_NUMBER_OF_PASSENGERS(lastDrivenVehicle) == 0)
-		{
-			if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(lastDrivenVehicle))
+			if (LastStolenVehicle != lastDrivenVehicle)
 			{
-				Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
-
-				float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, LighthouseArea.x1, LighthouseArea.y1, LighthouseArea.z1);
-
-				if (CheatDistance > 1000000.0f)
+				if (VEHICLE::GET_VEHICLE_NUMBER_OF_PASSENGERS(lastDrivenVehicle) == 0)
 				{
-					LastStolenVehicle = lastDrivenVehicle;
-				}
+					if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(lastDrivenVehicle))
+					{
+						Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
 
-				else
-				{
-					VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
-					CreateHelpText((char*)"Parking lot abuse detected!", true);
-				}
+						float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, LighthouseArea.x1, LighthouseArea.y1, LighthouseArea.z1);
 
+						if (CheatDistance > 50.0f)
+						{
+							LastStolenVehicle = lastDrivenVehicle;
+						}
+						else
+						{
+							VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
+							CreateHelpText((char*)"Parking lot abuse detected!", true);
+						}
+
+					}
+				}
 			}
-		}
-       }
 
 			Hash lastDriveModelHash = ENTITY::GET_ENTITY_MODEL(lastDrivenVehicle);
 
