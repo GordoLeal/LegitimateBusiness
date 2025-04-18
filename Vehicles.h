@@ -217,7 +217,7 @@ const char* VehiclesList[] =
 //"POLICEOLD1", //North Yankton
 //"POLICEOLD2", //North Yankton
 "POLICET",
-"POLMAV",
+//"POLMAV", //FLYING
 "PONY",
 "PONY2",
 "POUNDER",
@@ -410,6 +410,7 @@ const char* FlyingVehicles[] =
 "TITAN", //FLYING
 "VELUM", //FLYING
 "VESTRA" //FLYING
+"POLMAV", //FLYING
 };
 
 const char* WaterVehicles[] =
