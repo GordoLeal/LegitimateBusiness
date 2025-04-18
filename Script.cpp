@@ -32,6 +32,15 @@ ScriptStage currentStage = ScriptStage::CheckCurrentVehicle;
 bool OrtegaTrailerDelivered;
 // MissionReplay
 bool missionReplayCalled;
+// Generate Remaining Cars List.
+const DWORD genMaxPressingTime = 5000;
+DWORD genStartPressingTime;
+bool genStartTimer= false;
+bool genAlreadyCreatingFile = false;
+//Quick Help generate missing vehicles
+const DWORD hmvMaxTimer = 1800000; //30 minutes
+//DWORD hmvMaxTimer = 30000; //30 seconds
+DWORD hmvStartTime;
 
 static void CreateHelpText(char* text, bool doSound) {
 	UI::_SET_TEXT_COMPONENT_FORMAT((char*)"STRING");
@@ -78,21 +87,29 @@ void LoadHookPointers() {
 void FillFullVehicleList()
 {
 	fullVehicleList.clear();
-	for (const char* a : VehiclesList) {
+	for (const char* a : VehiclesList)
+	{
 		fullVehicleList.push_back(a);
 	}
-	if (gSettings.EnableFlyingVehicles) {
-		for (const char* b : FlyingVehicles) {
+
+	if (gSettings.EnableFlyingVehicles)
+	{
+		for (const char* b : FlyingVehicles)
+		{
 			fullVehicleList.push_back(b);
 		}
 	}
-	if (gSettings.EnableWaterVehicles) {
-		for (const char* c : WaterVehicles) {
+	if (gSettings.EnableWaterVehicles)
+	{
+		for (const char* c : WaterVehicles)
+		{
 			fullVehicleList.push_back(c);
 		}
 	}
-	if (gSettings.EnableTrailers) {
-		for (const char* c : WaterVehicles) {
+	if (gSettings.EnableTrailers)
+	{
+		for (const char* c : TrailerVehicles) 
+		{
 			fullVehicleList.push_back(c);
 		}
 	}
@@ -237,13 +254,13 @@ void CreateQuickTextThisFrame(char* text) {
 }
 
 void ShowCollectedAmount() {
-	std::string output;
-	output += std::to_string(deliveredVehicles.size() + OrtegaTrailerDelivered);
+	std::string outputAmount;
+	outputAmount += std::to_string(deliveredVehicles.size() + OrtegaTrailerDelivered);
 	if (gSettings.DisplayMaxAmount) {
-		output += " | ";
-		output += std::to_string(fullVehicleList.size() + OrtegaTrailerDelivered);
+		outputAmount += " | ";
+		outputAmount += std::to_string(fullVehicleList.size() + OrtegaTrailerDelivered);
 	}
-	//Draw basic text
+	//Draw collect amount
 	UI::SET_TEXT_FONT(0);
 	UI::SET_TEXT_WRAP(0.0, 1.0);
 	UI::SET_TEXT_CENTRE(1);
@@ -253,8 +270,19 @@ void ShowCollectedAmount() {
 	UI::SET_TEXT_OUTLINE();
 	UI::_SET_TEXT_ENTRY((char*)"STRING");
 	UI::SET_TEXT_COLOUR(255, 255, 255, 255);
-	UI::_ADD_TEXT_COMPONENT_STRING((char*)output.c_str());
+	UI::_ADD_TEXT_COMPONENT_STRING((char*)outputAmount.c_str());
 	UI::_DRAW_TEXT(0.25f, 0.85f);
+
+	if (gSettings.ShowHelpText)
+	{
+		if (GetTickCount() >= hmvStartTime + hmvMaxTimer)
+		{
+			hmvStartTime = GetTickCount();
+			//quick help text
+			const char* outputHelp = "Need help?\nHold ~INPUT_RELOAD~ and ~INPUT_COVER~ for 5 seconds to create a missing cars list.";
+			CreateHelpText((char*)outputHelp, true);
+		}
+	}
 }
 
 
@@ -450,7 +478,83 @@ void Update() {
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- USER INTERFACE =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 	ShowCollectedAmount();
+	
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GENERATE LIST OF MISSING CARS =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	bool genList1 = CONTROLS::IS_CONTROL_PRESSED(0,eControl::ControlCover);
+	bool genList2 = CONTROLS::IS_CONTROL_PRESSED(0,eControl::ControlReload);
 
+	if (genList1 && genList2) {
+		
+		if (genStartTimer) 
+		{
+			if ((GetTickCount() >= genStartPressingTime + genMaxPressingTime )&& !genAlreadyCreatingFile)
+			{
+				genAlreadyCreatingFile = true;
+
+				std::fstream genFileStream;
+				genFileStream.open("SSA_MissingVehicles.txt", std::ios::in | std::ios::out | std::ios::trunc);
+				if (genFileStream.is_open()) {
+					std::list<const char*> genMissingVehicles;
+					for (const char* x : fullVehicleList)
+					{
+						bool found = false;
+						for (const char* z : deliveredVehicles)
+						{
+							if (x == z)
+							{
+								found = true;
+							}
+						}
+						if (!found)
+						{
+							genMissingVehicles.push_back(x);
+						}
+
+					}
+
+					genFileStream << "Missing Vehicles:\n";
+					for (const char* a : genMissingVehicles) 
+					{
+						genFileStream << a;
+						genFileStream << '\n';
+					}
+
+					genFileStream << '\n';
+					genFileStream << "Delivered Vehicles:\n";
+					
+					for (const char* b : deliveredVehicles)
+					{
+						genFileStream << b;
+						genFileStream << '\n';
+					}
+					genFileStream.close();
+
+					UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
+					UI::_ADD_TEXT_COMPONENT_STRING((char*)"file SSA_MissingVehicles.txt created.");
+					UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"Simeon", (char*)"");
+					UI::_DRAW_NOTIFICATION(0, 1);
+				}
+				else 
+				{
+					UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
+					UI::_ADD_TEXT_COMPONENT_STRING((char*)"SSA_MissingVehicles.txt couldn't be created.\nPlease start GTAV as ADMINISTRATOR.");
+					UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"WARNING!", (char*)"");
+					UI::_DRAW_NOTIFICATION(0, 1);
+				}
+			}
+		}
+		else
+		{
+			genStartTimer = true;
+			genStartPressingTime = GetTickCount();
+		}
+
+	}
+	else 
+	{
+		genStartTimer = false;
+		genAlreadyCreatingFile = false;
+	}
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- TRAILERS TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// We want to only call this only once per frame, so have it so can be reused for other parts of the script.
 	const int ARR_SIZE = 255;
@@ -489,7 +593,7 @@ void Update() {
 				}
 			}
 
-			// Using the trailer loop just so we don't have a second loop, is a small optmization.
+			// Using the trailer loop just so we don't have to create a second loop, is a small optmization.
 			if (!OrtegaTrailerDelivered) {
 				if (VEHICLE::IS_VEHICLE_MODEL(vehTrailerTest, GAMEPLAY::GET_HASH_KEY((char*)"PROPTRAILER")) == TRUE)
 				{

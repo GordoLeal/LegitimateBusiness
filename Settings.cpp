@@ -6,7 +6,7 @@
 #include <list>
 #include <Windows.h>
 
-const char* SettingsFileName = "SSASettings.txt";
+const char* SettingsFileName = "SSA_Settings.txt";
 //DoesSettingsFileExists should be run before this command.
 bool Settings::GetBoolFromSetting(char* setting)
 {
@@ -42,6 +42,8 @@ void Settings::CreateSettingsFile()
 		fileout += "EnableWaterVehicles=1\n\n";
 		fileout += "# Display Max Amount of vehicles to be collected\n";
 		fileout += "DisplayMaxAmount=1\n\n";
+		fileout += "# Show help text about missing vehicles list every 30 minutes\n";
+		fileout += "ShowHelpText=1\n\n";
 		fileout += "# Mod Made by GordoLeal\n";
 		fileout += "# Twitch.tv/GordoLeal";
 		settingsStream << fileout;
@@ -87,6 +89,7 @@ void Settings::ReadValuesFromSettingsFile()
 		EnableFlyingVehicles = true;
 		EnableWaterVehicles = true;
 		DisplayMaxAmount = true;
+		ShowHelpText = true;
 		return;
 	}
 	std::fstream settFileStream;
@@ -170,6 +173,11 @@ void Settings::ReadValuesFromSettingsFile()
 			if (!found && command.find("DisplayMaxAmount") == 0)
 			{
 				DisplayMaxAmount = stringToBool(value);
+				found = true;
+			}
+			if (!found && command.find("ShowHelpText") == 0)
+			{
+				ShowHelpText = stringToBool(value);
 				found = true;
 			}
 		}

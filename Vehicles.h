@@ -376,8 +376,8 @@ const char* TrailerVehicles[] =
 "TRAILERSMALL", //Trailer
 //"TVTRAILER", //Trailer - Need glitch to leave mission area
 //"FREIGHTTRAILER", //TRAILER - Big Score Setup Sidetracked - Impossible to obtain
-"TRFLAT" //Trailer
-"RAKETRAILER", //Trailer
+"TRFLAT", //Trailer
+"RAKETRAILER" //Trailer
 };
 
 const char* FlyingVehicles[] =
