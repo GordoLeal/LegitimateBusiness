@@ -36,7 +36,7 @@ bool missionReplayCalled;
 // Generate Remaining Cars List.
 const DWORD genMaxPressingTime = 5000;
 DWORD genStartPressingTime;
-bool genStartTimer= false;
+bool genStartTimer = false;
 bool genAlreadyCreatingFile = false;
 //Quick Help generate missing vehicles
 const DWORD hmvMaxTimer = 1800000; //30 minutes
@@ -109,7 +109,7 @@ void FillFullVehicleList()
 	}
 	if (gSettings.EnableTrailers)
 	{
-		for (const char* c : TrailerVehicles) 
+		for (const char* c : TrailerVehicles)
 		{
 			fullVehicleList.push_back(c);
 		}
@@ -227,18 +227,6 @@ void DisableAllDeliveryBlips() {
 		UI::REMOVE_BLIP(&lifeguardBeachBlip);
 }
 
-//bool TestIfVehicleIsValid(Hash veh) {
-//	bool valid = false;
-//	if ((VEHICLE::IS_THIS_MODEL_A_HELI(veh) && gSettings.EnableFlyingVehicles) || (VEHICLE::IS_THIS_MODEL_A_PLANE(veh) && gSettings.EnableFlyingVehicles))
-//	{
-//		valid = true;
-//	}
-//	else if (VEHICLE::IS_THIS_MODEL_A_BOAT(veh) && gSettings.EnableWaterVehicles) {
-//		valid = true;
-//	}
-//	return valid;
-//}
-
 void CreateQuickTextThisFrame(char* text) {
 	//Draw basic text
 	UI::SET_TEXT_FONT(0);
@@ -256,10 +244,16 @@ void CreateQuickTextThisFrame(char* text) {
 
 void ShowCollectedAmount() {
 	std::string outputAmount;
-	outputAmount += std::to_string(deliveredVehicles.size() + OrtegaTrailerDelivered);
+	int totalDeliveredVehicles = deliveredVehicles.size();
+	int totalFullVehicles = fullVehicleList.size();
+	if (OrtegaTrailerDelivered)
+	{
+		totalFullVehicles++;
+	}
+	outputAmount += std::to_string(totalDeliveredVehicles);
 	if (gSettings.DisplayMaxAmount) {
 		outputAmount += " | ";
-		outputAmount += std::to_string(fullVehicleList.size() + OrtegaTrailerDelivered);
+		outputAmount += std::to_string(totalFullVehicles);
 	}
 	//Draw collect amount
 	UI::SET_TEXT_FONT(0);
@@ -335,11 +329,11 @@ StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 
 void DrawBoxArea(DeliveryArea area) {
 	GRAPHICS::DRAW_BOX(area.x1, area.y1, area.z1, area.x2, area.y2, area.z2, 2, 120, 120, 100);
-
 }
 
 // =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= ORTEGA TRAILER =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
 
+// First check after load to know if ortega was already delivered in this save.
 void SetOrtegaTrailerWasDelivered() {
 	const std::string modelName = "PROPTRAILER";
 	for (char* a : deliveredVehicles) {
@@ -353,74 +347,157 @@ void SetOrtegaTrailerWasDelivered() {
 	OrtegaTrailerDelivered = false;
 }
 
+Vector3 pos1;
+Vector3 pos2;
+bool show = false;
 
 void Update() {
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+	if (IsKeyJustUp(VK_NUMPAD0))
+	{
+		// get entity to teleport
+		Entity e = PLAYER::PLAYER_PED_ID();
+		if (PED::IS_PED_IN_ANY_VEHICLE(e, 0))
+			e = PED::GET_VEHICLE_PED_IS_USING(e);
+
+		// get coords
+		Vector3 coords;
+		bool success = false;
+
+		bool blipFound = false;
+		// search for marker blip
+		int blipIterator = UI::_GET_BLIP_INFO_ID_ITERATOR();
+		for (Blip i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator); UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator))
+		{
+			if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4)
+			{
+				coords = UI::GET_BLIP_INFO_ID_COORD(i);
+				blipFound = true;
+				break;
+			}
+		}
+		if (blipFound)
+		{
+			// load needed map region and check height levels for ground existence
+			bool groundFound = false;
+			static float groundCheckHeight[] = {
+				100.0, 150.0, 50.0, 0.0, 200.0, 250.0, 300.0, 350.0, 400.0,
+				450.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0
+			};
+			for (int i = 0; i < sizeof(groundCheckHeight) / sizeof(float); i++)
+			{
+				ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, coords.x, coords.y, groundCheckHeight[i], 0, 0, 1);
+				WAIT(100);
+				if (GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, groundCheckHeight[i], &coords.z, FALSE))
+				{
+					groundFound = true;
+					coords.z += 3.0;
+					break;
+				}
+			}
+			// if ground not found then set Z in air and give player a parachute
+			if (!groundFound)
+			{
+				coords.z = 1000.0;
+				WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), GAMEPLAY::GET_HASH_KEY((char*)"GADGET_PARACHUTE"), 1, 0);
+			}
+			success = true;
+		}
+
+
+	}
+
+	if (IsKeyJustUp(VK_NUMPAD1))
+	{
+		DWORD modelA = GAMEPLAY::GET_HASH_KEY((char*)"ARMYTANKER");
+		if (STREAMING::IS_MODEL_IN_CDIMAGE(modelA) && STREAMING::IS_MODEL_A_VEHICLE(modelA))
+		{
+			STREAMING::REQUEST_MODEL(modelA);
+			while (!STREAMING::HAS_MODEL_LOADED(modelA)) WAIT(0);
+			Vector3 coords = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER::PLAYER_PED_ID(), 5.0, 5.0, 0.0);
+			Vehicle veh = VEHICLE::CREATE_VEHICLE(modelA, coords.x, coords.y, coords.z, 0.0, 1, 1);
+			VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(veh);
+
+			WAIT(0);
+			STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(modelA);
+			ENTITY::SET_VEHICLE_AS_NO_LONGER_NEEDED(&veh);
+		}
+	}
+	if (IsKeyJustUp(VK_NUMPAD2))
+	{
+		DWORD model = GAMEPLAY::GET_HASH_KEY((char*)"PHANTOM");
+		if (STREAMING::IS_MODEL_A_VEHICLE(model))
+		{
+			STREAMING::REQUEST_MODEL(model);
+			while (!STREAMING::HAS_MODEL_LOADED(model)) WAIT(0);
+			Vector3 coords = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER::PLAYER_PED_ID(), 12.0, 5.0, 10.0);
+			Vehicle veh = VEHICLE::CREATE_VEHICLE(model, coords.x, coords.y, coords.z, 0.0, 1, 1);
+			VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(veh);
+
+			WAIT(0);
+			STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(model);
+			ENTITY::SET_VEHICLE_AS_NO_LONGER_NEEDED(&veh);
+		}
+	}
+
+	if (IsKeyJustUp(VK_NUMPAD4))
+	{
+		Vector3 pos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+		std::string a;
+		a += "Pos X: ";
+		a += std::to_string(pos.x);
+		a += "\nPos Y: ";
+		a += std::to_string(pos.y);
+		a += "\nPos Z: ";
+		a += std::to_string(pos.z);
+		CreateHelpText((char*)a.c_str(), true);
+		pos1 = pos;
+	}
+	if (IsKeyJustUp(VK_NUMPAD5))
+	{
+		Vector3 pos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+		std::string a;
+		a += "Pos X: ";
+		a += std::to_string(pos.x);
+		a += "\nPos Y: ";
+		a += std::to_string(pos.y);
+		a += "\nPos Z: ";
+		a += std::to_string(pos.z);
+		CreateHelpText((char*)a.c_str(), true);
+		pos2 = pos;
+	}
+	if (IsKeyJustUp(VK_NUMPAD6))
+	{
+		show = !show;
+		if (show)
+		{
+			CreateHelpText((char*)"yes",true);
+
+		}
+		else
+		{
+			CreateHelpText((char*)"no", true);
+		}
+	}
+	if (show) 
+	{
+		DeliveryArea area;
+		area.x1 = pos1.x;
+		area.y1 = pos1.y;
+		area.z1 = pos1.z;
+		area.x2 = pos2.x;
+		area.y2 = pos2.y;
+		area.z2 = pos2.z;
+		DrawBoxArea(area);
+		GRAPHICS::DRAW_BOX(pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z, 2, 120, 120, 200);
+		Vector3 pos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
+		GRAPHICS::DRAW_DEBUG_SPHERE(pos.x, pos.y, pos.z,3,10,150,10,200);
+	}
+
 
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CONSTANTLY USED VARIABLES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	Ped pPedID = PLAYER::PLAYER_PED_ID();
 	Player pID = PLAYER::PLAYER_ID();
-
-	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	//if (IsKeyDown(VK_NUMPAD0))
-	//{
-	//	DrawBoxArea(SimeonArea);
-	//	DrawBoxArea(LighthouseArea);
-	//	DrawBoxArea(BeachArea);
-	//}
-	//if (IsKeyJustUp(VK_NUMPAD1))
-	//{
-	//	//Taken from the nativetrainer
-	//	// get entity to teleport
-	//	Entity e = PLAYER::PLAYER_PED_ID();
-	//	if (PED::IS_PED_IN_ANY_VEHICLE(e, 0))
-	//		e = PED::GET_VEHICLE_PED_IS_USING(e);
-
-	//	// get coords
-	//	Vector3 coords;
-	//	bool success = false;
-	//	bool blipFound = false;
-	//	// search for marker blip
-	//	int blipIterator = UI::_GET_BLIP_INFO_ID_ITERATOR();
-	//	for (Blip i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator); UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator))
-	//	{
-	//		if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4)
-	//		{
-	//			coords = UI::GET_BLIP_INFO_ID_COORD(i);
-	//			blipFound = true;
-	//			break;
-	//		}
-	//	}
-	//	if (blipFound)
-	//	{
-	//		// load needed map region and check height levels for ground existence
-	//		bool groundFound = false;
-	//		static float groundCheckHeight[] = {
-	//			100.0, 150.0, 50.0, 0.0, 200.0, 250.0, 300.0, 350.0, 400.0,
-	//			450.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0
-	//		};
-	//		for (int i = 0; i < sizeof(groundCheckHeight) / sizeof(float); i++)
-	//		{
-	//			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, coords.x, coords.y, groundCheckHeight[i], 0, 0, 1);
-	//			WAIT(100);
-	//			if (GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, groundCheckHeight[i], &coords.z, FALSE))
-	//			{
-	//				groundFound = true;
-	//				coords.z += 3.0;
-	//				break;
-	//			}
-	//		}
-	//		// if ground not found then set Z in air and give player a parachute
-	//		if (!groundFound)
-	//		{
-	//			coords.z = 100.0;
-	//			WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), GAMEPLAY::GET_HASH_KEY((char*)"GADGET_PARACHUTE"), 1, 0);
-	//		}
-	//		success = true;
-	//	}
-	//}
-	/*if (IsKeyJustUp(VK_NUMPAD3))
-	{
-	}*/
 
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- MISSION REPLAY TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// Detect if we started a Mission Replay.
@@ -433,7 +510,6 @@ void Update() {
 		}
 
 	lastValueOfToBeLoadedSaveFile = ToBeLoadedSaveFile;
-
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SAVE LOADING TEST=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 	// GTA and ScriptHookV don't have a option to directly check if the player just saved the game manually, only auto saves,
@@ -466,10 +542,10 @@ void Update() {
 					CreateHelpText((char*)"Saving error...", true);
 				}
 			}
-			else
-			{
-				CreateHelpText((char*)"Not enough Collected Vehicles to save", true);
-			}
+			//else
+			//{
+			//	//CreateHelpText((char*)"Not enough Collected Vehicles to save", true);
+			//}
 		}
 	}
 	else
@@ -479,16 +555,16 @@ void Update() {
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- USER INTERFACE =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 	ShowCollectedAmount();
-	
+
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GENERATE LIST OF MISSING CARS =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	bool genList1 = CONTROLS::IS_CONTROL_PRESSED(0,eControl::ControlCover);
-	bool genList2 = CONTROLS::IS_CONTROL_PRESSED(0,eControl::ControlReload);
+	bool genList1 = CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlCover);
+	bool genList2 = CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlReload);
 
 	if (genList1 && genList2) {
-		
-		if (genStartTimer) 
+
+		if (genStartTimer)
 		{
-			if ((GetTickCount() >= genStartPressingTime + genMaxPressingTime )&& !genAlreadyCreatingFile)
+			if ((GetTickCount() >= genStartPressingTime + genMaxPressingTime) && !genAlreadyCreatingFile)
 			{
 				genAlreadyCreatingFile = true;
 
@@ -514,7 +590,7 @@ void Update() {
 					}
 
 					genFileStream << "Missing Vehicles:\n";
-					for (const char* a : genMissingVehicles) 
+					for (const char* a : genMissingVehicles)
 					{
 						genFileStream << a;
 						genFileStream << '\n';
@@ -522,7 +598,7 @@ void Update() {
 
 					genFileStream << '\n';
 					genFileStream << "Delivered Vehicles:\n";
-					
+
 					for (const char* b : deliveredVehicles)
 					{
 						genFileStream << b;
@@ -535,7 +611,7 @@ void Update() {
 					UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"Simeon", (char*)"");
 					UI::_DRAW_NOTIFICATION(0, 1);
 				}
-				else 
+				else
 				{
 					UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
 					UI::_ADD_TEXT_COMPONENT_STRING((char*)"SSA_MissingVehicles.txt couldn't be created.\nPlease start GTAV as ADMINISTRATOR.");
@@ -551,12 +627,13 @@ void Update() {
 		}
 
 	}
-	else 
+	else
 	{
 		genStartTimer = false;
 		genAlreadyCreatingFile = false;
 	}
-	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- TRAILERS TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- TRAILERS AND ORTEGA TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// We want to only call this only once per frame, so have it so can be reused for other parts of the script.
 	const int ARR_SIZE = 255;
 	Vehicle vehInWorld[ARR_SIZE];
@@ -575,19 +652,19 @@ void Update() {
 
 						if (!QuickCheckIfDelivered((char*)a))
 						{
-							VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(GAMEPLAY::GET_HASH_KEY((char*)a));
-							VEHICLE::DETACH_VEHICLE_FROM_TRAILER(PLAYER::GET_PLAYERS_LAST_VEHICLE());
 							ENTITY::SET_ENTITY_AS_MISSION_ENTITY(vehTrailerTest, TRUE, TRUE);
+							VEHICLE::DETACH_VEHICLE_FROM_TRAILER(PLAYER::GET_PLAYERS_LAST_VEHICLE());
 							VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(vehTrailerTest);
 							QuickAddToDelivered((char*)a);
 							VEHICLE::DELETE_VEHICLE(&vehTrailerTest);
+
 							std::string trHelper;
-							trHelper += "Trailer Delivered to Simeon!";
+							trHelper += "Trailer Delivered!\n";
 							trHelper += "(";
 							trHelper += a;
 							trHelper += ")";
+
 							CreateHelpText((char*)trHelper.c_str(), true);
-							OrtegaTrailerDelivered = true;
 						}
 						break;
 					}
@@ -607,7 +684,7 @@ void Update() {
 						QuickAddToDelivered((char*)"PROPTRAILER");
 						VEHICLE::DELETE_VEHICLE(&vehTrailerTest);
 						std::string trHelper;
-						trHelper += "Ortega Delivered to Simeon???";
+						trHelper += "Ortega Delivered???\n";
 						trHelper += "(";
 						trHelper += "PROPTRAILER";
 						trHelper += ")";
@@ -616,6 +693,7 @@ void Update() {
 						UI::_ADD_TEXT_COMPONENT_STRING((char*)"WHY DID YOU BRING A ENTIRE TRAILER? AND WHY THERE'S A GUY INSIDE IT?");
 						UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"SIMEON", (char*)"What is this?");
 						UI::_DRAW_NOTIFICATION(0, 1);
+						OrtegaTrailerDelivered = true;
 					}
 					break;
 				}
@@ -667,8 +745,6 @@ void Update() {
        }
 
 			Hash lastDriveModelHash = ENTITY::GET_ENTITY_MODEL(lastDrivenVehicle);
-			OutputDebugString("player last drive model hash:");
-			OutputDebugString(std::to_string(lastDriveModelHash).c_str());
 
 			for (const char* a : fullVehicleList)
 			{
@@ -680,13 +756,13 @@ void Update() {
 					if (QuickCheckIfDelivered((char*)a))
 					{
 						alreadyHave = true;
-						CreateHelpText((char*)"Simeon already has this vehicle!", false);
+						CreateHelpText((char*)"This vehicle has already been delivered!", false);
 						break;
 					}
 
 					// This vehicle haven't been delivered, tell the player about it and start the script.
 					currentStage = ScriptStage::Delivering;
-					CreateHelpText((char*)"This vehicle can be delivered to Simeon!", true);
+					CreateHelpText((char*)"This vehicle can be delivered!", true);
 					EnableAllDeliveryBlips();
 					lastValidVehicle = (char*)a;
 					break;
@@ -711,7 +787,6 @@ void Update() {
 		if (!PED::IS_PED_IN_ANY_VEHICLE(pPedID, false)) {
 			//Player is not in vehicle, start looking for the next one.
 			currentStage = ScriptStage::CheckCurrentVehicle;
-
 		}
 		break;
 
@@ -764,9 +839,7 @@ void Update() {
 
 		// PLAYER IS IN DELIVERY AREA
 		AI::TASK_EVERYONE_LEAVE_VEHICLE(lastDriven);
-		ENTITY::SET_ENTITY_AS_MISSION_ENTITY(lastDriven, true, true); // set current vehicle as a mission entity, so we can delete after.
-		// GTA missions scripts = const float DEFAULT_VEH_STOPPING_DISTANCE = 10.5
-
+		//ENTITY::SET_ENTITY_AS_MISSION_ENTITY(lastDriven, true, true); // set current vehicle as a mission entity, so we can delete after.
 		currentStage = ScriptStage::DeleteVehicle;
 		WAIT(500);
 		break;
@@ -830,7 +903,7 @@ void Update() {
 		// Car is probably free to delete;
 		if (!PED::IS_PED_IN_ANY_VEHICLE(pPedID, true)) {
 			std::string deliMsg;
-			deliMsg += "Vehicle Delivered to Simeon!";
+			deliMsg += "Vehicle Delivered!";
 			deliMsg += "\n(";
 			deliMsg += VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(lastDriven));
 			deliMsg += ")";
@@ -847,38 +920,6 @@ void Update() {
 
 		break;
 	}
-
-	//Random Ideas - Delete later
-	// 			//ENUM VEHICLE_SEAT
-			//VS_ANY_PASSENGER = -2,				 //Any passenger seat
-			//	VS_DRIVER = -1,						 // Drivers seat
-			//	VS_FRONT_RIGHT = 0,					// Front Right seat
-			//	VS_BACK_LEFT,						//Back left 	
-			//	VS_BACK_RIGHT,						//Back right
-			//	VS_EXTRA_LEFT_1,
-			//	VS_EXTRA_RIGHT_1,
-			//	VS_EXTRA_LEFT_2,
-			//	VS_EXTRA_RIGHT_2,
-			//	VS_EXTRA_LEFT_3,
-			//	VS_EXTRA_RIGHT_3
-	//Vector3 a = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true);
-	//std::string textcomplet = "X: " + std::to_string(a.x) + " | Y: " + std::to_string(a.y) + " | Z: " + std::to_string(a.z);
-	//CreateQuickDebugTextThisFrame((char*)textcomplet.c_str());
-	//Vehicle lastdrivenvehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
-	////float vehiclehealth = VEHICLE::GET_VEHICLE_BODY_HEALTH(lastdrivenvehicle);
-	////int vehicleClass = VEHICLE::GET_VEHICLE_LAYOUT_HASH(lastdrivenvehicle);
-	//Hash h = GAMEPLAY::GET_HASH_KEY((char*)"taxi");
-	//textcomplet = textcomplet + "\nlast driven vehicle: " + std::to_string(lastdrivenvehicle) + "\n TAXI HASH NAME:" + std::to_string(h);
-	//if (VEHICLE::IS_VEHICLE_MODEL(lastdrivenvehicle, h) == TRUE) {
-
-	//	UI::_SET_TEXT_COMPONENT_FORMAT((char*)"STRING");
-	//	UI::_ADD_TEXT_COMPONENT_STRING((char*)textcomplet.c_str());
-	//	UI::_DISPLAY_HELP_TEXT_FROM_STRING_LABEL(0, 0, 0, -1);
-	//}
-	//VEHICLE::IS_VEHICLE_MODEL();
-	//STREAMING::IS_MODEL_A_VEHICLE();
-	//ENTITY::GET_ENTITY_MODEL(); // Hash model of a entity. now how to get a entity from a vehicle
-	//draw help text
 }
 
 // Reminder to myself: variables set outside of functions are reserved as globals
