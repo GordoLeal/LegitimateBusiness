@@ -315,7 +315,7 @@ StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 	if (ENTITY::IS_ENTITY_IN_AREA(entity, SimeonArea.x1, SimeonArea.y1, SimeonArea.z1, SimeonArea.x2, SimeonArea.y2, SimeonArea.z2, false, false, 0)
 		&& gSettings.SimeonAsDelivery)
 	{
-		if(!gSettings.SimeonStateDuringArmenian && IsInArmenian)
+		if (!gSettings.SimeonStateDuringArmenian && IsInArmenian)
 		{
 			return none;
 		}
@@ -363,6 +363,48 @@ void SetOrtegaTrailerWasDelivered() {
 Vector3 pos1;
 Vector3 pos2;
 bool show = false;
+
+void CreateMissingCarsTXTFile()
+{
+	std::fstream genFileStream;
+	genFileStream.open("SSA_MissingVehicles.txt", std::ios::in | std::ios::out | std::ios::trunc);
+	if (genFileStream.is_open()) {
+		std::list<const char*> genMissingVehicles;
+		for (const char* x : fullVehicleList)
+		{
+			bool found = false;
+			for (const char* z : deliveredVehicles)
+			{
+				if (x == z)
+				{
+					found = true;
+				}
+			}
+			if (!found)
+			{
+				genMissingVehicles.push_back(x);
+			}
+
+		}
+
+		genFileStream << "Missing Vehicles:\n";
+		for (const char* a : genMissingVehicles)
+		{
+			genFileStream << a;
+			genFileStream << '\n';
+		}
+
+		genFileStream << '\n';
+		genFileStream << "Delivered Vehicles:\n";
+
+		for (const char* b : deliveredVehicles)
+		{
+			genFileStream << b;
+			genFileStream << '\n';
+		}
+		genFileStream.close();
+	}
+}
 
 void Update() {
 
@@ -438,58 +480,7 @@ void Update() {
 			if ((GetTickCount() >= genStartPressingTime + genMaxPressingTime) && !genAlreadyCreatingFile)
 			{
 				genAlreadyCreatingFile = true;
-
-				std::fstream genFileStream;
-				genFileStream.open("SSA_MissingVehicles.txt", std::ios::in | std::ios::out | std::ios::trunc);
-				if (genFileStream.is_open()) {
-					std::list<const char*> genMissingVehicles;
-					for (const char* x : fullVehicleList)
-					{
-						bool found = false;
-						for (const char* z : deliveredVehicles)
-						{
-							if (x == z)
-							{
-								found = true;
-							}
-						}
-						if (!found)
-						{
-							genMissingVehicles.push_back(x);
-						}
-
-					}
-
-					genFileStream << "Missing Vehicles:\n";
-					for (const char* a : genMissingVehicles)
-					{
-						genFileStream << a;
-						genFileStream << '\n';
-					}
-
-					genFileStream << '\n';
-					genFileStream << "Delivered Vehicles:\n";
-
-					for (const char* b : deliveredVehicles)
-					{
-						genFileStream << b;
-						genFileStream << '\n';
-					}
-					genFileStream.close();
-
-					UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
-					UI::_ADD_TEXT_COMPONENT_STRING((char*)"file SSA_MissingVehicles.txt created.");
-					UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"Simeon", (char*)"");
-					UI::_DRAW_NOTIFICATION(0, 1);
-				}
-				else
-				{
-
-					UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
-					UI::_ADD_TEXT_COMPONENT_STRING((char*)"SSA_MissingVehicles.txt couldn't be created.\nPlease start GTAV as ADMINISTRATOR.");
-					UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"WARNING!", (char*)"");
-					UI::_DRAW_NOTIFICATION(0, 1);
-				}
+				CreateMissingCarsTXTFile();
 			}
 		}
 		else
@@ -506,7 +497,7 @@ void Update() {
 	}
 
 	//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-  MISSION SPECIFIC STUFF  =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- 
-	
+
 	// i don't like this code, find a better way later...
 	IsInArmenian = false;
 	IsInDLG = false;
@@ -848,6 +839,7 @@ void Update() {
 			ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&lastDriven);
 			//VEHICLE::DELETE_VEHICLE(&lastDriven);
 			CreateHelpText((char*)deliMsg.c_str(), true);
+			CreateMissingCarsTXTFile();
 			currentStage = ScriptStage::CheckCurrentVehicle;
 		}
 

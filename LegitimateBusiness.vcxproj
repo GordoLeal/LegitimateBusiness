@@ -160,18 +160,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="keyboard.cpp" />
-    <ClCompile Include="SaveSystem.cpp" />
-    <ClCompile Include="Script.cpp" />
-    <ClCompile Include="Settings.cpp" />
+    <ClCompile Include="Code\dllmain.cpp" />
+    <ClCompile Include="Code\keyboard.cpp" />
+    <ClCompile Include="Code\SaveSystem.cpp" />
+    <ClCompile Include="Code\Script.cpp" />
+    <ClCompile Include="Code\Settings.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="keyboard.h" />
-    <ClInclude Include="SaveSystem.h" />
-    <ClInclude Include="Script.h" />
-    <ClInclude Include="Settings.h" />
-    <ClInclude Include="Vehicles.h" />
+    <ClInclude Include="Code\keyboard.h" />
+    <ClInclude Include="Code\SaveSystem.h" />
+    <ClInclude Include="Code\Script.h" />
+    <ClInclude Include="Code\Settings.h" />
+    <ClInclude Include="Code\Vehicles.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
