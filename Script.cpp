@@ -32,6 +32,9 @@ char* lastValidVehicle;
 Settings gSettings;
 ScriptStage currentStage = ScriptStage::CheckCurrentVehicle;
 bool OrtegaTrailerDelivered;
+// Mission specific
+bool IsInArmenian = false;
+bool IsInDLG = false;
 // MissionReplay
 bool missionReplayCalled;
 // Generate Remaining Cars List.
@@ -205,14 +208,16 @@ void EnableAllDeliveryBlips()
 		UI::SET_BLIP_FLASH_TIMER(countrysideLightHouseBlip, 5000);
 		UI::SET_BLIP_COLOUR(countrysideLightHouseBlip, 41);
 	}
-	if (gSettings.SimeonAsDelivery)
+
+	if (gSettings.SimeonAsDelivery && !(!gSettings.SimeonStateDuringArmenian && IsInArmenian))
 	{
 		simeonBlip = UI::ADD_BLIP_FOR_COORD(-55, -1112, 26);
 		UI::SET_BLIP_FLASHES(simeonBlip, true);
 		UI::SET_BLIP_FLASH_TIMER(simeonBlip, 5000);
 		UI::SET_BLIP_COLOUR(simeonBlip, BlipColorGreen);
+
 	}
-	if (gSettings.PierAsDelivery) {
+	if (gSettings.PierAsDelivery && !(!gSettings.SimeonStateDuringArmenian && IsInDLG)) {
 		PierBlip = UI::ADD_BLIP_FOR_COORD(-1813, -1200, 13);
 		UI::SET_BLIP_FLASHES(PierBlip, true);
 		UI::SET_BLIP_FLASH_TIMER(PierBlip, 5000);
@@ -300,35 +305,44 @@ StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 	if (ENTITY::IS_ENTITY_IN_AREA(entity, LighthouseArea.x1, LighthouseArea.y1, LighthouseArea.z1, LighthouseArea.x2, LighthouseArea.y2, LighthouseArea.z2, true, true, 0)
 		&& gSettings.LightHouseAsDelivery)
 	{
-		//OutputDebugString("Lighthouse tel");
 		return Lighthouse;
 	}
 	if (ENTITY::IS_ENTITY_IN_ANGLED_AREA(entity, BeachArea.x1, BeachArea.y1, BeachArea.z1, BeachArea.x2, BeachArea.y2, BeachArea.z2, 45, false, false, 0)
 		&& gSettings.BeachAsDelivery)
 	{
-		//OutputDebugString("beach tel");
 		return Beach;
 	}
 	if (ENTITY::IS_ENTITY_IN_AREA(entity, SimeonArea.x1, SimeonArea.y1, SimeonArea.z1, SimeonArea.x2, SimeonArea.y2, SimeonArea.z2, false, false, 0)
 		&& gSettings.SimeonAsDelivery)
 	{
-		//	OutputDebugString("Simeon tel");
+		if(!gSettings.SimeonStateDuringArmenian && IsInArmenian)
+		{
+			return none;
+		}
+
 		return Simeon;
 	}
 	if (ENTITY::IS_ENTITY_IN_ANGLED_AREA(entity, PierArea.x1, PierArea.y1, PierArea.z1, PierArea.x2, PierArea.y2, PierArea.z2, 45, false, false, 0)
 		&& gSettings.PierAsDelivery)
 	{
-		//	OutputDebugString("Simeon tel");
+		if (!gSettings.PierStateDuringDLG && IsInDLG)
+		{
+			return none;
+		}
 		return Pier;
 	}
 	return none;
 }
+
+
+
 
 //DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 void DrawBoxArea(DeliveryArea area) {
 	GRAPHICS::DRAW_BOX(area.x1, area.y1, area.z1, area.x2, area.y2, area.z2, 2, 120, 120, 100);
 }
+
 
 // =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= ORTEGA TRAILER =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
 
@@ -491,6 +505,27 @@ void Update() {
 		genAlreadyCreatingFile = false;
 	}
 
+	//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-  MISSION SPECIFIC STUFF  =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- 
+	
+	// i don't like this code, find a better way later...
+	IsInArmenian = false;
+	IsInDLG = false;
+
+	if (!gSettings.SimeonStateDuringArmenian
+		&& (SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"Armenian1")) > 0
+			|| SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"Armenian3")) > 0)
+		)
+	{
+		IsInArmenian = true;
+	}
+
+	if (!gSettings.PierStateDuringDLG && SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"Family2")) > 0)
+	{
+		IsInDLG = true;
+	}
+
+
+
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- TRAILERS AND ORTEGA TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// We want to only call this only once per frame, so have it in a way that can be reused for other parts of the script.
 	const int ARR_SIZE = 255;
@@ -576,52 +611,52 @@ void Update() {
 			Vehicle lastDrivenVehicle = PLAYER::GET_PLAYERS_LAST_VEHICLE();
 			bool foundValidVehicle = false;
 			bool alreadyHave = false;
-			
+
 			// ANTI PARKING LOT ABUSE
-		if (gSettings.AntiParkingLotBeach && gSettings.BeachAsDelivery) 
-		{
-			if (LastStolenVehicle != lastDrivenVehicle)
+			if (gSettings.AntiParkingLotBeach && gSettings.BeachAsDelivery)
 			{
-				if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(lastDrivenVehicle))
+				if (LastStolenVehicle != lastDrivenVehicle)
 				{
-				Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
-
-				float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, -1195, -1788, 0);
-
-					if (CheatDistance < 600.0f)
+					if (!VEHICLE::_IS_VEHICLE_ENGINE_ON(lastDrivenVehicle))
 					{
-						if (!GAMEPLAY::GET_MISSION_FLAG())
+						Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
+
+						float CheatDistance = SYSTEM::VDIST(CurrentCoords.x, CurrentCoords.y, CurrentCoords.z, -1195, -1788, 0);
+
+						if (CheatDistance < 600.0f)
 						{
+							if (!GAMEPLAY::GET_MISSION_FLAG())
+							{
+								ParkingAbuseDuringMission = 0x0;
+								ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z + 1, 0x0, 0x0, 0x0, 0x0);
+								WAIT(1000);
+								VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
+								CreateHelpText((char*)"Parking lot abuse detected!", true);
+								break;
+							}
+
+							else
+							{
+								ParkingAbuseDuringMission = 0x1;
+							}
+						}
+
+						else
+						{
+							ParkingAbuseDuringMission = 0x0;
+							LastStolenVehicle = lastDrivenVehicle;
+						}
+
+					}
+
+					else
+					{
 						ParkingAbuseDuringMission = 0x0;
-						ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z + 1, 0x0, 0x0, 0x0, 0x0);
-						WAIT(1000);
-						VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
-						CreateHelpText((char*)"Parking lot abuse detected!", true);
-						break;
-						}
-
-						else 
-						{
-						ParkingAbuseDuringMission = 0x1;
-						}
+						LastStolenVehicle = lastDrivenVehicle;
 					}
-
-					else 
-					{
-					ParkingAbuseDuringMission = 0x0;
-					LastStolenVehicle = lastDrivenVehicle;
-					}
-
-				}
-
-				else 
-				{
-				ParkingAbuseDuringMission = 0x0;
-				LastStolenVehicle = lastDrivenVehicle;
 				}
 			}
-		}
-				
+
 			Hash lastDriveModelHash = ENTITY::GET_ENTITY_MODEL(lastDrivenVehicle);
 
 			for (const char* a : fullVehicleList)
@@ -726,7 +761,7 @@ void Update() {
 				lastValidVehicle = (char*)"";
 				return;
 			}
-									
+
 			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 1, 5, true); // Stop vehicle
 			break;
 		case Pier:

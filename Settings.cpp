@@ -17,27 +17,44 @@ void Settings::CreateSettingsFile()
 		OutputDebugStringA("ta open");
 		std::string fileout;
 		fileout += "# SETTINGS FILE FOR SUPER SIMEON AUTOS\n";
-		fileout += "# 0 = false/disabled | 1 = true/enabled\n\n";
+		fileout += "# 0 = Disabled | 1 = Enabled\n\n";
+
 		fileout += "# Enable lighthouse as a delivery point\n";
 		fileout += "LightHouseAsDelivery=1\n\n";
+
 		fileout += "# Enable the Del Perro Pier as a delivery point\n";
 		fileout += "PierAsDelivery=1\n\n";
+
+		fileout += "# Enable/Disable the Del Perro Pier as a delivery point during Daddy's Little Girl  (enabled(1) by default)\n";
+		fileout += "PierStateDuringDLG=1\n\n";
+
+		fileout += "# Enable or Disable Simeon as a delivery point during Armenian missions (Frankling and Lamar | Complications) (enabled (1) by default)\n";
+		fileout += "SimeonStateDuringArmenian=1\n\n";
+
 		fileout += "# Enable the lifeguard tower (Vespucci Beach) as a delivery point\n";
 		fileout += "BeachAsDelivery=0\n\n";
+
 		fileout += "# Protection for the player to not abuse the parking lot next to lifeguard tower (anti cheat)\n";
 		fileout += "AntiParkingLotBeach=1\n\n";
+
 		fileout += "# Enable Simeon as a delivery point\n";
 		fileout += "SimeonAsDelivery=1\n\n";
+
 		fileout += "# Enable Trailers as vehicles that can be delivered\n";
 		fileout += "EnableTrailers=1\n\n";
+
 		fileout += "# Enable Heli/Planes to be delivered\n";
 		fileout += "EnableFlyingVehicles=1\n\n";
+
 		fileout += "# Enable boats to be delivered\n";
 		fileout += "EnableWaterVehicles=1\n\n";
+
 		fileout += "# Display Max Amount of vehicles to be collected\n";
 		fileout += "DisplayMaxAmount=1\n\n";
+
 		fileout += "# Show help text about missing vehicles list every 30 minutes\n";
 		fileout += "ShowHelpText=1\n\n";
+
 		fileout += "# Mod Made by GordoLeal\n";
 		fileout += "# Twitch.tv/GordoLeal";
 		settingsStream << fileout;
@@ -80,7 +97,9 @@ void Settings::ReadValuesFromSettingsFile()
 		LightHouseAsDelivery = true;
 		BeachAsDelivery = false;
 		SimeonAsDelivery = true;
+		SimeonStateDuringArmenian = true;
 		PierAsDelivery = true;
+		PierStateDuringDLG = true;
 		EnableTrailers = true;
 		EnableFlyingVehicles = true;
 		EnableWaterVehicles = true;
@@ -153,6 +172,11 @@ void Settings::ReadValuesFromSettingsFile()
 				SimeonAsDelivery = stringToBool(value);
 				found = true;
 			}
+			if (!found && command.find("SimeonStateDuringArmenian") == 0)
+			{
+				AntiParkingLotBeach = stringToBool(value);
+				found = true;
+			}
 			if (!found && command.find("PierAsDelivery") == 0)
 			{
 				PierAsDelivery = stringToBool(value);
@@ -161,6 +185,11 @@ void Settings::ReadValuesFromSettingsFile()
 			if (!found && command.find("EnableTrailers") == 0)
 			{
 				EnableTrailers = stringToBool(value);
+				found = true;
+			}
+			if (!found && command.find("PierStateDuringDLG") == 0)
+			{
+				PierStateDuringDLG = stringToBool(value);
 				found = true;
 			}
 			if (!found && command.find("EnableFlyingVehicles") == 0)
@@ -188,6 +217,7 @@ void Settings::ReadValuesFromSettingsFile()
 				AntiParkingLotBeach = stringToBool(value);
 				found = true;
 			}
+
 		}
 	}
 }

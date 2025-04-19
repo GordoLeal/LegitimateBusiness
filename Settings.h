@@ -5,13 +5,16 @@ public:
 	bool LightHouseAsDelivery;
 	bool BeachAsDelivery;
 	bool SimeonAsDelivery;
+	bool SimeonStateDuringArmenian;
 	bool PierAsDelivery;
+	bool PierStateDuringDLG;
 	bool EnableTrailers;
 	bool EnableFlyingVehicles;
 	bool EnableWaterVehicles;
 	bool DisplayMaxAmount;
 	bool ShowHelpText;
 	bool AntiParkingLotBeach;
+
 
 	bool DoesSettingsFileExists();
 	void ReadValuesFromSettingsFile();
