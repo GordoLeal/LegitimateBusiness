@@ -6,6 +6,7 @@
 std::list<char*> deliveredVehicles;
 std::list<const char*> fullVehicleList;
 Vehicle LastStolenVehicle;
+BOOLEAN ParkingAbuseDuringMission;
 
 enum ScriptStage {
 	CheckCurrentVehicle,
@@ -753,16 +754,23 @@ void Update() {
 					{
 						if (!GAMEPLAY::GET_MISSION_FLAG())
 						{
+						ParkingAbuseDuringMission = 0x0;
 						ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z + 1, 0x0, 0x0, 0x0, 0x0);
 						WAIT(1000);
 						VEHICLE::EXPLODE_VEHICLE(lastDrivenVehicle, false, true);
 						CreateHelpText((char*)"Parking lot abuse detected!", true);
 						break;
 						}
+
+						else 
+						{
+						ParkingAbuseDuringMission = 0x1;
+						}
 					}
 
 					else 
 					{
+					ParkingAbuseDuringMission = 0x0;
 					LastStolenVehicle = lastDrivenVehicle;
 					}
 
@@ -770,6 +778,7 @@ void Update() {
 
 				else 
 				{
+				ParkingAbuseDuringMission = 0x0;
 				LastStolenVehicle = lastDrivenVehicle;
 				}
 			}
@@ -864,6 +873,22 @@ void Update() {
 			ENTITY::SET_ENTITY_COORDS(pPedID, 3351, 5152, 20, false, false, false, false); // warp to safe zone.
 			break;
 		case Beach:
+
+			if (gSettings.AntiParkingLotBeach && ParkingAbuseDuringMission)
+			{
+				Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
+				ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z + 1, 0x0, 0x0, 0x0, 0x0);
+
+				WAIT(1000);
+				VEHICLE::EXPLODE_VEHICLE(lastDriven, false, true);
+				CreateHelpText((char*)"Parking lot abuse detected!", true);
+
+				DisableAllDeliveryBlips();
+				currentStage = ScriptStage::CheckCurrentVehicle;
+				lastValidVehicle = (char*)"";
+				return;
+			}
+									
 			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 1, 5, true); // Stop vehicle
 			break;
 		case Pier:
