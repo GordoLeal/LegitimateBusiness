@@ -77,6 +77,7 @@
     <OutDir>Compiled\$(Configuration)\</OutDir>
     <IntDir>Temp\$(Configuration)\</IntDir>
     <TargetExt>.asi</TargetExt>
+    <TargetName>SuperSimeonAutos</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>C:\Users\pedro\OneDrive\Área de Trabalho\GTA Modding\LegitimateBusiness\inc;$(IncludePath)</IncludePath>
@@ -84,6 +85,7 @@
     <OutDir>Compiled\$(Configuration)\</OutDir>
     <IntDir>Temp\$(Configuration)\</IntDir>
     <TargetExt>.asi</TargetExt>
+    <TargetName>SuperSimeonAutos</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -169,7 +171,6 @@
     <ClInclude Include="SaveSystem.h" />
     <ClInclude Include="Script.h" />
     <ClInclude Include="Settings.h" />
-    <ClInclude Include="VehicleEnums.h" />
     <ClInclude Include="Vehicles.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

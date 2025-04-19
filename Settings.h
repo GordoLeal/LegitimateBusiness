@@ -13,7 +13,6 @@ public:
 	bool ShowHelpText;
 	bool AntiParkingLotBeach;
 
-	bool GetBoolFromSetting(char* setting);
 	bool DoesSettingsFileExists();
 	void ReadValuesFromSettingsFile();
 	void CreateSettingsFile();

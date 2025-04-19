@@ -79,10 +79,8 @@ SaveSystem::ErrSave SaveSystem::SaveProgress(std::list<char*> vehicles, bool isE
 		saveStream.open(lastUsedSaveFilePath.c_str(), std::ios::in | std::ios::out | std::ios::binary | std::ios::ate);
 		saveStream << Identifier.c_str(); //identifier to know from now on is only the data we have written, need to be something unique.
 		//don't need fancy json/xml stuff for now, just write the data and recover later.
-		OutputDebugString("saving Loop");
 		for (char* v : vehicles) {
 			saveStream << ',';
-			OutputDebugString(v);
 			saveStream << v;
 			saveStream << '#';
 		}
@@ -136,10 +134,8 @@ SaveSystem::ErrSave SaveSystem::SaveProgressForReplay(std::list<char*> vehicles,
 		saveStream.open(lastUsedSaveFilePath.c_str(), std::ios::in | std::ios::out | std::ios::binary | std::ios::ate);
 		saveStream << Identifier.c_str(); //identifier to know from that point and forward is only the data we have written, need to be something unique.
 		//don't need fancy json/xml stuff for now, just write the data and recover later.
-		OutputDebugString("saving Loop");
 		for (char* v : vehicles) {
 			saveStream << ',';
-			OutputDebugString(v);
 			saveStream << v;
 			saveStream << '#';
 		}
@@ -294,18 +290,15 @@ SaveSystem::ErrSave FillArrayWithSaveFileData(std::wstring saveFolderPath, std::
 	// found this simple "file to string" iterator while looking on other stuff, it seems to work, not a clue how it works... magic...
 	// good enough for me.
 	std::string savefilecontent{ std::istreambuf_iterator<char>(streamRecentFile), std::istreambuf_iterator<char>() };
-	OutputDebugString(savefilecontent.c_str());
 	size_t posOurContent = savefilecontent.find(Identifier);
 	if (posOurContent == std::string::npos) {
 		//Identifier not found, save don't have any data.
-		OutputDebugString("Save File don't have data");
 		return SaveSystem::ErrSave::SaveFileDontHaveData;
 	}
 	// i don't care for the content that comes before the identifier, also remove the identifier.
 	savefilecontent.erase(0, posOurContent + Identifier.size());
 	deliveredVehiclesFromSave.clear();
 	//just a basic loop.
-	OutputDebugStringA("Start of basic load loop");
 	int x = 0;
 	std::string content;
 	bool hitEnd = false;
@@ -313,28 +306,23 @@ SaveSystem::ErrSave FillArrayWithSaveFileData(std::wstring saveFolderPath, std::
 		switch (savefilecontent.at(x))
 		{
 		case '?':
-			OutputDebugStringA("IDENTIFIER IS WHERE IT SHOULD NEVER BE");
 			content.clear();
 			break;
 		case ','://start of value
-			OutputDebugStringA("Start of value");
 			content.clear();
 			break;
 		case '#'://end of value{
 		{
-			OutputDebugStringA("End of Value");
 			char* memoryIssues = new char[content.size() + 1];
 			strcpy_s(memoryIssues, content.size() + 1, content.c_str());
 			deliveredVehiclesFromSave.push_back(memoryIssues);
 			break;
 		}
 		case '!'://end of data we care.
-			OutputDebugStringA("End of loop");
 			hitEnd = true;
 			break;
 		default:
 			content += savefilecontent.at(x);
-			OutputDebugStringA(("returning at " + std::to_string(x) + " =" + content).c_str());
 			break;
 		}
 		x++;

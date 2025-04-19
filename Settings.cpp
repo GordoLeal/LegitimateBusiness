@@ -7,16 +7,6 @@
 #include <Windows.h>
 
 const char* SettingsFileName = "SSA_Settings.txt";
-//DoesSettingsFileExists should be run before this command.
-bool Settings::GetBoolFromSetting(char* setting)
-{
-	std::ifstream inFile;
-	inFile.open(SettingsFileName);
-	if (inFile.is_open()) {
-
-	}
-	return false;
-}
 
 void Settings::CreateSettingsFile()
 {
@@ -81,6 +71,7 @@ bool stringToBool(std::string inS) {
 		return false;
 	}
 }
+
 void Settings::ReadValuesFromSettingsFile()
 {
 	if (!DoesSettingsFileExists()) {

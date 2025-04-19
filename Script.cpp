@@ -40,7 +40,7 @@ bool genStartTimer = false;
 bool genAlreadyCreatingFile = false;
 //Quick Help generate missing vehicles
 const DWORD hmvMaxTimer = 1800000; //30 minutes
-//DWORD hmvMaxTimer = 30000; //30 seconds
+//DWORD hmvMaxTimer = 30000; //30 seconds for testing
 DWORD hmvStartTime;
 
 static void CreateHelpText(char* text, bool doSound) {
@@ -122,7 +122,6 @@ void LoadCurrentSave() {
 	// Mission replay does not cause a script reload.
 	if (SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"Prologue1")) > 0)
 	{
-		OutputDebugString("New Mission started, cleaning delivered vehicles");
 		// Player just loaded a new game.
 		// clean everything.
 		deliveredVehicles.clear();
@@ -133,7 +132,6 @@ void LoadCurrentSave() {
 		if (missionReplayCalled)
 		{
 			std::string cmp(ToBeLoadedSaveFile);
-			OutputDebugString((cmp + "Testando").c_str());
 			if (cmp.find("MISREP000") != std::string::npos) {
 				//Nothing is needed
 			}
@@ -143,7 +141,6 @@ void LoadCurrentSave() {
 				SaveSystem::LoadProgress(pathToSaveFolder, LastLoadedSaveSlotNumber, deliveredVehicles);
 			}
 			// Player just got out of a mission replay and is loading everything back.
-			OutputDebugString("Mission replay is over, loading MISREP");
 
 		}
 		else
@@ -153,14 +150,12 @@ void LoadCurrentSave() {
 			{
 				// Player Just loaded a save file.
 				// Load user data from that save.
-				OutputDebugString("Load Save File...");
 				deliveredVehicles.clear();
 				SaveSystem::LoadProgress(pathToSaveFolder, LastLoadedSaveSlotNumber, deliveredVehicles);
 
 			}
 			else
 			{
-				OutputDebugString("Load Save File for the first time...");
 				SaveSystem::LoadProgressForFirstTime(pathToSaveFolder, deliveredVehicles);
 				// Player Just oppened the game, check the latest saved files.
 			}
@@ -237,20 +232,6 @@ void DisableAllDeliveryBlips() {
 }
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=- UI =-=-=-=-=-=-=-=-=-=-
-void CreateQuickTextThisFrame(char* text) {
-	//Draw basic text
-	UI::SET_TEXT_FONT(0);
-	UI::SET_TEXT_SCALE(0.5f, 0.5f);
-	UI::SET_TEXT_WRAP(0.0, 1.0);
-	UI::SET_TEXT_CENTRE(1);
-	//UI::SET_TEXT_DROPSHADOW(0, 0, 0, 0, 0);
-	//UI::SET_TEXT_EDGE(0, 0, 0, 0, 0);
-	UI::SET_TEXT_SCALE(0, 0.2f);
-	UI::_SET_TEXT_ENTRY((char*)"STRING");
-	UI::SET_TEXT_COLOUR(255, 255, 255, 255);
-	UI::_ADD_TEXT_COMPONENT_STRING(text);
-	UI::_DRAW_TEXT(0.5f, 0.5f);
-}
 
 void ShowCollectedAmount() {
 	std::string outputAmount;
@@ -289,7 +270,6 @@ void ShowCollectedAmount() {
 		}
 	}
 }
-
 
 // =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-  Testing player in Area =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 typedef struct {
@@ -370,148 +350,6 @@ Vector3 pos2;
 bool show = false;
 
 void Update() {
-	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	if (IsKeyJustUp(VK_NUMPAD0))
-	{
-		// get entity to teleport
-		Entity e = PLAYER::PLAYER_PED_ID();
-		if (PED::IS_PED_IN_ANY_VEHICLE(e, 0))
-			e = PED::GET_VEHICLE_PED_IS_USING(e);
-
-		// get coords
-		Vector3 coords;
-		bool success = false;
-
-		bool blipFound = false;
-		// search for marker blip
-		int blipIterator = UI::_GET_BLIP_INFO_ID_ITERATOR();
-		for (Blip i = UI::GET_FIRST_BLIP_INFO_ID(blipIterator); UI::DOES_BLIP_EXIST(i) != 0; i = UI::GET_NEXT_BLIP_INFO_ID(blipIterator))
-		{
-			if (UI::GET_BLIP_INFO_ID_TYPE(i) == 4)
-			{
-				coords = UI::GET_BLIP_INFO_ID_COORD(i);
-				blipFound = true;
-				break;
-			}
-		}
-		if (blipFound)
-		{
-			// load needed map region and check height levels for ground existence
-			bool groundFound = false;
-			static float groundCheckHeight[] = {
-				100.0, 150.0, 50.0, 0.0, 200.0, 250.0, 300.0, 350.0, 400.0,
-				450.0, 500.0, 550.0, 600.0, 650.0, 700.0, 750.0, 800.0
-			};
-			for (int i = 0; i < sizeof(groundCheckHeight) / sizeof(float); i++)
-			{
-				ENTITY::SET_ENTITY_COORDS_NO_OFFSET(e, coords.x, coords.y, groundCheckHeight[i], 0, 0, 1);
-				WAIT(100);
-				if (GAMEPLAY::GET_GROUND_Z_FOR_3D_COORD(coords.x, coords.y, groundCheckHeight[i], &coords.z, FALSE))
-				{
-					groundFound = true;
-					coords.z += 3.0;
-					break;
-				}
-			}
-			// if ground not found then set Z in air and give player a parachute
-			if (!groundFound)
-			{
-				coords.z = 1000.0;
-				WEAPON::GIVE_DELAYED_WEAPON_TO_PED(PLAYER::PLAYER_PED_ID(), GAMEPLAY::GET_HASH_KEY((char*)"GADGET_PARACHUTE"), 1, 0);
-			}
-			success = true;
-		}
-
-
-	}
-
-	if (IsKeyJustUp(VK_NUMPAD1))
-	{
-		DWORD modelA = GAMEPLAY::GET_HASH_KEY((char*)"ARMYTANKER");
-		if (STREAMING::IS_MODEL_IN_CDIMAGE(modelA) && STREAMING::IS_MODEL_A_VEHICLE(modelA))
-		{
-			STREAMING::REQUEST_MODEL(modelA);
-			while (!STREAMING::HAS_MODEL_LOADED(modelA)) WAIT(0);
-			Vector3 coords = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER::PLAYER_PED_ID(), 5.0, 5.0, 0.0);
-			Vehicle veh = VEHICLE::CREATE_VEHICLE(modelA, coords.x, coords.y, coords.z, 0.0, 1, 1);
-			VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(veh);
-
-			WAIT(0);
-			STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(modelA);
-			ENTITY::SET_VEHICLE_AS_NO_LONGER_NEEDED(&veh);
-		}
-	}
-	if (IsKeyJustUp(VK_NUMPAD2))
-	{
-		DWORD model = GAMEPLAY::GET_HASH_KEY((char*)"PHANTOM");
-		if (STREAMING::IS_MODEL_A_VEHICLE(model))
-		{
-			STREAMING::REQUEST_MODEL(model);
-			while (!STREAMING::HAS_MODEL_LOADED(model)) WAIT(0);
-			Vector3 coords = ENTITY::GET_OFFSET_FROM_ENTITY_IN_WORLD_COORDS(PLAYER::PLAYER_PED_ID(), 12.0, 5.0, 10.0);
-			Vehicle veh = VEHICLE::CREATE_VEHICLE(model, coords.x, coords.y, coords.z, 0.0, 1, 1);
-			VEHICLE::SET_VEHICLE_ON_GROUND_PROPERLY(veh);
-
-			WAIT(0);
-			STREAMING::SET_MODEL_AS_NO_LONGER_NEEDED(model);
-			ENTITY::SET_VEHICLE_AS_NO_LONGER_NEEDED(&veh);
-		}
-	}
-
-	if (IsKeyJustUp(VK_NUMPAD4))
-	{
-		Vector3 pos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
-		std::string a;
-		a += "Pos X: ";
-		a += std::to_string(pos.x);
-		a += "\nPos Y: ";
-		a += std::to_string(pos.y);
-		a += "\nPos Z: ";
-		a += std::to_string(pos.z);
-		CreateHelpText((char*)a.c_str(), true);
-		pos1 = pos;
-	}
-	if (IsKeyJustUp(VK_NUMPAD5))
-	{
-		Vector3 pos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
-		std::string a;
-		a += "Pos X: ";
-		a += std::to_string(pos.x);
-		a += "\nPos Y: ";
-		a += std::to_string(pos.y);
-		a += "\nPos Z: ";
-		a += std::to_string(pos.z);
-		CreateHelpText((char*)a.c_str(), true);
-		pos2 = pos;
-	}
-	if (IsKeyJustUp(VK_NUMPAD6))
-	{
-		show = !show;
-		if (show)
-		{
-			CreateHelpText((char*)"yes", true);
-
-		}
-		else
-		{
-			CreateHelpText((char*)"no", true);
-		}
-	}
-	if (show)
-	{
-		DeliveryArea area;
-		area.x1 = pos1.x;
-		area.y1 = pos1.y;
-		area.z1 = pos1.z;
-		area.x2 = pos2.x;
-		area.y2 = pos2.y;
-		area.z2 = pos2.z;
-		DrawBoxArea(area);
-		GRAPHICS::DRAW_BOX(pos1.x, pos1.y, pos1.z, pos2.x, pos2.y, pos2.z, 2, 120, 120, 200);
-		Vector3 pos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), false);
-		GRAPHICS::DRAW_DEBUG_SPHERE(pos.x, pos.y, pos.z, 3, 10, 150, 10, 200);
-	}
-
 
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CONSTANTLY USED VARIABLES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	Ped pPedID = PLAYER::PLAYER_PED_ID();
@@ -653,7 +491,7 @@ void Update() {
 	}
 
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- TRAILERS AND ORTEGA TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	// We want to only call this only once per frame, so have it so can be reused for other parts of the script.
+	// We want to only call this only once per frame, so have it in a way that can be reused for other parts of the script.
 	const int ARR_SIZE = 255;
 	Vehicle vehInWorld[ARR_SIZE];
 	int vehInWorldCount = worldGetAllVehicles(vehInWorld, ARR_SIZE);
@@ -915,7 +753,7 @@ void Update() {
 		}
 
 		if (someoneStillInCar) {
-			//Someone still is in the car, test next frame.
+			//Someone still is in the car, emergency remove.
 			for (int x = -2; x < 9; x++)
 			{
 				//	if (!VEHICLE::IS_VEHICLE_SEAT_FREE(lastDriven, x)) //this function don't work.
@@ -934,6 +772,7 @@ void Update() {
 			}
 			break;
 		}
+
 		// Car is probably free to delete;
 		if (!PED::IS_PED_IN_ANY_VEHICLE(pPedID, true)) {
 			std::string deliMsg;
