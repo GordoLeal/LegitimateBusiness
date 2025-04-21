@@ -5,11 +5,20 @@
 
 std::list<char*> deliveredVehicles;
 std::list<const char*> fullVehicleList;
+//Parking Lot Abuse
 Vehicle LastStolenVehicle;
 BOOLEAN ParkingAbuseDuringMission;
+//Lighthouse generation
 UINT64 GTAVBase;
 UINT64 EndOfOurModule;
 UINT64 OurModuleBase;
+Hash lightHouseModel;
+Hash lightHouseRoofModel;
+Hash lightHouseLightModel;
+Hash lightHouseLight2Model;
+Entity lightHouseEntity;
+int lighHouseRotationTimer = 0;
+Vector3 lightHouseCoords;
 
 enum ScriptStage {
 	CheckCurrentVehicle,
@@ -43,7 +52,7 @@ bool IsInDLG = false;
 // MissionReplay
 bool missionReplayCalled;
 // Generate Remaining Cars List.
-const DWORD genMaxPressingTime = 5000;
+const DWORD genMaxPressingTime = 3000;
 DWORD genStartPressingTime;
 bool genStartTimer = false;
 bool genAlreadyCreatingFile = false;
@@ -384,7 +393,7 @@ void SetOrtegaTrailerWasDelivered() {
 	OrtegaTrailerDelivered = false;
 }
 
-// =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= ORTEGA TRAILER =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
+// =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= Create Missing Cars =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
 
 void CreateMissingCarsTXTFile()
 {
@@ -397,7 +406,7 @@ void CreateMissingCarsTXTFile()
 			bool found = false;
 			for (const char* z : deliveredVehicles)
 			{
-				if (x == z)
+				if (std::string(x).find(z) == 0)
 				{
 					found = true;
 				}
@@ -428,6 +437,96 @@ void CreateMissingCarsTXTFile()
 	}
 }
 
+// =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= LIGHTHOUSE DECORATION =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
+void LighthouseDecoration() {
+
+
+	if (!lightHouseModel) {
+		lightHouseModel = GAMEPLAY::GET_HASH_KEY((char*)"prop_storagetank_07a");
+	}
+
+	if (!lightHouseRoofModel) {
+		lightHouseRoofModel = GAMEPLAY::GET_HASH_KEY((char*)"prop_watertower01");
+	}
+
+	if (!lightHouseLightModel) {
+		lightHouseLightModel = GAMEPLAY::GET_HASH_KEY((char*)"prop_warninglight_01");
+	}
+
+	if (!lightHouseLight2Model) {
+		lightHouseLight2Model = GAMEPLAY::GET_HASH_KEY((char*)"prop_spot_01");
+	}
+
+	if (*(UINT64*)(GTAVBase + 0x1624174) == 0x1416CAE828EC8348) //Check if we are on 1.27
+	{
+		if (*(UINT64*)(GTAVBase + 0xC3FD94) == 0x000244840F01C1F6)	//Check if trainers already patched the pattern
+		{
+			*(UINT64*)(GTAVBase + 0x1659FDB) = 0x5E5FFD840F01C1F6;
+			*(UINT64*)(GTAVBase + 0x1659FE3) = 0xCCCCFF5E5DB4E9FF;
+			*(UINT64*)(GTAVBase + 0x16772F0) = OurModuleBase;
+			*(UINT64*)(GTAVBase + 0x1678D50) = EndOfOurModule;
+
+			*(UINT64*)(GTAVBase + 0x165A97C) = 0x0001A024848B4850;
+			*(UINT64*)(GTAVBase + 0x165A984) = 0xE95800000933E900;
+			*(UINT64*)(GTAVBase + 0x165A98C) = 0x244C894CFFFFF64B;
+			*(UINT64*)(GTAVBase + 0x165B2BD) = 0x0F0001DA8C053B48;
+			*(UINT64*)(GTAVBase + 0x165B2C5) = 0x0AADE9FFFFF6C083;
+			*(UINT64*)(GTAVBase + 0x165B2CD) = 0x20244C8944CC0000;
+			*(UINT64*)(GTAVBase + 0x165BD7C) = 0x0F0001B56D053B48;
+			*(UINT64*)(GTAVBase + 0x165BD84) = 0x13E958FFFFEC0186;
+			*(UINT64*)(GTAVBase + 0x165BD8C) = 0x244C894CCCFF5E40;
+
+			*(UINT64*)(GTAVBase + 0xC3FD94) = 0x90909000A1ABE3E9;
+			*(UINT8*)(GTAVBase + 0xC3FD9C) = 0x90;
+		}
+
+		if (!ENTITY::DOES_ENTITY_EXIST(lightHouseEntity))
+		{
+
+			STREAMING::REQUEST_MODEL(lightHouseModel);
+			STREAMING::REQUEST_MODEL(lightHouseRoofModel);
+			STREAMING::REQUEST_MODEL(lightHouseLightModel);
+			STREAMING::REQUEST_MODEL(lightHouseLight2Model);
+			while (!STREAMING::HAS_MODEL_LOADED(lightHouseModel)
+				|| !STREAMING::HAS_MODEL_LOADED(lightHouseRoofModel)
+				|| !STREAMING::HAS_MODEL_LOADED(lightHouseLightModel)
+				|| !STREAMING::HAS_MODEL_LOADED(lightHouseLight2Model))
+			{
+				WAIT(0);
+			}
+
+			lightHouseEntity = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseModel, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z, false, true, true);
+			ENTITY::FREEZE_ENTITY_POSITION(lightHouseEntity, 0x1);
+			ENTITY::SET_ENTITY_LOD_DIST(lightHouseEntity, 0xFFFF);
+			lightHouseEntity = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseModel, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z + 6.0f, false, true, true);
+			ENTITY::FREEZE_ENTITY_POSITION(lightHouseEntity, 0x1);
+			ENTITY::SET_ENTITY_LOD_DIST(lightHouseEntity, 0xFFFF);
+			lightHouseEntity = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseRoofModel, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z + 12.0f, false, true, true);
+			ENTITY::FREEZE_ENTITY_POSITION(lightHouseEntity, 0x1);
+			ENTITY::SET_ENTITY_LOD_DIST(lightHouseEntity, 0xFFFF);
+			lightHouseEntity = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseLightModel, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z + 18.5f, false, true, false);
+			ENTITY::FREEZE_ENTITY_POSITION(lightHouseEntity, 0x1);
+			ENTITY::SET_ENTITY_LOD_DIST(lightHouseEntity, 0xFFFF);
+			lightHouseEntity = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseLight2Model, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z + 16.5f, false, true, false);
+			ENTITY::FREEZE_ENTITY_POSITION(lightHouseEntity, 0x1);
+			ENTITY::SET_ENTITY_LOD_DIST(lightHouseEntity, 0xFFFF);
+
+			lighHouseRotationTimer = GAMEPLAY::GET_GAME_TIMER();
+		}
+		else
+		{
+			int newTime = GAMEPLAY::GET_GAME_TIMER();
+
+			float degrees = (newTime / 1000.0f - lighHouseRotationTimer / 1000.0f) * 10.0f;
+
+			Vector3 currentRotation = ENTITY::GET_ENTITY_ROTATION(lightHouseEntity, 2);
+
+			ENTITY::SET_ENTITY_ROTATION(lightHouseEntity, currentRotation.x, currentRotation.y, fmod(currentRotation.z + degrees, 360.0f), 2, true);
+			lighHouseRotationTimer = newTime;
+		}
+	}
+}
+
 //  =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
 //  =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= UPDATE =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0
 //  =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
@@ -435,6 +534,9 @@ void CreateMissingCarsTXTFile()
 void Update()
 {
 
+
+
+	LighthouseDecoration();
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CONSTANTLY USED VARIABLES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	Ped pPedID = PLAYER::PLAYER_PED_ID();
 	Player pID = PLAYER::PLAYER_ID();
@@ -444,7 +546,6 @@ void Update()
 	if (!missionReplayCalled)
 		if (lastValueOfToBeLoadedSaveFile.find("MISREP") == std::string::npos && std::string(ToBeLoadedSaveFile).find("MISREP") != std::string::npos)
 		{
-			OutputDebugString("Mission Replay Started");
 			missionReplayCalled = true;
 			SaveSystem::SaveProgressForReplay(deliveredVehicles, false, pathToSaveFolder);
 		}
@@ -452,17 +553,20 @@ void Update()
 	lastValueOfToBeLoadedSaveFile = ToBeLoadedSaveFile;
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SAVE LOADING TEST=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-	// GTA and ScriptHookV don't have a option to directly check if the player just saved the game manually, only auto saves,
-	// this require to investigate the globals and too lazy to do this now, so gonna do this check manually.
-	// Did the player open the save menu or auto-save happened?
-	// check if any file has been modified, and if it did trigger the save.
-	// note for myself: i could also check if the hud element for the save icon is visible.
+	// GTA and ScriptHookV don't have a option to directly check if the player just saved the game manually, only auto saves.
+	// So we need to do this manual check via globals.
+	// Did a save just happen? Check if any file has been modified, and if it did trigger the save.
 	if (*IsGameSaving || GAMEPLAY::IS_AUTO_SAVE_IN_PROGRESS())
 	{
-		// if save was been called or the save menu has been open, test if we can save and try to save into it.
+		// if save has been called test if we can save and try to save into it.
 		if (!alreadySaving) {
 			alreadySaving = true;
-
+			if (GAMEPLAY::IS_AUTO_SAVE_IN_PROGRESS())
+			{
+				//BUG: if a save prompt shows up it can cause a FileDoesNotExistOrNotBellowBuffer error.
+				//try delay a bit to see if it fixes the issues.
+				WAIT(300);
+			}
 			WAIT(200);//GTA needs to finish messing with the file before we do anything.
 			if (deliveredVehicles.size() > 0) {
 				for (char* dah : deliveredVehicles) {
@@ -470,14 +574,13 @@ void Update()
 				}
 				SaveSystem::ErrSave err = SaveSystem::SaveProgress(deliveredVehicles, false, pathToSaveFolder);
 				if (err == SaveSystem::ErrSave::FileDoesNotExistOrNotBellowBuffer) {
-					CreateHelpText((char*)"FileDoesNotExistOrNotBellowBuffer", true);
+					CreateHelpText((char*)"Saving failed! please try again...", true);
 				}
 				else if (err == SaveSystem::ErrSave::SaveDone) {
-					CreateHelpText((char*)"Collected Vehicles saved with success...", true);
+					CreateHelpText((char*)"Collected Vehicles saved with success!", true);
 				}
 				else {
-					// TODO: if saving error happens make a global backup save.
-					CreateHelpText((char*)"Saving error...", true);
+					CreateHelpText((char*)"Saving error! please try again...", true);
 				}
 			}
 		}
@@ -562,7 +665,6 @@ void Update()
 						{
 							ENTITY::SET_ENTITY_AS_MISSION_ENTITY(vehTrailerTest, TRUE, TRUE);
 							VEHICLE::DETACH_VEHICLE_FROM_TRAILER(PLAYER::GET_PLAYERS_LAST_VEHICLE());
-							VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(vehTrailerTest);
 							QuickAddToDelivered((char*)a);
 							VEHICLE::DELETE_VEHICLE(&vehTrailerTest);
 
@@ -605,10 +707,8 @@ void Update()
 					}
 					break;
 				}
-
 			}
 		}
-
 	}
 
 	//  =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SCRIPT STAGES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
@@ -757,7 +857,11 @@ void Update()
 			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 1, 5, true); // Stop vehicle
 			break;
 		case Lighthouse:
-			WAIT(1000);
+			if (!VEHICLE::IS_THIS_MODEL_A_PLANE(GAMEPLAY::GET_HASH_KEY(lastValidVehicle))) //Remove delay just to be safe with the player going directly to the lighthouse.
+			{
+				//Add a small delay just so the player see the car flying
+				WAIT(1000);
+			}
 			ENTITY::SET_ENTITY_COORDS(pPedID, 3351, 5152, 20, false, false, false, false); // warp to safe zone.
 			break;
 		case Beach:
@@ -853,7 +957,7 @@ void Update()
 			std::string deliMsg;
 			deliMsg += "Vehicle Delivered!";
 			deliMsg += "\n(";
-			deliMsg += VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(lastDriven));
+			deliMsg += VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(GAMEPLAY::GET_HASH_KEY(lastValidVehicle)));
 			deliMsg += ")";
 			VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(lastDriven);
 			QuickAddToDelivered(lastValidVehicle);
@@ -876,6 +980,9 @@ void Update()
 // the code inside the script is reloaded after transitions and loading screens.
 void ScriptMain()
 {
+	lightHouseCoords.x = -1831.544f;
+	lightHouseCoords.y = -1189.259f;
+	lightHouseCoords.z = 27.16121f;
 	//Just to make sure everything is correctly loaded.
 	LoadHookPointers();
 	//Settings

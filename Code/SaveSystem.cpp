@@ -436,6 +436,55 @@ SaveSystem::ErrSave SaveSystem::LoadProgress(std::wstring saveFolderPath, int sa
 	return FillArrayWithSaveFileData(saveFolderPath, saveFileName, deliveredVehiclesFromSave);
 }
 
+/// <summary>
+/// On first time load the game sets the slot to -1 and stays this way until a save is loaded.
+/// the game loads the last written save file, so we do the same after the script is loaded for
+/// the first time.
+/// This function should be called at the script start because of that.
+/// </summary>
+SaveSystem::ErrSave SaveSystem::LoadProgressForFirstTime(std::wstring saveFolderPath, std::list<char*>& deliveredVehiclesFromSave)
+{
+	// Find the newest modified save.
+	std::wstring testingFilesPath = saveFolderPath + L"\\*";
+	// start the check files loop operation
+	WIN32_FIND_DATAW folderData;
+	HANDLE hFind = FindFirstFileW(testingFilesPath.c_str(), &folderData);
+	if (hFind == INVALID_HANDLE_VALUE) //For debug
+	{
+		return ErrSave::FolderNotFound;
+	}
+
+	FILETIME mostRecentModifiedTime = { 0, 0 };
+	std::wstring mostRecentFile;
+
+	do {
+		//ignore folders.
+		if (!(folderData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+			//the fastest way to compare wchar* is to just abuse the wstring powers.
+			//Uses a bit more of memory and cpu cycles, but is the easier solution.
+			std::wstring tobetested = folderData.cFileName;
+			//Check only the save files and ignore the backup files.
+			//settings and snapmatic are saved in the same folder so we need to ignore them.
+			if (!tobetested.empty())
+				if (tobetested.find(L"SGTA") != std::wstring::npos && tobetested.find(L".bak") == std::wstring::npos) {
+					if (CompareFileTime(&folderData.ftLastWriteTime, &mostRecentModifiedTime) > 0)
+					{
+						mostRecentModifiedTime = folderData.ftLastWriteTime;
+						mostRecentFile = folderData.cFileName;
+					}
+				}
+		}
+
+
+	} while (FindNextFileW(hFind, &folderData));
+	FindClose(hFind);
+	if (mostRecentFile.empty())
+	{
+		return ErrSave::FileDoesNotExist;
+	}
+	return FillArrayWithSaveFileData(saveFolderPath, mostRecentFile, deliveredVehiclesFromSave);
+}
+
 SaveSystem::ErrSave SaveSystem::LoadProgressFromReplay(std::wstring saveFolderPath, std::list<char*>& deliveredVehiclesFromSave)
 {
 	std::wstring testingFilesPath = saveFolderPath + L"\\*";

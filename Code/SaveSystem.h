@@ -36,7 +36,7 @@ public:
 	static ErrSave SaveProgress(std::list<char*> vehicles, bool isCurrentPatch, std::wstring SaveFolderPath);
 	static ErrSave SaveProgressForReplay(std::list<char*> vehicles, bool isCurrentPatch, std::wstring SaveFolderPath);
 	static ErrSave GetPointerToBeLoadedSaveFile(intptr_t* pointerBuffer);
-
+	static ErrSave LoadProgressForFirstTime(std::wstring saveFolderPath, std::list<char*>& deliveredVehiclesFromSave);
 	/// <summary>
 	/// 
 	/// </summary>
