@@ -533,9 +533,6 @@ void LighthouseDecoration() {
 
 void Update()
 {
-
-
-
 	LighthouseDecoration();
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CONSTANTLY USED VARIABLES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	Ped pPedID = PLAYER::PLAYER_PED_ID();
@@ -784,13 +781,23 @@ void Update()
 					if (QuickCheckIfDelivered((char*)a))
 					{
 						alreadyHave = true;
-						CreateHelpText((char*)"This vehicle has already been delivered!", false);
+						std::string alreadyHaveHelpText;
+						alreadyHaveHelpText += "This vehicle has already been delivered!\n";
+						alreadyHaveHelpText += "(";
+						alreadyHaveHelpText += a;
+						alreadyHaveHelpText += ")";
+						CreateHelpText((char*)alreadyHaveHelpText.c_str(), false);
 						break;
 					}
 
 					// This vehicle haven't been delivered, tell the player about it and start the script.
 					currentStage = ScriptStage::Delivering;
-					CreateHelpText((char*)"This vehicle can be delivered!", true);
+					std::string deliveredHelpText;
+					deliveredHelpText += "This vehicle can be delivered!\n";
+					deliveredHelpText += "(";
+					deliveredHelpText += a;
+					deliveredHelpText += ")";
+					CreateHelpText((char*)deliveredHelpText.c_str(), true);
 					EnableAllDeliveryBlips();
 					lastValidVehicle = (char*)a;
 					break;
@@ -955,9 +962,9 @@ void Update()
 		// Car is probably free to delete;
 		if (!PED::IS_PED_IN_ANY_VEHICLE(pPedID, true)) {
 			std::string deliMsg;
-			deliMsg += "Vehicle Delivered!";
-			deliMsg += "\n(";
-			deliMsg += VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(ENTITY::GET_ENTITY_MODEL(GAMEPLAY::GET_HASH_KEY(lastValidVehicle)));
+			deliMsg += "Vehicle Delivered!\n";
+			deliMsg += "(";
+			deliMsg += lastValidVehicle;
 			deliMsg += ")";
 			VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(lastDriven);
 			QuickAddToDelivered(lastValidVehicle);
