@@ -2,12 +2,9 @@
 #include "SaveSystem.h"
 #include <Psapi.h>
 #include <filesystem>
-#include <ShlObj.h>
-#include <Shlwapi.h>
-//#include <stdexcept>
-//#include <exception>
 #include <iostream>
 #include <list>
+#include <ShlObj.h>
 
 const std::string Identifier = "GORDOLEAL?";
 //outputdebugstringA()
@@ -194,6 +191,19 @@ SaveSystem::ErrSave SaveSystem::GetToBeReadSaveFile(char** ToBeReadSaveFile, int
 
 }
 
+/// <summary>
+/// Just a quick helper.
+/// </summary>
+/// <param name="inB"></param>
+/// <param name="pointer"></param>
+/// <returns></returns>
+SaveSystem::ErrSave SaveSystem::GetIntPointerFromPointer(int** inB, intptr_t* pointer)
+{
+	*inB = reinterpret_cast<int*>(*pointer);
+	return SaveSystem::SaveDone;
+}
+
+
 SaveSystem::ErrSave SaveSystem::GetPointerToLastLoadedSlotNumber(intptr_t* pointerBuffer)
 {
 	//GTA Handle
@@ -281,6 +291,46 @@ SaveSystem::ErrSave SaveSystem::GetPointerToBeLoadedSaveFile(intptr_t* pointerBu
 	return SaveSystem::SaveDone;
 }
 
+SaveSystem::ErrSave SaveSystem::GetPointerToIsSaveHappening(intptr_t* pointerBuffer)
+{
+	//GTA Handle
+	HANDLE gtaProcess = GetCurrentProcess();
+	HMODULE hModule = GetModuleHandleA(NULL);
+	if (hModule == NULL) {
+		return ErrSave::ModuleHandleWasNull;
+	}
+	MODULEINFO modInfo = { 0 };
+	if (!K32GetModuleInformation(gtaProcess, hModule, &modInfo, sizeof(MODULEINFO)))
+	{
+		return ErrSave::CouldNotGetGTAVModule;
+	}
+
+	uintptr_t baseAddress = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
+	size_t moduleSize = modInfo.SizeOfImage;
+
+	// GTAV saves a string of the save file that needs to be read on the next load.
+	// For mission replays it sets to MSRP0000 right at the start of the mission replay.
+	// the value stays until a save file load is called or another mission replay starts.
+	// we already know when a mission replay starts, can use this to know if it ended.
+
+	//                               \/(??) address to RIP offset.
+	//41 B8 ? ? ? ? E8 ? ? ? ? 89 1D ? ? ? ? 48 83 C4 20
+	//                                       /\ (E8) address to next instruction (not required to be part of the pattern just coincidence)
+	const unsigned char MemorySlotPattern[] = "\x41\xB8\x00\x00\x00\x00\xE8\x00\x00\x00\x00\x89\x1D\x00\x00\x00\x00\x48\x83\xC4\x20";
+	const char MemorySlotMask[] = "xx????x????xx????xxxx";
+
+	uintptr_t addressToPatern = GetAddressFromPattern(baseAddress, moduleSize, MemorySlotPattern, MemorySlotMask);
+	if (addressToPatern == 0x0)
+	{
+		return SaveSystem::ErrSave::AddressToPaternNotFound;
+	}
+	//GTAV is x64, RIP-relative address, so i need to do a bit extra math for the correct address.
+	int ripOffset = *reinterpret_cast<int*>(addressToPatern + 13);
+	uintptr_t addressNextCall = addressToPatern + 17;
+	*pointerBuffer = addressNextCall + ripOffset;
+	return SaveSystem::SaveDone;
+}
+
 
 SaveSystem::ErrSave FillArrayWithSaveFileData(std::wstring saveFolderPath, std::wstring saveFileName, std::list<char*>& deliveredVehiclesFromSave)
 {
@@ -329,54 +379,6 @@ SaveSystem::ErrSave FillArrayWithSaveFileData(std::wstring saveFolderPath, std::
 	} while (!hitEnd);
 	streamRecentFile.close();
 	return SaveSystem::ErrSave::SaveDone;
-}
-
-/// <summary>
-/// On first time load the game sets the slot to -1 and stays this way until a save is loaded.
-/// the game loads the last written save file, so we do the same after the script is loaded for
-/// the first time.
-/// This function should be called at the script start because of that.
-/// </summary>
-SaveSystem::ErrSave SaveSystem::LoadProgressForFirstTime(std::wstring saveFolderPath, std::list<char*>& deliveredVehiclesFromSave)
-{
-	// Find the newest modified save.
-	std::wstring testingFilesPath = saveFolderPath + L"\\*";
-	// start the check files loop operation
-	WIN32_FIND_DATAW folderData;
-	HANDLE hFind = FindFirstFileW(testingFilesPath.c_str(), &folderData);
-	if (hFind == INVALID_HANDLE_VALUE) //For debug
-	{
-		return ErrSave::FolderNotFound;
-	}
-
-	FILETIME mostRecentModifiedTime = { 0, 0 };
-	std::wstring mostRecentFile;
-	do {
-		//ignore folders.
-		if (!(folderData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
-			//the fastest way to compare wchar* is to just abuse the wstring powers.
-			//Uses a bit more of memory and cpu cycles, but is the easier solution.
-			std::wstring tobetested = folderData.cFileName;
-			//Check only the save files and ignore the backup files.
-			//settings and snapmatic are saved in the same folder so we need to ignore them.
-			if (!tobetested.empty())
-				if (tobetested.find(L"SGTA") != std::wstring::npos && tobetested.find(L".bak") == std::wstring::npos) {
-					if (CompareFileTime(&folderData.ftLastWriteTime, &mostRecentModifiedTime) > 0)
-					{
-						mostRecentModifiedTime = folderData.ftLastWriteTime;
-						mostRecentFile = folderData.cFileName;
-					}
-				}
-		}
-	} while (FindNextFileW(hFind, &folderData));
-	FindClose(hFind);
-
-	if (mostRecentFile.empty())
-	{
-		return ErrSave::FileDoesNotExist;
-	}
-
-	return FillArrayWithSaveFileData(saveFolderPath, mostRecentFile, deliveredVehiclesFromSave);
 }
 
 /// <summary>

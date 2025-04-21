@@ -12,7 +12,6 @@ void Settings::CreateSettingsFile()
 {
 	std::fstream settingsStream;
 	settingsStream.open(SettingsFileName, std::ios::in | std::ios::out | std::ios::trunc);
-	OutputDebugStringA("caralho cria a pasta caralho");
 	if (settingsStream.is_open()) {
 		OutputDebugStringA("ta open");
 		std::string fileout;

@@ -7,6 +7,9 @@ std::list<char*> deliveredVehicles;
 std::list<const char*> fullVehicleList;
 Vehicle LastStolenVehicle;
 BOOLEAN ParkingAbuseDuringMission;
+UINT64 GTAVBase;
+UINT64 EndOfOurModule;
+UINT64 OurModuleBase;
 
 enum ScriptStage {
 	CheckCurrentVehicle,
@@ -19,9 +22,11 @@ enum ScriptStage {
 // Pattern Pointers
 intptr_t pSavedSlotNumberPTR;
 intptr_t pToBeLoadedSaveFilePTR;
+intptr_t pIsSaveMenuOpen;
 // Return of the pointers
 int LastLoadedSaveSlotNumber;
 char* ToBeLoadedSaveFile;
+int* IsGameSaving;
 // Misc
 std::string lastLoadedSaveFile;
 std::wstring pathToSaveFolder;
@@ -52,11 +57,25 @@ static void CreateHelpText(char* text, bool doSound) {
 	UI::_ADD_TEXT_COMPONENT_STRING(text);
 	UI::_DISPLAY_HELP_TEXT_FROM_STRING_LABEL(0, 0, doSound, -1);
 }
+
 void LoadHookPointers() {
 	//Save Files
+
+	HMODULE Module = GetModuleHandleA(NULL);
+	GTAVBase = (UINT64)Module;
+
+	HMODULE OurModule = GetModuleHandleA("SuperSimeonAutos.asi");
+	OurModuleBase = (UINT64)OurModule;
+
+	PIMAGE_DOS_HEADER dosHeader = (PIMAGE_DOS_HEADER)OurModule;
+	PIMAGE_NT_HEADERS ntHeaders = (PIMAGE_NT_HEADERS)((std::uint8_t*)OurModule + dosHeader->e_lfanew);
+
+	DWORD sizeOfImage = ntHeaders->OptionalHeader.SizeOfImage;
+	EndOfOurModule = OurModuleBase + sizeOfImage;
+
 	SaveSystem::GetSaveFilePath(false, &pathToSaveFolder);
 
-	//Pattern Finding
+	// Pattern Finding
 	// Number of last Loaded Save slot
 	if (SaveSystem::GetPointerToLastLoadedSlotNumber(&pSavedSlotNumberPTR) == SaveSystem::ErrSave::SaveDone)
 	{
@@ -76,6 +95,20 @@ void LoadHookPointers() {
 	//char* of to be loaded Save File.
 	if (SaveSystem::GetPointerToBeLoadedSaveFile(&pToBeLoadedSaveFilePTR) == SaveSystem::ErrSave::SaveDone) {
 		if (SaveSystem::GetToBeReadSaveFile(&ToBeLoadedSaveFile, &pToBeLoadedSaveFilePTR) != SaveSystem::ErrSave::SaveDone) {
+			OutputDebugString("something happened address could not be loaded...");
+			CreateHelpText((char*)"something happened address could not be loaded...", true);
+			return;
+		}
+	}
+	else
+	{
+		OutputDebugString("something happened and pointers could not be loaded...");
+		CreateHelpText((char*)"something happened and pointers could not be loaded...", true);
+		return;
+	}
+
+	if (SaveSystem::GetPointerToIsSaveHappening(&pIsSaveMenuOpen) == SaveSystem::ErrSave::SaveDone) {
+		if (SaveSystem::GetIntPointerFromPointer(&IsGameSaving, &pIsSaveMenuOpen) != SaveSystem::ErrSave::SaveDone) {
 			OutputDebugString("something happened address could not be loaded...");
 			CreateHelpText((char*)"something happened address could not be loaded...", true);
 			return;
@@ -141,6 +174,7 @@ void LoadCurrentSave() {
 			}
 			else
 			{
+				// Player loaded a save file while playing replay.
 				deliveredVehicles.clear();
 				SaveSystem::LoadProgress(pathToSaveFolder, LastLoadedSaveSlotNumber, deliveredVehicles);
 			}
@@ -185,7 +219,7 @@ bool QuickCheckIfDelivered(char* veh)
 	return false;
 }
 
-// BLIPS
+// =-=-=-=-=-=-=-=-=-=-=-=-=- BLIPS =-=-=-=-=-=-=-=-=-=-
 Blip simeonBlip;
 Blip countrysideLightHouseBlip;
 Blip lifeguardBeachBlip;
@@ -334,16 +368,6 @@ StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 	return none;
 }
 
-
-
-
-//DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- DEBUG =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-void DrawBoxArea(DeliveryArea area) {
-	GRAPHICS::DRAW_BOX(area.x1, area.y1, area.z1, area.x2, area.y2, area.z2, 2, 120, 120, 100);
-}
-
-
 // =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= ORTEGA TRAILER =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
 
 // First check after load to know if ortega was already delivered in this save.
@@ -360,9 +384,7 @@ void SetOrtegaTrailerWasDelivered() {
 	OrtegaTrailerDelivered = false;
 }
 
-Vector3 pos1;
-Vector3 pos2;
-bool show = false;
+// =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= ORTEGA TRAILER =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
 
 void CreateMissingCarsTXTFile()
 {
@@ -406,7 +428,12 @@ void CreateMissingCarsTXTFile()
 	}
 }
 
-void Update() {
+//  =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
+//  =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= UPDATE =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0
+//  =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
+
+void Update()
+{
 
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CONSTANTLY USED VARIABLES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	Ped pPedID = PLAYER::PLAYER_PED_ID();
@@ -430,20 +457,18 @@ void Update() {
 	// Did the player open the save menu or auto-save happened?
 	// check if any file has been modified, and if it did trigger the save.
 	// note for myself: i could also check if the hud element for the save icon is visible.
-	if (SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"save_anywhere")) > 0
-		|| GAMEPLAY::IS_AUTO_SAVE_IN_PROGRESS())
+	if (*IsGameSaving || GAMEPLAY::IS_AUTO_SAVE_IN_PROGRESS())
 	{
 		// if save was been called or the save menu has been open, test if we can save and try to save into it.
 		if (!alreadySaving) {
 			alreadySaving = true;
-			std::wstring savepath;
+
 			WAIT(200);//GTA needs to finish messing with the file before we do anything.
-			SaveSystem::GetSaveFilePath(false, &savepath);
 			if (deliveredVehicles.size() > 0) {
 				for (char* dah : deliveredVehicles) {
 					OutputDebugString(dah);
 				}
-				SaveSystem::ErrSave err = SaveSystem::SaveProgress(deliveredVehicles, false, savepath);
+				SaveSystem::ErrSave err = SaveSystem::SaveProgress(deliveredVehicles, false, pathToSaveFolder);
 				if (err == SaveSystem::ErrSave::FileDoesNotExistOrNotBellowBuffer) {
 					CreateHelpText((char*)"FileDoesNotExistOrNotBellowBuffer", true);
 				}
@@ -455,10 +480,6 @@ void Update() {
 					CreateHelpText((char*)"Saving error...", true);
 				}
 			}
-			//else
-			//{
-			//	//CreateHelpText((char*)"Not enough Collected Vehicles to save", true);
-			//}
 		}
 	}
 	else
@@ -481,6 +502,9 @@ void Update() {
 			{
 				genAlreadyCreatingFile = true;
 				CreateMissingCarsTXTFile();
+				UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
+				UI::_ADD_TEXT_COMPONENT_STRING((char*)"Missing vehicles list created: \"SSA_MissingVehicles.txt\" (see game files)");
+				UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", true, 4, (char*)"SIMEON", (char*)"");
 			}
 		}
 		else
@@ -737,7 +761,7 @@ void Update() {
 			ENTITY::SET_ENTITY_COORDS(pPedID, 3351, 5152, 20, false, false, false, false); // warp to safe zone.
 			break;
 		case Beach:
-
+			// Parking lot abuse detection
 			if (gSettings.AntiParkingLotBeach && ParkingAbuseDuringMission)
 			{
 				Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
@@ -850,7 +874,8 @@ void Update() {
 // Reminder to myself: variables set outside of functions are reserved as globals
 // they keep their value between transitions and loading screens IF a default value have not been set.
 // the code inside the script is reloaded after transitions and loading screens.
-void ScriptMain() {
+void ScriptMain()
+{
 	//Just to make sure everything is correctly loaded.
 	LoadHookPointers();
 	//Settings

@@ -38,16 +38,6 @@ public:
 	static ErrSave GetPointerToBeLoadedSaveFile(intptr_t* pointerBuffer);
 
 	/// <summary>
-	/// On first time load the game sets the slot to -1 and stays this way until a save is loaded.
-	/// the game loads the last written save file, so we do the same after the script is loaded for
-	/// the first time.
-	/// This function should be called at the start of the script because of that.
-	/// </summary>
-	/// <param name="saveFolderPath">: Path to the save file folder inside the documents folder</param>
-	/// <param name="deliveredVehiclesFromSave"> : Returns the list of delivered vehicles from the save file</param>
-	/// <returns></returns>
-	static ErrSave LoadProgressForFirstTime(std::wstring saveFolderPath, std::list<char*>& deliveredVehiclesFromSave);
-	/// <summary>
 	/// 
 	/// </summary>
 	static ErrSave LoadProgress(std::wstring saveFolderPath, int saveSlotNumber, std::list<char*>& deliveredVehiclesFromSave);
@@ -67,6 +57,9 @@ public:
 	/// Try get the pointer to the address of the global variable that holds the int value for the last loaded slot.
 	/// </summary>
 	static ErrSave GetPointerToLastLoadedSlotNumber(intptr_t* pointerBuffer);
+
+	static ErrSave GetPointerToIsSaveHappening(intptr_t* pointerBuffer);
+	static ErrSave GetIntPointerFromPointer(int** inB, intptr_t* pointer);
 	/// <summary>
 	/// returns the path to the save file folder
 	/// </summary>
