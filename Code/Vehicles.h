@@ -90,8 +90,8 @@ const char* VehiclesList[] =
 "DAEMON",
 "DILETTANTE",
 "DILETTANTE2", //spawns in Davis Quartz zone at night.
-"DINGHY",
-"DINGHY2",
+//"DINGHY", //Water
+//"DINGHY2", //WATEr
 "DLOADER",
 //"DOCKTRAILER",
 "DOCKTUG",
@@ -427,5 +427,7 @@ const char* WaterVehicles[] =
 "SUBMERSIBLE2", //WATER
 "SUNTRAP", //WATER
 //"TORO", //WATER - Not Available in 1.27
-"TROPIC" //WATER
+"TROPIC", //WATER
+"DINGHY", //Water
+"DINGHY2" //WATEr
 };

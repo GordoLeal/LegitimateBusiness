@@ -406,13 +406,17 @@ void CreateMissingCarsTXTFile()
 			bool found = false;
 			for (const char* z : deliveredVehicles)
 			{
-				if (std::string(x).find(z) == 0)
+				
+				std::string a(x);
+				std::string b(z);
+				if (a.find(z) == 0  && a.size() == b.size())
 				{
 					found = true;
 				}
 			}
 			if (!found)
 			{
+	
 				genMissingVehicles.push_back(x);
 			}
 
@@ -421,8 +425,13 @@ void CreateMissingCarsTXTFile()
 		genFileStream << "Missing Vehicles:\n";
 		for (const char* a : genMissingVehicles)
 		{
+
+
+			
+			genFileStream << UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(GAMEPLAY::GET_HASH_KEY((char*)a)));
+			genFileStream << " (";
 			genFileStream << a;
-			genFileStream << '\n';
+			genFileStream << ")\n";
 		}
 
 		genFileStream << '\n';
@@ -430,7 +439,12 @@ void CreateMissingCarsTXTFile()
 
 		for (const char* b : deliveredVehicles)
 		{
-			genFileStream << b;
+			std::string outLine;
+			outLine += UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(GAMEPLAY::GET_HASH_KEY((char*)b)));
+			outLine += " (";
+			outLine += b;
+			outLine += ")";
+			genFileStream << outLine;
 			genFileStream << '\n';
 		}
 		genFileStream.close();
@@ -533,6 +547,23 @@ void LighthouseDecoration() {
 
 void Update()
 {
+	//if (IsKeyJustUp(VK_NUMPAD0)) 
+	//{
+	//	Hash b1 = GAMEPLAY::GET_HASH_KEY((char*)"BURRITO");
+	//	Hash b2 = GAMEPLAY::GET_HASH_KEY((char*)"BURRITO2");
+	//	Hash b3 = GAMEPLAY::GET_HASH_KEY((char*)"BURRITO3");
+	//	STREAMING::REQUEST_MODEL(b1);
+	//	STREAMING::REQUEST_MODEL(b2);
+	//	STREAMING::REQUEST_MODEL(b3);
+	//	while(!STREAMING::HAS_MODEL_LOADED(b1) || !STREAMING::HAS_MODEL_LOADED(b2) || !STREAMING::HAS_MODEL_LOADED(b3)) WAIT(0);
+
+	//	Vector3 pPosition = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(),false);
+	//	VEHICLE::CREATE_VEHICLE(b1, pPosition.x, pPosition.y, pPosition.z, 0, 0, 0);
+	//	VEHICLE::CREATE_VEHICLE(b2, pPosition.x + 8, pPosition.y, pPosition.z, 0, 0, 0);
+	//	VEHICLE::CREATE_VEHICLE(b3, pPosition.x+16, pPosition.y, pPosition.z, 0, 0, 0);
+	//	
+	//}
+
 	LighthouseDecoration();
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CONSTANTLY USED VARIABLES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	Ped pPedID = PLAYER::PLAYER_PED_ID();
