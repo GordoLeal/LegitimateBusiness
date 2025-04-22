@@ -17,6 +17,10 @@ Hash lightHouseRoofModel;
 Hash lightHouseLightModel;
 Hash lightHouseLight2Model;
 Entity lightHouseEntity;
+Entity lightHouseBase;
+Entity lightHouseTop;
+Entity lightHouseHat;
+Entity lightHouseSignal;
 int lighHouseRotationTimer = 0;
 Vector3 lightHouseCoords;
 
@@ -407,17 +411,17 @@ void CreateMissingCarsTXTFile()
 			bool found = false;
 			for (const char* z : deliveredVehicles)
 			{
-				
+
 				std::string a(x);
 				std::string b(z);
-				if (a.find(z) == 0  && a.size() == b.size())
+				if (a.find(z) == 0 && a.size() == b.size())
 				{
 					found = true;
 				}
 			}
 			if (!found)
 			{
-	
+
 				genMissingVehicles.push_back(x);
 			}
 
@@ -428,7 +432,7 @@ void CreateMissingCarsTXTFile()
 		{
 
 
-			
+
 			genFileStream << UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(GAMEPLAY::GET_HASH_KEY((char*)a)));
 			genFileStream << " (";
 			genFileStream << a;
@@ -495,8 +499,25 @@ void LighthouseDecoration() {
 			*(UINT8*)(GTAVBase + 0xC3FD9C) = 0x90;
 		}
 
-		if (!ENTITY::DOES_ENTITY_EXIST(lightHouseEntity))
+		if (!ENTITY::DOES_ENTITY_EXIST(lightHouseBase)
+			|| !ENTITY::DOES_ENTITY_EXIST(lightHouseTop)
+			|| !ENTITY::DOES_ENTITY_EXIST(lightHouseHat)
+			|| !ENTITY::DOES_ENTITY_EXIST(lightHouseSignal)
+			|| !ENTITY::DOES_ENTITY_EXIST(lightHouseEntity)
+			)
 		{
+
+			if (ENTITY::DOES_ENTITY_EXIST(lightHouseBase))
+				OBJECT::DELETE_OBJECT(&lightHouseBase);
+			if (ENTITY::DOES_ENTITY_EXIST(lightHouseTop))
+				OBJECT::DELETE_OBJECT(&lightHouseTop);
+			if (ENTITY::DOES_ENTITY_EXIST(lightHouseHat))
+				OBJECT::DELETE_OBJECT(&lightHouseHat);
+			if (ENTITY::DOES_ENTITY_EXIST(lightHouseSignal))
+				OBJECT::DELETE_OBJECT(&lightHouseSignal);
+			if (ENTITY::DOES_ENTITY_EXIST(lightHouseEntity))
+				OBJECT::DELETE_OBJECT(&lightHouseEntity);
+
 
 			STREAMING::REQUEST_MODEL(lightHouseModel);
 			STREAMING::REQUEST_MODEL(lightHouseRoofModel);
@@ -510,18 +531,18 @@ void LighthouseDecoration() {
 				WAIT(0);
 			}
 
-			lightHouseEntity = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseModel, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z, false, true, true);
-			ENTITY::FREEZE_ENTITY_POSITION(lightHouseEntity, 0x1);
-			ENTITY::SET_ENTITY_LOD_DIST(lightHouseEntity, 0xFFFF);
-			lightHouseEntity = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseModel, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z + 6.0f, false, true, true);
-			ENTITY::FREEZE_ENTITY_POSITION(lightHouseEntity, 0x1);
-			ENTITY::SET_ENTITY_LOD_DIST(lightHouseEntity, 0xFFFF);
-			lightHouseEntity = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseRoofModel, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z + 12.0f, false, true, true);
-			ENTITY::FREEZE_ENTITY_POSITION(lightHouseEntity, 0x1);
-			ENTITY::SET_ENTITY_LOD_DIST(lightHouseEntity, 0xFFFF);
-			lightHouseEntity = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseLightModel, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z + 18.5f, false, true, false);
-			ENTITY::FREEZE_ENTITY_POSITION(lightHouseEntity, 0x1);
-			ENTITY::SET_ENTITY_LOD_DIST(lightHouseEntity, 0xFFFF);
+			lightHouseBase = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseModel, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z, false, true, true);
+			ENTITY::FREEZE_ENTITY_POSITION(lightHouseBase, 0x1);
+			ENTITY::SET_ENTITY_LOD_DIST(lightHouseBase, 0xFFFF);
+			lightHouseTop = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseModel, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z + 6.0f, false, true, true);
+			ENTITY::FREEZE_ENTITY_POSITION(lightHouseTop, 0x1);
+			ENTITY::SET_ENTITY_LOD_DIST(lightHouseTop, 0xFFFF);
+			lightHouseHat = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseRoofModel, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z + 12.0f, false, true, true);
+			ENTITY::FREEZE_ENTITY_POSITION(lightHouseHat, 0x1);
+			ENTITY::SET_ENTITY_LOD_DIST(lightHouseHat, 0xFFFF);
+			lightHouseSignal = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseLightModel, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z + 18.5f, false, true, false);
+			ENTITY::FREEZE_ENTITY_POSITION(lightHouseSignal, 0x1);
+			ENTITY::SET_ENTITY_LOD_DIST(lightHouseSignal, 0xFFFF);
 			lightHouseEntity = OBJECT::CREATE_OBJECT_NO_OFFSET(lightHouseLight2Model, lightHouseCoords.x, lightHouseCoords.y, lightHouseCoords.z + 16.5f, false, true, false);
 			ENTITY::FREEZE_ENTITY_POSITION(lightHouseEntity, 0x1);
 			ENTITY::SET_ENTITY_LOD_DIST(lightHouseEntity, 0xFFFF);
