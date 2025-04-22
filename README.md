@@ -19,11 +19,18 @@ Super Simeon Autos is a mod for Grand Theft Auto V  that lets you collect and de
 ## How to play
 **Objective**: Locate vehicles across the map ([vehicles guide available](https://docs.google.com/document/d/1HLy1r_IYJAnth6uyUSzunOT0c65c5wLdxrW01GbjFZA/edit?usp=sharing)) and deliver them to highlighted delivery points.
 
-**Customizable Settings**: Upon loading a save, the SSA_Settings.txt file is created, allowing you to:
-* Disable specific delivery points during missions like DLG, Complications, and Franklin & Lamar to customize your experience.
-* Adjust other options to customize gameplay to your preferences.
+**Customizable Settings**: Upon loading a save for the first time the SSA_Settings.txt file is created, allowing you to enable/disable up to 4 delivery points: Del Perro Pier, Simeon, Lighthouse and Lifeguard Tower. (Lifeguard is disabled by default)
+![del perro pier](https://github.com/GordoLeal/SuperSimeonAutos/blob/master/githubpage/delperro.png)
+![Simeon](https://github.com/GordoLeal/SuperSimeonAutos/blob/master/githubpage/simeon.png)
+![Lighthouse](https://github.com/GordoLeal/SuperSimeonAutos/blob/master/githubpage/lighthouse.png)
+![lifeguardtower](https://github.com/GordoLeal/SuperSimeonAutos/blob/master/githubpage/lifeguard.png)
 
-**Vehicle Tracking**: Hold the Get in Cover and Reload Weapon buttons for 5 seconds to display a list of vehicles you have delivered and those still missing from your collection.
+*Mod Creator recommendation: If you want the same experience as the mods from the 3D era games, enable ONLY the **Del Perro Pier** and **Lighthouse** as delivery points in SSA_Settings.txt.
+If you want a chill and fast experience, keep all the options as default.
+
+Other small options inside the SSA_Settings.txt are also available for you to adjust your gameplay.
+
+**Vehicle Tracking**: Hold the "Get in Cover" and "Reload Weapon" buttons for 5 seconds to generate a txt file inside the game folder with a list of vehicles you have delivered and those still missing from your collection.
 
 ## Support
 For bugs, questions, or suggestions, send a message in #ssa-mod-discussion in the [GTA V Speedruns Discord](https://discord.com/invite/3qjGGBM) or check the [Project-127 repository](https://github.com/TwosHusbandS/Project-127/) for more information.
