@@ -334,6 +334,13 @@ typedef struct {
 	float z2;
 }DeliveryArea;
 
+typedef struct
+{
+	float x;
+	float y;
+	float z;
+} DeliveryTeleportPoint;
+
 enum StatusEntityInArea {
 	none,
 	Simeon,
@@ -343,9 +350,13 @@ enum StatusEntityInArea {
 };
 
 const DeliveryArea SimeonArea = { -38, -1102, -1, -60, -1120, 35 };
-const DeliveryArea LighthouseArea = { 3459, 5148, 45, 3369, 5197, -1 };
+const DeliveryTeleportPoint SimeonTPoint = { -62,-1093,26.5f };
+const DeliveryArea LighthouseArea = { 3459, 5148, 45, 3356, 5201, -1 };
+const DeliveryTeleportPoint LighthouseTPoint = { 3351, 5152, 20 };
 const DeliveryArea BeachArea = { -1165, -1807, 25, -1223, -1761, -1 };
+const DeliveryTeleportPoint BeachTPoint = { -1187,-1781,9 };
 const DeliveryArea PierArea = { -1787, -1180, 50, -1859, -1260, -1 };
+const DeliveryTeleportPoint PierTPoint = { -1816,-1192,14.5f };
 
 StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 
@@ -430,9 +441,6 @@ void CreateMissingCarsTXTFile()
 		genFileStream << "Missing Vehicles:\n";
 		for (const char* a : genMissingVehicles)
 		{
-
-
-
 			genFileStream << UI::_GET_LABEL_TEXT(VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(GAMEPLAY::GET_HASH_KEY((char*)a)));
 			genFileStream << " (";
 			genFileStream << a;
@@ -569,23 +577,6 @@ void LighthouseDecoration() {
 
 void Update()
 {
-	//if (IsKeyJustUp(VK_NUMPAD0)) 
-	//{
-	//	Hash b1 = GAMEPLAY::GET_HASH_KEY((char*)"BURRITO");
-	//	Hash b2 = GAMEPLAY::GET_HASH_KEY((char*)"BURRITO2");
-	//	Hash b3 = GAMEPLAY::GET_HASH_KEY((char*)"BURRITO3");
-	//	STREAMING::REQUEST_MODEL(b1);
-	//	STREAMING::REQUEST_MODEL(b2);
-	//	STREAMING::REQUEST_MODEL(b3);
-	//	while(!STREAMING::HAS_MODEL_LOADED(b1) || !STREAMING::HAS_MODEL_LOADED(b2) || !STREAMING::HAS_MODEL_LOADED(b3)) WAIT(0);
-
-	//	Vector3 pPosition = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(),false);
-	//	VEHICLE::CREATE_VEHICLE(b1, pPosition.x, pPosition.y, pPosition.z, 0, 0, 0);
-	//	VEHICLE::CREATE_VEHICLE(b2, pPosition.x + 8, pPosition.y, pPosition.z, 0, 0, 0);
-	//	VEHICLE::CREATE_VEHICLE(b3, pPosition.x+16, pPosition.y, pPosition.z, 0, 0, 0);
-	//	
-	//}
-
 	LighthouseDecoration();
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- CONSTANTLY USED VARIABLES =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	Ped pPedID = PLAYER::PLAYER_PED_ID();
@@ -692,8 +683,6 @@ void Update()
 	{
 		DisableInDLG = true;
 	}
-
-
 
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- TRAILERS AND ORTEGA TEST =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	// We want to only call this only once per frame, so have it in a way that can be reused for other parts of the script.
@@ -908,6 +897,7 @@ void Update()
 	{ // C2360
 
 		Vehicle lastDriven = PLAYER::GET_PLAYERS_LAST_VEHICLE();
+		Hash lastValidHash = GAMEPLAY::GET_HASH_KEY(lastValidVehicle);
 		//vehicle id / stopping distance / time to stop the vehicle for / bool: no idea what it does
 		//VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 5, 5, true); // Stop vehicle
 		switch (IsEntityInDeliveryArea(pPedID))
@@ -916,22 +906,34 @@ void Update()
 			//wut?
 			break;
 		case Simeon:
-			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 1, 5, true); // Stop vehicle
+			if (VEHICLE::IS_THIS_MODEL_A_PLANE(lastValidHash) || VEHICLE::IS_THIS_MODEL_A_HELI(lastValidHash)) //Remove delay just to be safe with the player going directly to the lighthouse.
+			{
+				//Add a small delay just so the player see the car flying
+				ENTITY::SET_ENTITY_COORDS(pPedID, SimeonTPoint.x, SimeonTPoint.y, SimeonTPoint.z, false, false, false, false); // warp to safe zone.
+			}
+			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 15, 5, true); // Stop vehicle
 			break;
 		case Lighthouse:
-			if (!VEHICLE::IS_THIS_MODEL_A_PLANE(GAMEPLAY::GET_HASH_KEY(lastValidVehicle))) //Remove delay just to be safe with the player going directly to the lighthouse.
+			if (!VEHICLE::IS_THIS_MODEL_A_PLANE(lastValidHash) || !VEHICLE::IS_THIS_MODEL_A_HELI(lastValidHash) || !VEHICLE::IS_THIS_MODEL_A_BOAT(lastValidHash)) //Remove delay just to be safe with the player going directly to the lighthouse.
 			{
 				//Add a small delay just so the player see the car flying
 				WAIT(1000);
 			}
-			ENTITY::SET_ENTITY_COORDS(pPedID, 3351, 5152, 20, false, false, false, false); // warp to safe zone.
+			ENTITY::SET_ENTITY_COORDS(pPedID, LighthouseTPoint.x,LighthouseTPoint.y,LighthouseTPoint.z, false, false, false, false); // warp to safe zone.
 			break;
 		case Beach:
 			// Parking lot abuse detection
 			if (gSettings.AntiParkingLotBeach && ParkingAbuseDuringMission)
 			{
 				Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
-				ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z + 1, 0x0, 0x0, 0x0, 0x0);
+				if (VEHICLE::IS_THIS_MODEL_A_PLANE(lastValidHash) || VEHICLE::IS_THIS_MODEL_A_HELI(lastValidHash))
+				{
+					ENTITY::SET_ENTITY_COORDS(pPedID, BeachTPoint.x, BeachTPoint.y, BeachTPoint.z, 0, 0, 0, 0);
+				}
+				else
+				{
+					ENTITY::SET_ENTITY_COORDS(pPedID, CurrentCoords.x, CurrentCoords.y, CurrentCoords.z + 1, 0x0, 0x0, 0x0, 0x0);
+				}
 
 				WAIT(1000);
 				VEHICLE::EXPLODE_VEHICLE(lastDriven, false, true);
@@ -942,11 +944,22 @@ void Update()
 				lastValidVehicle = (char*)"";
 				return;
 			}
+			else 
+			{
+				if (VEHICLE::IS_THIS_MODEL_A_PLANE(lastValidHash) || VEHICLE::IS_THIS_MODEL_A_HELI(lastValidHash))
+				{
+					ENTITY::SET_ENTITY_COORDS(pPedID, BeachTPoint.x, BeachTPoint.y, BeachTPoint.z, 0, 0, 0, 0);
+				}
+			}
 
-			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 1, 5, true); // Stop vehicle
+			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 15, 5, true); // Stop vehicle
 			break;
 		case Pier:
-			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 1, 5, true); // Stop vehicle
+			if (VEHICLE::IS_THIS_MODEL_A_PLANE(lastValidHash) || VEHICLE::IS_THIS_MODEL_A_HELI(lastValidHash))
+			{
+				ENTITY::SET_ENTITY_COORDS(pPedID, PierTPoint.x, PierTPoint.y, PierTPoint.z, 0, 0, 0, 0);
+			}
+			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 15, 5, true); // Stop vehicle
 			break;
 		}
 
