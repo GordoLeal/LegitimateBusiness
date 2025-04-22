@@ -20,6 +20,7 @@ Super Simeon Autos is a mod for Grand Theft Auto V  that lets you collect and de
 **Objective**: Locate vehicles across the map ([vehicles guide available](https://docs.google.com/document/d/1HLy1r_IYJAnth6uyUSzunOT0c65c5wLdxrW01GbjFZA/edit?usp=sharing)) and deliver them to highlighted delivery points.
 
 **Customizable Settings**: Upon loading a save for the first time the SSA_Settings.txt file is created, allowing you to enable/disable up to 4 delivery points: Del Perro Pier, Simeon, Lighthouse and Lifeguard Tower. (Lifeguard is disabled by default)
+
 ![del perro pier](https://github.com/GordoLeal/SuperSimeonAutos/blob/master/githubpage/delperro.png)
 ![Simeon](https://github.com/GordoLeal/SuperSimeonAutos/blob/master/githubpage/simeon.png)
 ![Lighthouse](https://github.com/GordoLeal/SuperSimeonAutos/blob/master/githubpage/lighthouse.png)
