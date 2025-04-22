@@ -173,7 +173,7 @@ void Settings::ReadValuesFromSettingsFile()
 			}
 			if (!found && command.find("SimeonStateDuringArmenian") == 0)
 			{
-				AntiParkingLotBeach = stringToBool(value);
+				SimeonStateDuringArmenian = stringToBool(value);
 				found = true;
 			}
 			if (!found && command.find("PierAsDelivery") == 0)

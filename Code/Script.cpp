@@ -47,8 +47,8 @@ Settings gSettings;
 ScriptStage currentStage = ScriptStage::CheckCurrentVehicle;
 bool OrtegaTrailerDelivered;
 // Mission specific
-bool IsInArmenian = false;
-bool IsInDLG = false;
+bool DisableInArmenian = false;
+bool DisableInDLG = false;
 // MissionReplay
 bool missionReplayCalled;
 // Generate Remaining Cars List.
@@ -252,7 +252,7 @@ void EnableAllDeliveryBlips()
 		UI::SET_BLIP_COLOUR(countrysideLightHouseBlip, 41);
 	}
 
-	if (gSettings.SimeonAsDelivery && !(!gSettings.SimeonStateDuringArmenian && IsInArmenian))
+	if (gSettings.SimeonAsDelivery && !(DisableInArmenian))
 	{
 		simeonBlip = UI::ADD_BLIP_FOR_COORD(-55, -1112, 26);
 		UI::SET_BLIP_FLASHES(simeonBlip, true);
@@ -260,7 +260,7 @@ void EnableAllDeliveryBlips()
 		UI::SET_BLIP_COLOUR(simeonBlip, BlipColorGreen);
 
 	}
-	if (gSettings.PierAsDelivery && !(!gSettings.SimeonStateDuringArmenian && IsInDLG)) {
+	if (gSettings.PierAsDelivery && !(DisableInDLG)) {
 		PierBlip = UI::ADD_BLIP_FOR_COORD(-1813, -1200, 13);
 		UI::SET_BLIP_FLASHES(PierBlip, true);
 		UI::SET_BLIP_FLASH_TIMER(PierBlip, 5000);
@@ -358,7 +358,8 @@ StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 	if (ENTITY::IS_ENTITY_IN_AREA(entity, SimeonArea.x1, SimeonArea.y1, SimeonArea.z1, SimeonArea.x2, SimeonArea.y2, SimeonArea.z2, false, false, 0)
 		&& gSettings.SimeonAsDelivery)
 	{
-		if (!gSettings.SimeonStateDuringArmenian && IsInArmenian)
+
+		if (DisableInArmenian)
 		{
 			return none;
 		}
@@ -368,7 +369,7 @@ StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
 	if (ENTITY::IS_ENTITY_IN_ANGLED_AREA(entity, PierArea.x1, PierArea.y1, PierArea.z1, PierArea.x2, PierArea.y2, PierArea.z2, 45, false, false, 0)
 		&& gSettings.PierAsDelivery)
 	{
-		if (!gSettings.PierStateDuringDLG && IsInDLG)
+		if (DisableInDLG)
 		{
 			return none;
 		}
@@ -654,20 +655,21 @@ void Update()
 	//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-  MISSION SPECIFIC STUFF  =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- 
 
 	// i don't like this code, find a better way later...
-	IsInArmenian = false;
-	IsInDLG = false;
+	DisableInArmenian = false;
+	DisableInDLG = false;
 
 	if (!gSettings.SimeonStateDuringArmenian
 		&& (SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"Armenian1")) > 0
-			|| SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"Armenian3")) > 0)
+			|| SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"Armenian3")) > 0
+			)
 		)
 	{
-		IsInArmenian = true;
+		DisableInArmenian = true;
 	}
 
 	if (!gSettings.PierStateDuringDLG && SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"Family2")) > 0)
 	{
-		IsInDLG = true;
+		DisableInDLG = true;
 	}
 
 
@@ -701,7 +703,7 @@ void Update()
 							trHelper += "(";
 							trHelper += a;
 							trHelper += ")";
-
+							CreateMissingCarsTXTFile();
 							CreateHelpText((char*)trHelper.c_str(), true);
 						}
 						break;
@@ -732,6 +734,7 @@ void Update()
 						UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"SIMEON", (char*)"What is this?");
 						UI::_DRAW_NOTIFICATION(0, 1);
 						OrtegaTrailerDelivered = true;
+						CreateMissingCarsTXTFile();
 					}
 					break;
 				}
