@@ -1,4 +1,4 @@
-![simeonautosbanner](https://github.com/user-attachments/assets/57ec5964-6bef-4e39-90e3-a3044c96931a)
+![simeonautosbanner](https://github.com/user-attachments/assets/39f17048-ae7a-4671-ac17-49fcb32cce04)
 # Super Simeon Autos
 Current Version: <code>1.2a</code>
 
@@ -27,3 +27,4 @@ Super Simeon Autos is a mod for Grand Theft Auto V  that lets you collect and de
 
 ## Support
 For bugs, questions, or suggestions, send a message in #ssa-mod-discussion in the [GTA V Speedruns Discord](https://discord.com/invite/3qjGGBM) or check the [Project-127 repository](https://github.com/TwosHusbandS/Project-127/) for more information.
+
