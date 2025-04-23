@@ -1,6 +1,6 @@
 ![simeonautosbanner](https://github.com/user-attachments/assets/39f17048-ae7a-4671-ac17-49fcb32cce04)
 # Super Simeon Autos
-Current Version: <code>1.2a</code>
+Current Version: <code>1.3</code>
 
 Super Simeon Autos is a mod for Grand Theft Auto V  that lets you collect and deliver (almost all) vehicles to specific locations on the map.
 
