@@ -38,6 +38,8 @@ For bugs, questions, or suggestions, send a message in #ssa-mod-discussion in th
 
 ## Credits
 Mod Created By GordoLeal.
+
 Thanks to Special For and Gogsi for providing help with the code and knowledge about the game.
+
 Thanks to Unnamed, AlexHonix, Twisted and the GTAV speedrun community for helping with the vehicle list.
 
