@@ -36,3 +36,8 @@ Other small options inside the SSA_Settings.txt are also available for you to ad
 ## Support
 For bugs, questions, or suggestions, send a message in #ssa-mod-discussion in the [GTA V Speedruns Discord](https://discord.com/invite/3qjGGBM) or check the [Project-127 repository](https://github.com/TwosHusbandS/Project-127/) for more information.
 
+## Credits
+Mod Created By GordoLeal.
+Thanks to Special For and Gogsi for providing help with the code and knowledge about the game.
+Thanks to Unnamed, AlexHonix, Twisted and the GTAV speedrun community for helping with the vehicle list.
+
