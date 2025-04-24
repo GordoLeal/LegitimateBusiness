@@ -64,6 +64,14 @@ bool genAlreadyCreatingFile = false;
 const DWORD hmvMaxTimer = 1800000; //30 minutes
 //DWORD hmvMaxTimer = 30000; //30 seconds for testing
 DWORD hmvStartTime;
+//Finale Messages
+bool FinalReached = false;
+bool finSimeonMSGReceived = false;
+bool finCashMSGReceived = false;
+DWORD finStartTimer;
+DWORD finTimeForSimeonMessage = 5000;
+DWORD finTimeForMoneyReceivedMSG = 16000;
+
 
 static void CreateHelpText(char* text, bool doSound) {
 	UI::_SET_TEXT_COMPONENT_FORMAT((char*)"STRING");
@@ -192,7 +200,6 @@ void LoadCurrentSave() {
 				SaveSystem::LoadProgress(pathToSaveFolder, LastLoadedSaveSlotNumber, deliveredVehicles);
 			}
 			// Player just got out of a mission replay and is loading everything back.
-
 		}
 		else
 		{
@@ -215,9 +222,68 @@ void LoadCurrentSave() {
 	missionReplayCalled = false;
 }
 
+// =-=-=-=-=-=-=-=- FINALE
+void FinaleStart()
+{
+	//Player started the finale give him 7$ dolars and a message from simeon.
+	FinalReached = true;
+	finStartTimer = GetTickCount();
+}
+
+void FinaleUpdate()
+{
+
+	if (FinalReached && GetTickCount() >= (finStartTimer + finTimeForSimeonMessage) && !PLAYER::IS_PLAYER_DEAD(PLAYER::PLAYER_ID()) && !finSimeonMSGReceived)
+	{
+		finSimeonMSGReceived = true;
+		UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
+		UI::_ADD_TEXT_COMPONENT_STRING((char*)"You are my favorite!\nMy new employee of the month!\nSoon you will receive your payment!");
+		UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", true, 4, (char*)"SIMEON", (char*)"Good Job!");
+		UI::_DRAW_NOTIFICATION(1, 1);
+	}
+
+	if (FinalReached && GetTickCount() >= (finStartTimer + finTimeForSimeonMessage + finTimeForMoneyReceivedMSG) && !PLAYER::IS_PLAYER_DEAD(PLAYER::PLAYER_ID()) && !finCashMSGReceived)
+	{
+		finCashMSGReceived = true;
+		UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
+		UI::_ADD_TEXT_COMPONENT_STRING((char*)"An online transaction was processed for your account in the amount of $7 from Simeon Yetarian");
+		UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_BANK_MAZE", (char*)"CHAR_BANK_MAZE", true, 4, (char*)"MAZE BANK", (char*)"");
+		UI::_DRAW_NOTIFICATION(1, 1);
+		// Pay Player
+		int cash0;
+		int cash1;
+		int cash2;
+
+		STATS::STAT_GET_INT(GAMEPLAY::GET_HASH_KEY((char*)"SP0_TOTAL_CASH"), &cash0, -1); // Michael
+		STATS::STAT_GET_INT(GAMEPLAY::GET_HASH_KEY((char*)"SP1_TOTAL_CASH"), &cash1, -1); // Franklin
+		STATS::STAT_GET_INT(GAMEPLAY::GET_HASH_KEY((char*)"SP2_TOTAL_CASH"), &cash2, -1); // Trevor
+		//Check Status_Enums.sch for more info
+		STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY((char*)"SP0_TOTAL_CASH"), cash0 + 7, 1); // Michael
+		STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY((char*)"SP1_TOTAL_CASH"), cash1 + 7, 1); // Franklin
+		STATS::STAT_SET_INT(GAMEPLAY::GET_HASH_KEY((char*)"SP2_TOTAL_CASH"), cash2 + 7, 1); // Trevor
+
+	}
+
+}
+
 void QuickAddToDelivered(char* veh)
 {
 	deliveredVehicles.push_back(veh);
+	
+	if (OrtegaTrailerDelivered)
+	{
+		//ortega will add +1 to delivered vehicles but not to full vehicle list
+		if (deliveredVehicles.size() >= fullVehicleList.size() + 1)
+		{
+			//Player collected the final car, start finale.
+			FinaleStart();
+		}
+	}
+	else if (deliveredVehicles.size() >= fullVehicleList.size())
+	{
+		//Player collected the final car, start finale.
+		FinaleStart();
+	}
 }
 
 bool QuickCheckIfDelivered(char* veh)
@@ -289,16 +355,23 @@ void DisableAllDeliveryBlips() {
 void ShowCollectedAmount() {
 	std::string outputAmount;
 	int totalDeliveredVehicles = deliveredVehicles.size();
-	int totalFullVehicles = fullVehicleList.size();
+	size_t totalFullVehicles = fullVehicleList.size();
+
 	if (OrtegaTrailerDelivered)
 	{
 		totalFullVehicles++;
+	}
+	if (deliveredVehicles.size() >= totalFullVehicles)
+	{
+		//Player collected the final car, start finale.
+		outputAmount += "~y~";
 	}
 	outputAmount += std::to_string(totalDeliveredVehicles);
 	if (gSettings.DisplayMaxAmount) {
 		outputAmount += " | ";
 		outputAmount += std::to_string(totalFullVehicles);
 	}
+
 	//Draw collect amount
 	UI::SET_TEXT_FONT(0);
 	UI::SET_TEXT_WRAP(0.0, 1.0);
@@ -571,6 +644,8 @@ void LighthouseDecoration() {
 	}
 }
 
+
+
 //  =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
 //  =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= UPDATE =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0
 //  =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
@@ -600,7 +675,7 @@ void Update()
 	if (*IsGameSaving || GAMEPLAY::IS_AUTO_SAVE_IN_PROGRESS())
 	{
 		// if save has been called test if we can save and try to save into it.
-		if (!alreadySaving) {
+		if (!alreadySaving && !missionReplayCalled) {
 			alreadySaving = true;
 			if (GAMEPLAY::IS_AUTO_SAVE_IN_PROGRESS())
 			{
@@ -633,7 +708,7 @@ void Update()
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- USER INTERFACE =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 	ShowCollectedAmount();
-
+	FinaleUpdate();
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GENERATE LIST OF MISSING CARS =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 	bool genList1 = CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlCover);
 	bool genList2 = CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlReload);
@@ -919,7 +994,7 @@ void Update()
 				//Add a small delay just so the player see the car flying
 				WAIT(1000);
 			}
-			ENTITY::SET_ENTITY_COORDS(pPedID, LighthouseTPoint.x,LighthouseTPoint.y,LighthouseTPoint.z, false, false, false, false); // warp to safe zone.
+			ENTITY::SET_ENTITY_COORDS(pPedID, LighthouseTPoint.x, LighthouseTPoint.y, LighthouseTPoint.z, false, false, false, false); // warp to safe zone.
 			break;
 		case Beach:
 			// Parking lot abuse detection
@@ -944,7 +1019,7 @@ void Update()
 				lastValidVehicle = (char*)"";
 				return;
 			}
-			else 
+			else
 			{
 				if (VEHICLE::IS_THIS_MODEL_A_PLANE(lastValidHash) || VEHICLE::IS_THIS_MODEL_A_HELI(lastValidHash))
 				{
@@ -1037,10 +1112,12 @@ void Update()
 			VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(lastDriven);
 			QuickAddToDelivered(lastValidVehicle);
 			// BUG: if player is in a hangout, for some random reason the script sets the last driven to null but the vehicle never gets deleted.
-			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(lastDriven, 0, 0, 0, true, true, true);
+			ENTITY::SET_ENTITY_COORDS_NO_OFFSET(lastDriven, 0, 0, -50, true, true, true);
 			VEHICLE::EXPLODE_VEHICLE(lastDriven, false, true);
 			ENTITY::SET_ENTITY_AS_NO_LONGER_NEEDED(&lastDriven);
-			//VEHICLE::DELETE_VEHICLE(&lastDriven);
+			//Last Try to remove the vehicle.
+			Vehicle toDelete = PLAYER::GET_PLAYERS_LAST_VEHICLE();
+			VEHICLE::DELETE_VEHICLE(&toDelete);
 			CreateHelpText((char*)deliMsg.c_str(), true);
 			CreateMissingCarsTXTFile();
 			currentStage = ScriptStage::CheckCurrentVehicle;
