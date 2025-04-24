@@ -167,9 +167,17 @@ void FillFullVehicleList()
 	}
 	if (gSettings.EnableTrailers)
 	{
-		for (const char* c : TrailerVehicles)
+		for (const char* d : TrailerVehicles)
 		{
-			fullVehicleList.push_back(c);
+			fullVehicleList.push_back(d);
+		}
+	}
+
+	if (gSettings.EnableBuryNYVehicles) 
+	{
+		for (const char* e : SnowVehicles)
+		{
+			fullVehicleList.push_back(e);
 		}
 	}
 }

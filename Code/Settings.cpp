@@ -48,6 +48,9 @@ void Settings::CreateSettingsFile()
 		fileout += "# Enable boats to be delivered\n";
 		fileout += "EnableWaterVehicles=1\n\n";
 
+		fileout += "# Enable Bury the Hatchet - North Yankton vehicles\n";
+		fileout += "EnableBuryNYVehicles=0\n\n";
+
 		fileout += "# Display Max Amount of vehicles to be collected\n";
 		fileout += "DisplayMaxAmount=1\n\n";
 
@@ -105,6 +108,7 @@ void Settings::ReadValuesFromSettingsFile()
 		DisplayMaxAmount = true;
 		ShowHelpText = true;
 		AntiParkingLotBeach = true;
+		EnableBuryNYVehicles = false;
 		return;
 	}
 
@@ -214,6 +218,11 @@ void Settings::ReadValuesFromSettingsFile()
 			if (!found && command.find("AntiParkingLotBeach") == 0)
 			{
 				AntiParkingLotBeach = stringToBool(value);
+				found = true;
+			}
+			if (!found && command.find("EnableBuryNYVehicles") == 0)
+			{
+				EnableBuryNYVehicles = stringToBool(value);
 				found = true;
 			}
 

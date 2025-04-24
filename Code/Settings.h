@@ -11,6 +11,7 @@ public:
 	bool EnableTrailers;
 	bool EnableFlyingVehicles;
 	bool EnableWaterVehicles;
+	bool EnableBuryNYVehicles;
 	bool DisplayMaxAmount;
 	bool ShowHelpText;
 	bool AntiParkingLotBeach;

@@ -282,7 +282,7 @@ const char* VehiclesList[] =
 "STANIER",
 "STINGER",
 "STOCKADE",
-//"STOCKADE3", //Cut from the game
+//"STOCKADE3", //North Yankton - Prologue exclusive and can't drive.
 "STRATUM",
 "STRETCH",
 //"STUNT", //FLYING
@@ -430,4 +430,18 @@ const char* WaterVehicles[] =
 "TROPIC", //WATER
 "DINGHY", //Water
 "DINGHY2" //WATEr
+};
+
+const char* SnowVehicles[] =
+{
+"ASEA2", // North Yankton - Bury
+"BURRITO5", // North Yankton - Bury
+"EMPEROR3", // North Yankton - Bury
+//"MESA2", // North Yankton - Bury, can't drive
+//"POLICEOLD1", //North Yankton - Prologue
+//"POLICEOLD2", //North Yankton - Prologue
+"RANCHERXL2", //North Yankton - Bury
+//"TRACTOR3", //North Yankton - Prologue
+//"STOCKADE3", //North Yankton - Prologue exclusive and can't drive.
+"SADLER2" //North Yankton - Bury
 };
