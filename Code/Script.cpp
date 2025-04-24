@@ -237,7 +237,7 @@ void FinaleUpdate()
 	{
 		finSimeonMSGReceived = true;
 		UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
-		UI::_ADD_TEXT_COMPONENT_STRING((char*)"You are my favorite!\nMy new employee of the month!\nSoon you will receive your payment!");
+		UI::_ADD_TEXT_COMPONENT_STRING((char*)"You are my favorite employee!\nMy new employee of the month!\nSoon you will receive your payment!");
 		UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", true, 4, (char*)"SIMEON", (char*)"Good Job!");
 		UI::_DRAW_NOTIFICATION(1, 1);
 	}
