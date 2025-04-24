@@ -1,6 +1,6 @@
 ![simeonautosbanner](https://github.com/user-attachments/assets/39f17048-ae7a-4671-ac17-49fcb32cce04)
 # Super Simeon Autos
-Current Version: <code>1.2a</code>
+Current Version: <code>1.3</code>
 
 Super Simeon Autos is a mod for Grand Theft Auto V  that lets you collect and deliver (almost all) vehicles to specific locations on the map.
 
@@ -35,4 +35,11 @@ Other small options inside the SSA_Settings.txt are also available for you to ad
 
 ## Support
 For bugs, questions, or suggestions, send a message in #ssa-mod-discussion in the [GTA V Speedruns Discord](https://discord.com/invite/3qjGGBM) or check the [Project-127 repository](https://github.com/TwosHusbandS/Project-127/) for more information.
+
+## Credits
+Mod Created By GordoLeal.
+
+Thanks to Special For and Gogsi for providing help with the code and knowledge about the game.
+
+Thanks to Unnamed, AlexHonix, Twisted and the GTAV speedrun community for helping with the vehicle list.
 
