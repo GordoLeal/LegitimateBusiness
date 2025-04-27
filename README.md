@@ -9,7 +9,7 @@ Super Simeon Autos is a mod for Grand Theft Auto V  that lets you collect and de
 * Returning Player Bonus: Required for all vehicles to function properly. The game will still launch without it, but vehicle collection may be impacted. (can be toggled on/off in the Project 1.27 launcher)
 
 ## Installation
-1. Ensure your game is running GTA V version 1.27.to downgrade follow the [Project-127 Downgrade Guide](https://github.com/TwosHusbandS/Project-127/blob/master/Installer/Info/Help.md).
+1. Ensure your game is running GTA V version 1.27. To downgrade follow the [Project-127 Downgrade Guide](https://github.com/TwosHusbandS/Project-127/blob/master/Installer/Info/Help.md).
 2. in Project 1.27: Enable "Returning Player Bonus" in Settings -> GTA & Launch Settings -> Tick the "Enable ReturningPlayerBonus" box
 3. in Project 1.27: Enable "ScriptHook on Downgraded GTA" in Settings -> GTA & Launch Settings -> Tick the "ScriptHook on Downgraded GTA" box
 4. Install the latest version of [ScriptHookV](https://www.dev-c.com/gtav/scripthookv/).
