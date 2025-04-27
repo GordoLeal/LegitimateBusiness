@@ -437,7 +437,7 @@ const char* SnowVehicles[] =
 "ASEA2", // North Yankton - Bury
 "BURRITO5", // North Yankton - Bury
 "EMPEROR3", // North Yankton - Bury
-//"MESA2", // North Yankton - Bury, can't drive
+"MESA2", // North Yankton - Bury
 //"POLICEOLD1", //North Yankton - Prologue
 //"POLICEOLD2", //North Yankton - Prologue
 "RANCHERXL2", //North Yankton - Bury
