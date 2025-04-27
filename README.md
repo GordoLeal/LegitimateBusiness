@@ -10,10 +10,12 @@ Super Simeon Autos is a mod for Grand Theft Auto V  that lets you collect and de
 
 ## Installation
 1. Ensure your game is running GTA V version 1.27. If you need to downgrade, follow the [Project-127 Downgrade Guide](https://github.com/TwosHusbandS/Project-127/blob/master/Installer/Info/Help.md).
-2. Install the latest version of [ScriptHookV](https://www.dev-c.com/gtav/scripthookv/).
-3. Download the latest release of Super Simeon Autos from the [Releases](https://github.com/GordoLeal/SuperSimeonAutos/releases) page.
-4. Place the downloaded .asi file in the root of your GTA V installation directory.
-5. Launch the game and load a save file to generate the <code>SSA_Settings.txt</code> configuration file.
+2. in Project 1.27: Enable "Returning Player Bonus" in Settings -> GTA & Launch Settings -> Tick the "Enable ReturningPlayerBonus" box
+3. in Project 1.27: Enable "ScriptHook on Downgraded GTA" in Settings -> GTA & Launch Settings -> Tick the "ScriptHook on Downgraded GTA" box
+4. Install the latest version of [ScriptHookV](https://www.dev-c.com/gtav/scripthookv/).
+5. Download the latest release of Super Simeon Autos from the [Releases](https://github.com/GordoLeal/SuperSimeonAutos/releases) page.
+6. Place the downloaded .asi file in the root of your GTA V installation directory.
+7. Launch the game and load a save file to generate the <code>SSA_Settings.txt</code> configuration file.
 
 ## How to play
 **Objective**: Locate vehicles across the map ([vehicles guide available](https://docs.google.com/document/d/1HLy1r_IYJAnth6uyUSzunOT0c65c5wLdxrW01GbjFZA/edit?usp=sharing)) and deliver them to highlighted delivery points.
