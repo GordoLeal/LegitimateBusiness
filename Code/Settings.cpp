@@ -51,8 +51,8 @@ void Settings::CreateSettingsFile()
 		fileout += "# Enable Bury the Hatchet ( North Yankton ) vehicles [Disabled (0) by default]\n";
 		fileout += "EnableBuryNYVehicles=0\n\n";	
 		
-		fileout += "# Enable On mission 0 vehicles ( only clown car at the moment ) [enabled (1) by default]\n";
-		fileout += "OnMissionZeroVehicles=1\n\n";
+		fileout += "# Enable On mission 0 vehicles ( only clown car at the moment ) [Disabled (0) by default]\n";
+		fileout += "OnMissionZeroVehicles=0\n\n";
 
 		fileout += "# Display Max Amount of vehicles to be collected [enabled (1) by default]\n";
 		fileout += "DisplayMaxAmount=1\n\n";
@@ -112,7 +112,7 @@ void Settings::ReadValuesFromSettingsFile()
 		ShowHelpText = true;
 		AntiParkingLotBeach = true;
 		EnableBuryNYVehicles = false;
-		OnMissionZeroVehicles = true;
+		OnMissionZeroVehicles = false;
 		return;
 	}
 
