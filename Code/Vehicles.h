@@ -275,7 +275,7 @@ const char* VehiclesList[] =
 "SOVEREIGN",
 //"SPEEDER", //WATER
 "SPEEDO",
-"SPEEDO2",
+//"SPEEDO2", // Clown Van - Om0 vehicles.
 //"SQUALO", //WATER
 "STALION",
 "STALION2",
@@ -444,4 +444,9 @@ const char* SnowVehicles[] =
 //"TRACTOR3", //North Yankton - Prologue
 //"STOCKADE3", //North Yankton - Prologue exclusive and can't drive.
 "SADLER2" //North Yankton - Bury
+};
+
+const char* OmoVehicles[] =
+{
+	"SPEEDO2"
 };

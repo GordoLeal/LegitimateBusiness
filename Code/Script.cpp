@@ -180,6 +180,14 @@ void FillFullVehicleList()
 			fullVehicleList.push_back(e);
 		}
 	}
+	
+	if (gSettings.OnMissionZeroVehicles)
+	{
+		for (const char* f : OmoVehicles)
+		{
+			fullVehicleList.push_back(f);
+		}
+	}
 }
 
 void LoadCurrentSave() {
@@ -240,7 +248,6 @@ void FinaleStart()
 
 void FinaleUpdate()
 {
-
 	if (FinalReached && GetTickCount() >= (finStartTimer + finTimeForSimeonMessage) && !PLAYER::IS_PLAYER_DEAD(PLAYER::PLAYER_ID()) && !finSimeonMSGReceived)
 	{
 		finSimeonMSGReceived = true;

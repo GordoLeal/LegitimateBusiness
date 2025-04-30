@@ -15,6 +15,7 @@ public:
 	bool DisplayMaxAmount;
 	bool ShowHelpText;
 	bool AntiParkingLotBeach;
+	bool OnMissionZeroVehicles;
 
 
 	bool DoesSettingsFileExists();
