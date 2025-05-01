@@ -713,10 +713,6 @@ static void RecoverVehicleList()
 					{
 						bool readingModel = false;
 						std::string vModel;
-						if (line.find("Delivered Vehicles") != std::string::npos)
-						{
-							break;
-						}
 						if (line.find('+') != std::string::npos)// +\n
 						{
 							// Going char by char
@@ -742,7 +738,6 @@ static void RecoverVehicleList()
 												{
 													//Now add to the list
 													QuickAddToDelivered((char*)veh);
-													OutputDebugString((std::string("adding") + std::string(vModel)).c_str());
 													counter++;
 												}
 											}
