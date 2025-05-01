@@ -50,12 +50,27 @@ SaveSystem::ErrSave SaveSystem::SaveProgress(std::list<char*> vehicles, bool isE
 					//if the file we are currently looking is inside the 5 seconds buffer.
 					//if FILETIME + 5 seconds is ahead of current time then is a file that have been written in the last 5 seconds.
 					if (CompareFileTime(&bufferForCurrentFileCheck, &currentSystemTime) > 0) {
-						//just in case we have 2 or more files with less than 5 seconds.
-						if (CompareFileTime(&folderData.ftLastWriteTime, &mostRecentModifiedTime) > 0)
-						{
-							mostRecentModifiedTime = folderData.ftLastWriteTime;
-							mostRecentFile = folderData.cFileName;
+						// BUG reminder: if an autosave is done and manual save after, the autosave can take over the manual save.
+						// instead of looking for a single file we now look for ANY file under 5 seconds. if we have multiple saves with 5 seconds it will write to it.
+						// https://clips.twitch.tv/create/AwkwardPlausibleSkirretArgieB8-E27gLMJ-PqJlLz0i
+
+						mostRecentModifiedTime = folderData.ftLastWriteTime;
+						mostRecentFile = folderData.cFileName;
+
+						std::wstring lastUsedSaveFilePath = saveFolderPath + L"\\" + mostRecentFile;
+						std::fstream saveStream;
+						// ios::ate: will write to the very end of the file. i don't want to break the save file.
+						saveStream.open(lastUsedSaveFilePath.c_str(), std::ios::in | std::ios::out | std::ios::binary | std::ios::ate);
+						saveStream << Identifier.c_str(); //identifier to know from now on is only the data we have written, need to be something unique.
+						//don't need fancy json/xml stuff for now, just write the data and recover later.
+						for (char* v : vehicles) {
+							saveStream << ',';
+							saveStream << v;
+							saveStream << '#';
 						}
+						saveStream << '!';// identifier to know we are over with the data.
+						saveStream.close();
+
 					}
 				}
 		}
@@ -67,24 +82,7 @@ SaveSystem::ErrSave SaveSystem::SaveProgress(std::list<char*> vehicles, bool isE
 		// We didn't find a save file or is all the saves are bellow the 5 seconds buffer, meaning a save didn't happen.
 		return ErrSave::FileDoesNotExistOrNotBellowBuffer;
 	}
-	else
-	{
-		// We have the save file now, try write information into it.
-		std::wstring lastUsedSaveFilePath = saveFolderPath + L"\\" + mostRecentFile;
-		std::fstream saveStream;
-		// ios::ate: will write to the very end of the file. i don't want to break the save file.
-		saveStream.open(lastUsedSaveFilePath.c_str(), std::ios::in | std::ios::out | std::ios::binary | std::ios::ate);
-		saveStream << Identifier.c_str(); //identifier to know from now on is only the data we have written, need to be something unique.
-		//don't need fancy json/xml stuff for now, just write the data and recover later.
-		for (char* v : vehicles) {
-			saveStream << ',';
-			saveStream << v;
-			saveStream << '#';
-		}
-		saveStream << '!';// identifier to know we are over with the data.
-		saveStream.close();
 
-	}
 	return ErrSave::SaveDone;
 }
 
@@ -219,7 +217,7 @@ SaveSystem::ErrSave SaveSystem::GetPointerToLastLoadedSlotNumber(intptr_t* point
 	{
 		*(UINT64*)(BaseAddress + 0xF18908) = 0x3390909090C301B0;
 	}
-	
+
 	MODULEINFO modInfo = { 0 };
 	if (!K32GetModuleInformation(gtaProcess, hModule, &modInfo, sizeof(MODULEINFO)))
 	{
@@ -432,7 +430,7 @@ SaveSystem::ErrSave SaveSystem::LoadProgress(std::wstring saveFolderPath, int sa
 		OutputDebugString("File does not exist");
 		return ErrSave::FileDoesNotExist;
 	}
-	
+
 	return FillArrayWithSaveFileData(saveFolderPath, saveFileName, deliveredVehiclesFromSave);
 }
 
@@ -503,8 +501,8 @@ SaveSystem::ErrSave SaveSystem::LoadProgressFromReplay(std::wstring saveFolderPa
 			std::wstring tobetested = folderData.cFileName;
 			if (!tobetested.empty())
 				if (tobetested.find(L"MISREP0000") != std::wstring::npos && tobetested.find(L".bak") == std::wstring::npos) {
-						mostRecentFile = folderData.cFileName;
-						break;
+					mostRecentFile = folderData.cFileName;
+					break;
 				}
 		}
 	} while (FindNextFileW(hFind, &folderData));

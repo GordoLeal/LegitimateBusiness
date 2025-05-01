@@ -44,7 +44,9 @@ int* IsGameSaving;
 std::string lastLoadedSaveFile;
 std::wstring pathToSaveFolder;
 std::string lastValueOfToBeLoadedSaveFile;
-bool alreadySaving = false;
+bool alreadyManualSaving = false;
+bool alreadyAutoSaving = false;
+bool alreadyBedSaving = false;
 bool wasLoadingScreenActive;
 char* lastValidVehicle;
 Settings gSettings;
@@ -60,6 +62,11 @@ const DWORD genMaxPressingTime = 3000;
 DWORD genStartPressingTime;
 bool genStartTimer = false;
 bool genAlreadyCreatingFile = false;
+// Recover Remaining Cars from List.
+const DWORD recMaxPressingTime = 5000;
+DWORD recStartPressingTime;
+bool recStartTimer = false;
+bool recAlreadyLookingFile = false;
 //Quick Help generate missing vehicles
 const DWORD hmvMaxTimer = 1800000; //30 minutes
 //DWORD hmvMaxTimer = 30000; //30 seconds for testing
@@ -173,14 +180,14 @@ void FillFullVehicleList()
 		}
 	}
 
-	if (gSettings.EnableBuryNYVehicles) 
+	if (gSettings.EnableBuryNYVehicles)
 	{
 		for (const char* e : SnowVehicles)
 		{
 			fullVehicleList.push_back(e);
 		}
 	}
-	
+
 	if (gSettings.OnMissionZeroVehicles)
 	{
 		for (const char* f : OmoVehicles)
@@ -189,6 +196,8 @@ void FillFullVehicleList()
 		}
 	}
 }
+
+// Save System
 
 void LoadCurrentSave() {
 
@@ -238,6 +247,101 @@ void LoadCurrentSave() {
 	missionReplayCalled = false;
 }
 
+void SaveCheck()
+{
+	// GTA and ScriptHookV don't have a option to directly check if the player just saved the game manually, only auto saves.
+	// So we need to do this manual check via globals.
+	// Did a save just happen? Check if any file has been modified, and if it did trigger the save.
+	//OutputDebugString(std::to_string(*IsGameSaving).c_str());
+
+	// Check if a saving is happening and if is manual save.
+	if (*IsGameSaving && SCRIPT::_GET_NUMBER_OF_INSTANCES_OF_STREAMED_SCRIPT(GAMEPLAY::GET_HASH_KEY((char*)"save_anywhere")) > 0)
+	{
+		// if save has been called test if we can save and try to save into it.
+		if (!alreadyManualSaving && !missionReplayCalled) {
+			alreadyManualSaving = true;
+			WAIT(200);//GTA needs to finish messing with the file before we do anything.
+			if (deliveredVehicles.size() > 0) {
+		/*		for (char* dah : deliveredVehicles) {
+					OutputDebugString(dah);
+				}*/
+				SaveSystem::ErrSave err = SaveSystem::SaveProgress(deliveredVehicles, false, pathToSaveFolder);
+				if (err == SaveSystem::ErrSave::FileDoesNotExistOrNotBellowBuffer) {
+					CreateHelpText((char*)"Saving failed! please try again...", true);
+				}
+				else if (err == SaveSystem::ErrSave::SaveDone) {
+					CreateHelpText((char*)"Collected Vehicles manual saved with success!", true);
+				}
+				else {
+					CreateHelpText((char*)"Saving error! please try again...", true);
+				}
+			}
+		}
+	}
+	else if (!*IsGameSaving)
+	{
+		alreadyManualSaving = false;
+	}
+
+	// AutoSave
+	if (GAMEPLAY::IS_AUTO_SAVE_IN_PROGRESS())
+	{
+		if (!alreadyAutoSaving && !missionReplayCalled) {
+			alreadyAutoSaving = true;
+			WAIT(500);//GTA needs to finish messing with the file before we do anything. Auto saves need a bit more because they take some time to update the save file.
+			if (deliveredVehicles.size() > 0) {
+				//for (char* dah : deliveredVehicles) {
+				//	OutputDebugString(dah);
+				//}
+				SaveSystem::ErrSave err = SaveSystem::SaveProgress(deliveredVehicles, false, pathToSaveFolder);
+				if (err == SaveSystem::ErrSave::FileDoesNotExistOrNotBellowBuffer) {
+					CreateHelpText((char*)"Saving failed! please try again...", true);
+				}
+				else if (err == SaveSystem::ErrSave::SaveDone) {
+					CreateHelpText((char*)"Collected Vehicles autosaved with success!", true);
+				}
+				else {
+					CreateHelpText((char*)"Saving error! please try again...", true);
+				}
+			}
+		}
+	}
+	else if (!*IsGameSaving)
+	{
+		alreadyAutoSaving = false;
+
+	}
+
+	// Probably is a Bed save.
+	if (*IsGameSaving && !alreadyAutoSaving && !alreadyManualSaving)
+	{
+		// if save has been called test if we can save and try to save into it.
+		if (!alreadyBedSaving && !missionReplayCalled) {
+			alreadyBedSaving = true;
+			WAIT(200);//GTA needs to finish messing with the file before we do anything.
+			if (deliveredVehicles.size() > 0) {
+				//for (char* dah : deliveredVehicles) {
+				//	OutputDebugString(dah);
+				//}
+				SaveSystem::ErrSave err = SaveSystem::SaveProgress(deliveredVehicles, false, pathToSaveFolder);
+				if (err == SaveSystem::ErrSave::FileDoesNotExistOrNotBellowBuffer) {
+					CreateHelpText((char*)"Saving failed! please try again...", true);
+				}
+				else if (err == SaveSystem::ErrSave::SaveDone) {
+					CreateHelpText((char*)"Collected Vehicles saved with success!", true);
+				}
+				else {
+					CreateHelpText((char*)"Saving error! please try again...", true);
+				}
+			}
+		}
+	}
+	else if (!*IsGameSaving)
+	{
+		alreadyBedSaving = false;
+	}
+
+}
 // =-=-=-=-=-=-=-=- FINALE
 void FinaleStart()
 {
@@ -284,7 +388,7 @@ void FinaleUpdate()
 void QuickAddToDelivered(char* veh)
 {
 	deliveredVehicles.push_back(veh);
-	
+
 	if (OrtegaTrailerDelivered)
 	{
 		//ortega will add +1 to delivered vehicles but not to full vehicle list
@@ -499,7 +603,7 @@ void SetOrtegaTrailerWasDelivered() {
 
 // =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= Create Missing Cars =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
 
-void CreateMissingCarsTXTFile()
+static void CreateMissingCarsTXTFile()
 {
 	std::fstream genFileStream;
 	genFileStream.open("SSA_MissingVehicles.txt", std::ios::in | std::ios::out | std::ios::trunc);
@@ -551,6 +655,154 @@ void CreateMissingCarsTXTFile()
 		genFileStream.close();
 	}
 }
+
+static void TestInputForMissingVehicles()
+{
+	bool genList1 = CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlCover);
+	bool genList2 = CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlReload);
+
+	if (genList1 && genList2) {
+
+		if (genStartTimer)
+		{
+			if ((GetTickCount() >= genStartPressingTime + genMaxPressingTime) && !genAlreadyCreatingFile)
+			{
+				genAlreadyCreatingFile = true;
+				CreateMissingCarsTXTFile();
+				UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
+				UI::_ADD_TEXT_COMPONENT_STRING((char*)"Missing vehicles list created: \"SSA_MissingVehicles.txt\" (see game files)");
+				UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", true, 4, (char*)"SIMEON", (char*)"");
+			}
+		}
+		else
+		{
+			genStartTimer = true;
+			genStartPressingTime = GetTickCount();
+		}
+
+	}
+	else
+	{
+		genStartTimer = false;
+		genAlreadyCreatingFile = false;
+	}
+}
+
+static void RecoverVehicleList()
+{
+	bool recBPress1 = CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlCover);
+	bool recBPress2 = CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlJump);
+	if (recBPress1 && recBPress2)
+	{
+		if (recStartTimer) 
+		{
+			if ((GetTickCount() >= recStartPressingTime + recMaxPressingTime) && !recAlreadyLookingFile)
+			{
+				recAlreadyLookingFile = true;
+				UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
+				UI::_ADD_TEXT_COMPONENT_STRING((char*)"Trying to recover delivered cars...");
+				UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"SIMEON", (char*)"");
+				std::fstream recoFileStream;
+				recoFileStream.open("SSA_MissingVehicles.txt", std::ios::in | std::ios::out);
+				if (recoFileStream.is_open())
+				{
+					int counter = 0;
+					std::string line;
+					//Going Line By Line
+					while (std::getline(recoFileStream, line))
+					{
+						bool readingModel = false;
+						std::string vModel;
+						if (line.find("Delivered Vehicles") != std::string::npos)
+						{
+							break;
+						}
+						if (line.find('+') != std::string::npos)// +\n
+						{
+							// Going char by char
+							for (int x = 0; x < line.size(); x++)
+							{
+								switch (line[x])
+								{
+								case '(':
+									readingModel = true;
+									break;
+								case ')':
+									// test vehicle and add to the list
+									if (!QuickCheckIfDelivered((char*)vModel.c_str()))
+									{
+										//First check if is a valid vehicle.
+										for (const char* veh : fullVehicleList)
+										{
+											std::string b = veh;
+											//Check if is the same size for reasons that vehicles can have the same name but with extra stuff after.
+											if (std::string(vModel).size() == b.size())
+											{
+												if (std::string(vModel).find(b) != std::string::npos) //Now verify if is the same name.
+												{
+													//Now add to the list
+													QuickAddToDelivered((char*)veh);
+													OutputDebugString((std::string("adding") + std::string(vModel)).c_str());
+													counter++;
+												}
+											}
+										}
+									}
+									break;
+								case '\n':
+									//we are done with this line, go to the next
+									break;
+								default:
+									if (readingModel)
+									{
+										vModel += line[x];
+									}
+									break;
+								}
+							}
+						}
+
+					}
+					recoFileStream.close();
+
+					if (counter > 0) 
+					{
+						UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
+						UI::_ADD_TEXT_COMPONENT_STRING((char*)std::string(std::to_string(counter) + " vehicles added to the delivered list!").c_str());
+						UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"SIMEON", (char*)"");
+					}
+					else
+					{
+						UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
+						UI::_ADD_TEXT_COMPONENT_STRING((char*)"0 Vehicles added, please add \"+\" at the end of the line to add the vehicle...");
+						UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", true, 4, (char*)"SIMEON", (char*)"");
+					}
+
+					
+				
+				}
+				else
+				{
+					UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
+					UI::_ADD_TEXT_COMPONENT_STRING((char*)"File \"SSA_MissingVehicles.txt does not exist\" ");
+					UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", true, 4, (char*)"SIMEON", (char*)"");
+				}
+			}
+		}
+		else 
+		{
+			recStartTimer = true;
+			recStartPressingTime = GetTickCount();
+		}
+		
+	}
+	else 
+	{
+		recStartTimer = false;
+		recAlreadyLookingFile = false;
+	}
+}
+
 
 // =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= LIGHTHOUSE DECORATION =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
 void LighthouseDecoration() {
@@ -683,76 +935,18 @@ void Update()
 
 	lastValueOfToBeLoadedSaveFile = ToBeLoadedSaveFile;
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SAVE LOADING TEST=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
-	// GTA and ScriptHookV don't have a option to directly check if the player just saved the game manually, only auto saves.
-	// So we need to do this manual check via globals.
-	// Did a save just happen? Check if any file has been modified, and if it did trigger the save.
-	if (*IsGameSaving || GAMEPLAY::IS_AUTO_SAVE_IN_PROGRESS())
-	{
-		// if save has been called test if we can save and try to save into it.
-		if (!alreadySaving && !missionReplayCalled) {
-			alreadySaving = true;
-			if (GAMEPLAY::IS_AUTO_SAVE_IN_PROGRESS())
-			{
-				//BUG: if a save prompt shows up it can cause a FileDoesNotExistOrNotBellowBuffer error.
-				//try delay a bit to see if it fixes the issues.
-				WAIT(300);
-			}
-			WAIT(200);//GTA needs to finish messing with the file before we do anything.
-			if (deliveredVehicles.size() > 0) {
-				for (char* dah : deliveredVehicles) {
-					OutputDebugString(dah);
-				}
-				SaveSystem::ErrSave err = SaveSystem::SaveProgress(deliveredVehicles, false, pathToSaveFolder);
-				if (err == SaveSystem::ErrSave::FileDoesNotExistOrNotBellowBuffer) {
-					CreateHelpText((char*)"Saving failed! please try again...", true);
-				}
-				else if (err == SaveSystem::ErrSave::SaveDone) {
-					CreateHelpText((char*)"Collected Vehicles saved with success!", true);
-				}
-				else {
-					CreateHelpText((char*)"Saving error! please try again...", true);
-				}
-			}
-		}
-	}
-	else
-	{
-		alreadySaving = false;
-	}
+	
+	SaveCheck();
+	
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- USER INTERFACE =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 	ShowCollectedAmount();
 	FinaleUpdate();
-	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- GENERATE LIST OF MISSING CARS =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	bool genList1 = CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlCover);
-	bool genList2 = CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlReload);
 
-	if (genList1 && genList2) {
+	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- PLAYER INPUT STUFF =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
-		if (genStartTimer)
-		{
-			if ((GetTickCount() >= genStartPressingTime + genMaxPressingTime) && !genAlreadyCreatingFile)
-			{
-				genAlreadyCreatingFile = true;
-				CreateMissingCarsTXTFile();
-				UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
-				UI::_ADD_TEXT_COMPONENT_STRING((char*)"Missing vehicles list created: \"SSA_MissingVehicles.txt\" (see game files)");
-				UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", true, 4, (char*)"SIMEON", (char*)"");
-			}
-		}
-		else
-		{
-			genStartTimer = true;
-			genStartPressingTime = GetTickCount();
-		}
-
-	}
-	else
-	{
-		genStartTimer = false;
-		genAlreadyCreatingFile = false;
-	}
+	TestInputForMissingVehicles();
+	RecoverVehicleList();
 
 	//=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-  MISSION SPECIFIC STUFF  =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- 
 
@@ -1066,17 +1260,17 @@ void Update()
 		VEHICLE::DETACH_VEHICLE_FROM_TRAILER(PLAYER::GET_PLAYERS_LAST_VEHICLE());
 		Vehicle lastDriven = PLAYER::GET_PLAYERS_LAST_VEHICLE();
 		ENTITY::SET_ENTITY_AS_MISSION_ENTITY(lastDriven, true, true);
-		//VS_ANY_PASSENGER = -2,				 //Any passenger seat
-		//	VS_DRIVER = -1,						 // Drivers seat
-		//	VS_FRONT_RIGHT = 0,					// Front Right seat
-		//	VS_BACK_LEFT,						//Back left 	
-		//	VS_BACK_RIGHT,						//Back right
-		//	VS_EXTRA_LEFT_1,
-		//	VS_EXTRA_RIGHT_1,
-		//	VS_EXTRA_LEFT_2,
-		//	VS_EXTRA_RIGHT_2,
-		//	VS_EXTRA_LEFT_3,
-		//	VS_EXTRA_RIGHT_3
+		// VS_ANY_PASSENGER = -2, //Any passenger seat
+		// VS_DRIVER = -1, // Drivers seat
+		// VS_FRONT_RIGHT = 0, // Front Right seat
+		// VS_BACK_LEFT, //Back left 	
+		// VS_BACK_RIGHT, //Back right
+		// VS_EXTRA_LEFT_1,
+		// VS_EXTRA_RIGHT_1,
+		// VS_EXTRA_LEFT_2,
+		// VS_EXTRA_RIGHT_2,
+		// VS_EXTRA_LEFT_3,
+		// VS_EXTRA_RIGHT_3
 		bool someoneStillInCar = false;
 		for (int x = -2; x < 9; x++)
 		{

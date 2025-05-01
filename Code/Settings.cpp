@@ -60,6 +60,11 @@ void Settings::CreateSettingsFile()
 		fileout += "# Show help text about missing vehicles list every 30 minutes [enabled (1) by default]\n";
 		fileout += "ShowHelpText=1\n\n";
 
+		fileout += "# Tip: If for some reason you lose your progress (maybe a bug or lost save file)\n";
+		fileout += "# load a save in the game and generate the SSA_MissingVehicles by holding your \"Get in cover\" and \"Reload Weapon\" buttons (Q and R by default) for 5 seconds\n";
+		fileout += "# Inside the SSA_MissingVehicles.txt, add a + at the end of the line for every vehicle you want to recover, like this: \"Asea (ASEA2)+\" \n";
+		fileout += "# Inside the game hold the \"Get in Cover\" and \"Jump\" buttons (Q and Spacebar by default), this will load all the vehicles with + at the end\n";
+
 		fileout += "# Mod Made by GordoLeal\n";
 		fileout += "# Twitch.tv/GordoLeal";
 		settingsStream << fileout;
