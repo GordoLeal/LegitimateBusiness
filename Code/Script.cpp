@@ -769,7 +769,7 @@ static void RecoverVehicleList()
 					else
 					{
 						UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
-						UI::_ADD_TEXT_COMPONENT_STRING((char*)"0 Vehicles added, please add \"+\" at the end of the line to add the vehicle...");
+						UI::_ADD_TEXT_COMPONENT_STRING((char*)"0 Vehicles added, please add \"+\" at the end of the line to add a vehicle...");
 						UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", true, 4, (char*)"SIMEON", (char*)"");
 					}
 
@@ -779,7 +779,7 @@ static void RecoverVehicleList()
 				else
 				{
 					UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
-					UI::_ADD_TEXT_COMPONENT_STRING((char*)"File \"SSA_MissingVehicles.txt does not exist\" ");
+					UI::_ADD_TEXT_COMPONENT_STRING((char*)"File \"SSA_MissingVehicles.txt does not exist or was not possible to read.\" ");
 					UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", true, 4, (char*)"SIMEON", (char*)"");
 				}
 			}
