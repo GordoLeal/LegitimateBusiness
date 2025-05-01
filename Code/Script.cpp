@@ -262,9 +262,9 @@ void SaveCheck()
 			alreadyManualSaving = true;
 			WAIT(200);//GTA needs to finish messing with the file before we do anything.
 			if (deliveredVehicles.size() > 0) {
-		/*		for (char* dah : deliveredVehicles) {
-					OutputDebugString(dah);
-				}*/
+				/*		for (char* dah : deliveredVehicles) {
+							OutputDebugString(dah);
+						}*/
 				SaveSystem::ErrSave err = SaveSystem::SaveProgress(deliveredVehicles, false, pathToSaveFolder);
 				if (err == SaveSystem::ErrSave::FileDoesNotExistOrNotBellowBuffer) {
 					CreateHelpText((char*)"Saving failed! please try again...", true);
@@ -343,14 +343,14 @@ void SaveCheck()
 
 }
 // =-=-=-=-=-=-=-=- FINALE
-void FinaleStart()
+static void FinaleStart()
 {
 	//Player started the finale give him 7$ dolars and a message from simeon.
 	FinalReached = true;
 	finStartTimer = GetTickCount();
 }
 
-void FinaleUpdate()
+static void FinaleUpdate()
 {
 	if (FinalReached && GetTickCount() >= (finStartTimer + finTimeForSimeonMessage) && !PLAYER::IS_PLAYER_DEAD(PLAYER::PLAYER_ID()) && !finSimeonMSGReceived)
 	{
@@ -385,7 +385,7 @@ void FinaleUpdate()
 
 }
 
-void QuickAddToDelivered(char* veh)
+static void QuickAddToDelivered(char* veh)
 {
 	deliveredVehicles.push_back(veh);
 
@@ -402,6 +402,18 @@ void QuickAddToDelivered(char* veh)
 	{
 		//Player collected the final car, start finale.
 		FinaleStart();
+	}
+}
+
+static void QuickRemoveFromDelivered(char* veh) {
+	if (std::string(veh).find("PROPTRAILER") != std::string::npos) {
+		OrtegaTrailerDelivered = false;
+	}
+	deliveredVehicles.remove_if([veh](char* v) { return strcmp(v, veh) ==0; });
+
+	if (deliveredVehicles.size() < fullVehicleList.size() + 1)
+	{
+		FinalReached = false;
 	}
 }
 
@@ -694,7 +706,7 @@ static void RecoverVehicleList()
 	bool recBPress2 = CONTROLS::IS_CONTROL_PRESSED(0, eControl::ControlJump);
 	if (recBPress1 && recBPress2)
 	{
-		if (recStartTimer) 
+		if (recStartTimer)
 		{
 			if ((GetTickCount() >= recStartPressingTime + recMaxPressingTime) && !recAlreadyLookingFile)
 			{
@@ -707,6 +719,7 @@ static void RecoverVehicleList()
 				if (recoFileStream.is_open())
 				{
 					int counter = 0;
+					int remCounter = 0;
 					std::string line;
 					//Going Line By Line
 					while (std::getline(recoFileStream, line))
@@ -757,24 +770,82 @@ static void RecoverVehicleList()
 							}
 						}
 
+						if (line.find('!') != std::string::npos)// !\n
+						{
+							// Going char by char
+							for (int x = 0; x < line.size(); x++)
+							{
+								switch (line[x])
+								{
+								case '(':
+									readingModel = true;
+									break;
+								case ')':
+									// test vehicle and add to the list
+									if (QuickCheckIfDelivered((char*)vModel.c_str()))
+									{
+										//First check if is a valid vehicle.
+										for (const char* veh : fullVehicleList)
+										{
+											std::string b = veh;
+											//Check if is the same size for reasons that vehicles can have the same name but with extra stuff after.
+											if (std::string(vModel).size() == b.size())
+											{
+												if (std::string(vModel).find(b) != std::string::npos) //Now verify if is the same name.
+												{
+													//Now remove from the list
+													QuickRemoveFromDelivered((char*)veh);
+													remCounter++;
+												}
+											}
+										}
+									}
+									break;
+								case '\n':
+									//we are done with this line, go to the next
+									break;
+								default:
+									if (readingModel)
+									{
+										vModel += line[x];
+									}
+									break;
+								}
+							}
+						}
+
 					}
 					recoFileStream.close();
-
-					if (counter > 0) 
+					bool z = true;
+					if (counter > 0)
 					{
+						z = false;
 						UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
 						UI::_ADD_TEXT_COMPONENT_STRING((char*)std::string(std::to_string(counter) + " vehicles added to the delivered list!").c_str());
 						UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"SIMEON", (char*)"");
 					}
-					else
+
+					if (remCounter > 0)
 					{
+						z = false;
 						UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
-						UI::_ADD_TEXT_COMPONENT_STRING((char*)"0 Vehicles added, please add \"+\" at the end of the line to add a vehicle...");
-						UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", true, 4, (char*)"SIMEON", (char*)"");
+						UI::_ADD_TEXT_COMPONENT_STRING((char*)std::string(std::to_string(remCounter) + " vehicles removed from the delivered list!").c_str());
+						UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", false, 4, (char*)"SIMEON", (char*)"");
 					}
 
-					
-				
+					if (z)
+					{
+						UI::_SET_NOTIFICATION_TEXT_ENTRY((char*)"STRING");
+						UI::_ADD_TEXT_COMPONENT_STRING((char*)"No vehicles changed. Please add \"+\" or \"!\" at the end of the line to add or remove a vehicle.");
+						UI::_SET_NOTIFICATION_MESSAGE((char*)"CHAR_SIMEON", (char*)"CHAR_SIMEON", true, 4, (char*)"SIMEON", (char*)"");
+					}
+					else
+					{
+						CreateMissingCarsTXTFile();
+					}
+
+
+
 				}
 				else
 				{
@@ -784,14 +855,14 @@ static void RecoverVehicleList()
 				}
 			}
 		}
-		else 
+		else
 		{
 			recStartTimer = true;
 			recStartPressingTime = GetTickCount();
 		}
-		
+
 	}
-	else 
+	else
 	{
 		recStartTimer = false;
 		recAlreadyLookingFile = false;
@@ -930,9 +1001,9 @@ void Update()
 
 	lastValueOfToBeLoadedSaveFile = ToBeLoadedSaveFile;
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- SAVE LOADING TEST=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-	
+
 	SaveCheck();
-	
+
 	// =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=- USER INTERFACE =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 	ShowCollectedAmount();
