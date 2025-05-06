@@ -553,13 +553,13 @@ enum StatusEntityInArea {
 	Pier
 };
 
-const DeliveryArea SimeonArea = { -38, -1102, -1, -60, -1120, 35 };
+const DeliveryArea SimeonArea = { -38, -1102, -1, -60, -1120, 80 };
 const DeliveryTeleportPoint SimeonTPoint = { -62,-1093,26.5f };
-const DeliveryArea LighthouseArea = { 3459, 5148, 45, 3356, 5201, -1 };
+const DeliveryArea LighthouseArea = { 3459, 5148, 80, 3356, 5201, -1 };
 const DeliveryTeleportPoint LighthouseTPoint = { 3351, 5152, 20 };
-const DeliveryArea BeachArea = { -1165, -1807, 25, -1223, -1761, -1 };
+const DeliveryArea BeachArea = { -1165, -1807, 50, -1223, -1761, -1 };
 const DeliveryTeleportPoint BeachTPoint = { -1187,-1781,9 };
-const DeliveryArea PierArea = { -1787, -1180, 50, -1859, -1260, -1 };
+const DeliveryArea PierArea = { -1787, -1180, 80, -1859, -1260, -1 };
 const DeliveryTeleportPoint PierTPoint = { -1816,-1192,14.5f };
 
 StatusEntityInArea IsEntityInDeliveryArea(Entity entity) {
