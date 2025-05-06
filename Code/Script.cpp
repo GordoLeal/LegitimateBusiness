@@ -197,6 +197,19 @@ void FillFullVehicleList()
 	}
 }
 
+bool IsInFlyingVehiclesList(char* veh)
+{
+	for (const char* a : FlyingVehicles)
+	{
+		std::string sa = a;
+		std::string sb = veh;
+		if (sa.compare(veh) == 0 && sa.size() == sb.size())
+		{
+			return true;
+		}
+	}
+	return false;
+}
 // Save System
 
 void LoadCurrentSave() {
@@ -740,18 +753,27 @@ static void RecoverVehicleList()
 									// test vehicle and add to the list
 									if (!QuickCheckIfDelivered((char*)vModel.c_str()))
 									{
-										//First check if is a valid vehicle.
-										for (const char* veh : fullVehicleList)
+										if (vModel.compare("PROPTRAILER") == 0) 
 										{
-											std::string b = veh;
-											//Check if is the same size for reasons that vehicles can have the same name but with extra stuff after.
-											if (std::string(vModel).size() == b.size())
+											OrtegaTrailerDelivered = true;
+											QuickAddToDelivered((char*)"PROPTRAILER");
+											counter++;
+										}
+										else
+										{
+											//First check if is a valid vehicle.
+											for (const char* veh : fullVehicleList)
 											{
-												if (std::string(vModel).find(b) != std::string::npos) //Now verify if is the same name.
+												std::string b = veh;
+												//Check if is the same size for reasons that vehicles can have the same name but with extra stuff after.
+												if (std::string(vModel).size() == b.size())
 												{
-													//Now add to the list
-													QuickAddToDelivered((char*)veh);
-													counter++;
+													if (std::string(vModel).find(b) != std::string::npos) //Now verify if is the same name.
+													{
+														//Now add to the list
+														QuickAddToDelivered((char*)veh);
+														counter++;
+													}
 												}
 											}
 										}
@@ -869,8 +891,8 @@ static void RecoverVehicleList()
 	}
 }
 
-
 // =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= LIGHTHOUSE DECORATION =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
+
 void LighthouseDecoration() {
 
 
@@ -977,8 +999,6 @@ void LighthouseDecoration() {
 	}
 }
 
-
-
 //  =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
 //  =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0= UPDATE =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0
 //  =0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=0=
@@ -1077,7 +1097,6 @@ void Update()
 				{
 					if (!QuickCheckIfDelivered((char*)"PROPTRAILER"))
 					{
-						VEHICLE::GET_DISPLAY_NAME_FROM_VEHICLE_MODEL(GAMEPLAY::GET_HASH_KEY((char*)"PROPTRAILER"));
 						VEHICLE::DETACH_VEHICLE_FROM_TRAILER(PLAYER::GET_PLAYERS_LAST_VEHICLE());
 						ENTITY::SET_ENTITY_AS_MISSION_ENTITY(vehTrailerTest, TRUE, TRUE);
 						VEHICLE::DETACH_VEHICLE_FROM_ANY_TOW_TRUCK(vehTrailerTest);
@@ -1256,7 +1275,7 @@ void Update()
 			//wut?
 			break;
 		case Simeon:
-			if (VEHICLE::IS_THIS_MODEL_A_PLANE(lastValidHash) || VEHICLE::IS_THIS_MODEL_A_HELI(lastValidHash)) //Remove delay just to be safe with the player going directly to the lighthouse.
+			if (IsInFlyingVehiclesList(lastValidVehicle)) //Remove delay just to be safe with the player going directly to the lighthouse.
 			{
 				//Add a small delay just so the player see the car flying
 				ENTITY::SET_ENTITY_COORDS(pPedID, SimeonTPoint.x, SimeonTPoint.y, SimeonTPoint.z, false, false, false, false); // warp to safe zone.
@@ -1264,9 +1283,10 @@ void Update()
 			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 15, 5, true); // Stop vehicle
 			break;
 		case Lighthouse:
-			if (!VEHICLE::IS_THIS_MODEL_A_PLANE(lastValidHash) || !VEHICLE::IS_THIS_MODEL_A_HELI(lastValidHash) || !VEHICLE::IS_THIS_MODEL_A_BOAT(lastValidHash)) //Remove delay just to be safe with the player going directly to the lighthouse.
+			if (!IsInFlyingVehiclesList(lastValidVehicle))
 			{
 				//Add a small delay just so the player see the car flying
+				OutputDebugString("IS NOT A FLYING");
 				WAIT(1000);
 			}
 			ENTITY::SET_ENTITY_COORDS(pPedID, LighthouseTPoint.x, LighthouseTPoint.y, LighthouseTPoint.z, false, false, false, false); // warp to safe zone.
@@ -1276,7 +1296,7 @@ void Update()
 			if (gSettings.AntiParkingLotBeach && ParkingAbuseDuringMission)
 			{
 				Vector3 CurrentCoords = ENTITY::GET_ENTITY_COORDS(pPedID, 0x1);
-				if (VEHICLE::IS_THIS_MODEL_A_PLANE(lastValidHash) || VEHICLE::IS_THIS_MODEL_A_HELI(lastValidHash))
+				if (IsInFlyingVehiclesList(lastValidVehicle))
 				{
 					ENTITY::SET_ENTITY_COORDS(pPedID, BeachTPoint.x, BeachTPoint.y, BeachTPoint.z, 0, 0, 0, 0);
 				}
@@ -1296,7 +1316,7 @@ void Update()
 			}
 			else
 			{
-				if (VEHICLE::IS_THIS_MODEL_A_PLANE(lastValidHash) || VEHICLE::IS_THIS_MODEL_A_HELI(lastValidHash))
+				if (IsInFlyingVehiclesList(lastValidVehicle))
 				{
 					ENTITY::SET_ENTITY_COORDS(pPedID, BeachTPoint.x, BeachTPoint.y, BeachTPoint.z, 0, 0, 0, 0);
 				}
@@ -1305,7 +1325,7 @@ void Update()
 			VEHICLE::_TASK_BRING_VEHICLE_TO_HALT(lastDriven, 15, 5, true); // Stop vehicle
 			break;
 		case Pier:
-			if (VEHICLE::IS_THIS_MODEL_A_PLANE(lastValidHash) || VEHICLE::IS_THIS_MODEL_A_HELI(lastValidHash))
+			if (IsInFlyingVehiclesList(lastValidVehicle))
 			{
 				ENTITY::SET_ENTITY_COORDS(pPedID, PierTPoint.x, PierTPoint.y, PierTPoint.z, 0, 0, 0, 0);
 			}

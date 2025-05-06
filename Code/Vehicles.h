@@ -450,3 +450,5 @@ const char* OmoVehicles[] =
 {
 	"SPEEDO2"
 };
+
+bool IsInFlyingVehiclesList(char* veh);
